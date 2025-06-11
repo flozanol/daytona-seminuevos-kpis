@@ -1,0 +1,16 @@
+{
+  "name": "daytona-seminuevos-kpis",
+  "version": "1.0.0",
+  "description": "Dashboard de KPIs para Seminuevos - Grupo Daytona",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": ["kpis", "dashboard", "daytona", "seminuevos", "automotive"],
+  "author": "Grupo Daytona",
+  "license": "MIT",
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
