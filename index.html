@@ -52,13 +52,15 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            🔑 Clave API de Google Cloud Console:
+                            🔑 Clave API (Pre-configurada):
                         </label>
                         <input 
                             type="text" 
                             id="apiKey"
-                            placeholder="AIzaSyC... (pega aquí tu clave API)"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm font-mono"
+                            value="AIzaSyDvTKqyK8n9XYxKW2rA9sF3vB1mC4dE5fG"
+                            placeholder="Clave API pre-configurada"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm font-mono bg-green-50"
+                            readonly
                         >
                     </div>
                     
@@ -78,8 +80,9 @@
                         onclick="connectWithAPI()"
                         class="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 font-bold text-lg shadow-lg transform hover:scale-105 transition-all"
                     >
-                        🚀 CONECTAR CON API (TIEMPO REAL)
+                        🚀 CONECTAR AHORA (TIEMPO REAL)
                     </button>
+                    <p class="text-xs text-green-700 text-center mt-2">✅ API pre-configurada - Solo presiona conectar</p>
                 </div>
 
                 <div id="apiConnectionStatus" class="mt-4 hidden"></div>
@@ -181,22 +184,26 @@
                         </div>
 
                         <div class="mt-4 text-center">
-                            <button onclick="updateAnalysis()" class="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 font-semibold">
+                            <button onclick="updateAnalysis()" class="px-6 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 font-semibold mr-2">
                                 🔄 Actualizar Análisis
+                            </button>
+                            <button onclick="refreshData()" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 font-semibold">
+                                📡 Refrescar Datos
                             </button>
                         </div>
                     </div>
                     
                     <div class="mt-6">
                         <h4 class="text-lg font-semibold text-gray-700 mb-3">📊 Vista Previa de KPIs:</h4>
-                        <div id="kpiPreview" class="overflow-x-auto">
+                        <div id="kpiPreview" class="overflow-auto max-h-96 border border-gray-200 rounded-lg">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                                <thead class="bg-gray-50 sticky top-0 z-10">
                                     <tr id="tableHeader"></tr>
                                 </thead>
                                 <tbody id="tableBody" class="bg-white divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
+                        <p class="text-xs text-gray-500 mt-2">📌 Los nombres de las agencias permanecen fijos arriba mientras haces scroll</p>
                     </div>
 
                     <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -310,12 +317,26 @@
         }
         
         // Google Sheets API Functions
-        async function connectWithAPI() {
+        function connectWithAPI() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const spreadsheetId = document.getElementById('spreadsheetId').value.trim();
             
+            // Check if data is already loaded from session
+            const savedData = sessionStorage.getItem('daytonaDashboardData');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    displayResults(parsedData);
+                    showAPIConnectionResult('success', `✅ Datos cargados desde sesión: ${parsedData.length} agencias`);
+                    showStatus('success', `✅ Datos disponibles desde sesión anterior`);
+                    return;
+                } catch (error) {
+                    console.log('No se pudieron cargar datos de sesión:', error);
+                }
+            }
+            
             if (!apiKey) {
-                alert('❌ Por favor ingresa tu clave API de Google Cloud Console\n\n🔧 Pasos:\n1. Ve a https://console.cloud.google.com/\n2. Crea proyecto → Habilita Google Sheets API\n3. Crear credenciales → Clave de API\n4. Pega la clave aquí');
+                alert('❌ Clave API requerida. Contacta al administrador para obtenerla.');
                 return;
             }
             
@@ -327,6 +348,10 @@
             showStatus('loading', '🔄 Conectando con Google Sheets API...');
             showAPIConnectionResult('loading', '🔄 Conectando con API...');
             
+            performAPIConnection(apiKey, spreadsheetId);
+        }
+        
+        async function performAPIConnection(apiKey, spreadsheetId) {
             try {
                 console.log('🔑 Usando API Key:', apiKey.substring(0, 20) + '...');
                 console.log('🆔 Spreadsheet ID:', spreadsheetId);
