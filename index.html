@@ -29,35 +29,96 @@
                 </button>
             </div>
 
-            <!-- Google Sheets Connection -->
+            <!-- Google Sheets API Connection -->
             <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6 mb-6">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                    🔗 Conectar Google Sheets
-                </h3>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        URL de tu Google Sheets:
-                    </label>
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-800">🚀 Google Sheets API - Tiempo Real (RECOMENDADO)</h3>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 class="font-semibold text-blue-800 mb-2">📋 Pasos para configurar la API:</h4>
+                    <ol class="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                        <li>Ve a <a href="https://console.cloud.google.com/" target="_blank" class="underline">Google Cloud Console</a></li>
+                        <li>Crea un proyecto nuevo: "Daytona-KPIs"</li>
+                        <li>Habilita "Google Sheets API"</li>
+                        <li>Crea credenciales → "Clave de API"</li>
+                        <li>Pega la clave aquí abajo:</li>
+                    </ol>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            🔑 Clave API de Google Cloud Console:
+                        </label>
+                        <input 
+                            type="text" 
+                            id="apiKey"
+                            placeholder="AIzaSyC... (pega aquí tu clave API)"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm font-mono"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            🆔 ID del Google Sheets:
+                        </label>
+                        <input 
+                            type="text" 
+                            id="spreadsheetId"
+                            value="1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm font-mono"
+                        >
+                    </div>
+                    
+                    <button 
+                        onclick="connectWithAPI()"
+                        class="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 font-bold text-lg shadow-lg transform hover:scale-105 transition-all"
+                    >
+                        🚀 CONECTAR CON API (TIEMPO REAL)
+                    </button>
+                </div>
+
+                <div id="apiConnectionStatus" class="mt-4 hidden"></div>
+            </div>
+
+            <!-- Alternative CSV Connection -->
+            <div class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6 mb-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                    <h3 class="font-semibold text-gray-800">📎 Método Alternativo - URL Directa</h3>
+                </div>
+                <div class="text-sm text-gray-700 space-y-2 mb-4">
+                    <p><strong>📝 Si la API no funciona:</strong> Usa la URL directa de tu Google Sheets</p>
+                </div>
+                
+                <div class="flex gap-2">
                     <input 
                         type="text" 
-                        id="sheetsUrl"
-                        placeholder="https://docs.google.com/spreadsheets/d/TU_ID_AQUI/edit"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        id="googleSheetsUrl"
+                        placeholder="https://docs.google.com/spreadsheets/d/TU_ID/edit"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
+                    <button 
+                        onclick="connectSheets()"
+                        class="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 font-semibold"
+                    >
+                        🔗 Conectar
+                    </button>
                 </div>
-                <button 
-                    onclick="connectSheets()"
-                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-                >
-                    🔗 Conectar Datos
-                </button>
-                <div id="connectionResult" class="mt-4 hidden"></div>
+
+                <div id="connectionResult" class="mt-3 hidden"></div>
             </div>
 
             <!-- Upload CSV -->
-            <div class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6 mb-6">
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                    📂 Subir Archivos CSV
+                    📂 Subir Archivos CSV (Último Recurso)
                 </h3>
                 <input 
                     type="file" 
@@ -65,7 +126,7 @@
                     accept=".csv"
                     multiple
                     onchange="handleFiles()"
-                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                 >
                 <p class="text-sm text-gray-600 mt-2">Selecciona uno o varios archivos CSV de tus agencias</p>
                 <div id="fileResult" class="mt-4 hidden"></div>
@@ -159,22 +220,22 @@
             <div class="bg-gray-50 rounded-lg p-6 mt-8">
                 <h3 class="text-lg font-semibold text-gray-800 mb-3">📋 Instrucciones:</h3>
                 <div class="text-sm text-gray-700 space-y-2">
-                    <p><strong>Para Google Sheets:</strong></p>
+                    <p><strong>🚀 MÉTODO RECOMENDADO - Google Sheets API:</strong></p>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li>Conexión directa en tiempo real</li>
+                        <li>Se actualiza automáticamente cuando cambies datos</li>
+                        <li>Acceso para todo el equipo sin re-cargar archivos</li>
+                        <li>Requiere configuración única de API (5 minutos)</li>
+                    </ul>
+                    
+                    <p class="mt-4"><strong>📎 Método Alternativo - URL Directa:</strong></p>
                     <ul class="list-disc list-inside ml-4 space-y-1">
                         <li>Haz tu documento público (Compartir → Cualquier persona con enlace → Visor)</li>
                         <li>Cada hoja debe tener el nombre exacto de la agencia</li>
                         <li>Primera fila: encabezados (KPI, Enero, Febrero, etc.)</li>
-                        <li>Siguientes filas: datos de cada KPI</li>
-                    </ul>
-                    
-                    <p class="mt-4"><strong>Para archivos CSV:</strong></p>
-                    <ul class="list-disc list-inside ml-4 space-y-1">
-                        <li>Un archivo por agencia</li>
-                        <li>Nombre del archivo = nombre de la agencia</li>
-                        <li>Misma estructura: KPI, meses, datos</li>
                     </ul>
 
-                    <p class="mt-4"><strong>Agencias esperadas:</strong></p>
+                    <p class="mt-4"><strong>📋 Agencias esperadas:</strong></p>
                     <p class="text-xs bg-gray-100 p-2 rounded font-mono">
                         GWM Iztapalapa, GWM Morelos, Honda Cuajimalpa, Honda Interlomas, 
                         KIA Interlomas, KIA Iztapalapa, MG Cuajimalpa, MG Interlomas, MG Iztapalapa
@@ -194,14 +255,13 @@
         let allMonths = [];
         
         function showTestMessage() {
-            alert('🎉 ¡El dashboard está funcionando correctamente!\n\nAhora puedes:\n• Conectar tu Google Sheets\n• Subir archivos CSV\n• Ver los datos procesados');
+            alert('🎉 ¡El dashboard está funcionando correctamente!\n\nAhora puedes:\n• Conectar con Google Sheets API (recomendado)\n• Conectar tu Google Sheets\n• Subir archivos CSV\n• Ver los datos procesados');
             
             // Show demo data
             loadDemoData();
         }
         
         function loadDemoData() {
-            // Demo data that matches your exact structure
             const demoData = [
                 {
                     agency: 'Honda Cuajimalpa (DEMO)',
@@ -251,18 +311,13 @@
             showStatus('success', '✅ Datos de demostración cargados correctamente - Estructura: KPI,Enero,Febrero,Marzo...');
         }
         
-        function extractSpreadsheetId(url) {
-            const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-            return match ? match[1] : null;
-        }
-        
         // Google Sheets API Functions
         async function connectWithAPI() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const spreadsheetId = document.getElementById('spreadsheetId').value.trim();
             
             if (!apiKey) {
-                alert('❌ Por favor ingresa tu clave API de Google Cloud');
+                alert('❌ Por favor ingresa tu clave API de Google Cloud Console\n\n🔧 Pasos:\n1. Ve a https://console.cloud.google.com/\n2. Crea proyecto → Habilita Google Sheets API\n3. Crear credenciales → Clave de API\n4. Pega la clave aquí');
                 return;
             }
             
@@ -275,7 +330,7 @@
             showAPIConnectionResult('loading', '🔄 Conectando con API...');
             
             try {
-                console.log('🔑 Usando API Key:', apiKey.substring(0, 10) + '...');
+                console.log('🔑 Usando API Key:', apiKey.substring(0, 20) + '...');
                 console.log('🆔 Spreadsheet ID:', spreadsheetId);
                 
                 // Get spreadsheet metadata to find all sheets
@@ -286,7 +341,7 @@
                 if (!metadataResponse.ok) {
                     const errorText = await metadataResponse.text();
                     console.error('❌ Error metadata:', errorText);
-                    throw new Error(`Error de API (${metadataResponse.status}): ${errorText}`);
+                    throw new Error(`Error de API (${metadataResponse.status}): Verifica que la clave API sea correcta y que el Google Sheets sea público.`);
                 }
                 
                 const metadata = await metadataResponse.json();
@@ -408,16 +463,23 @@
         
         function showAPIConnectionResult(type, message) {
             const resultDiv = document.getElementById('apiConnectionStatus');
-            resultDiv.className = `mt-3 p-3 rounded ${type === 'success' ? 'bg-green-100 text-green-800' : 
-                                                    type === 'loading' ? 'bg-blue-100 text-blue-800' : 
-                                                    'bg-red-100 text-red-800'}`;
+            resultDiv.className = `mt-4 p-3 rounded ${type === 'success' ? 'bg-green-100 text-green-800 border border-green-300' : 
+                                                    type === 'loading' ? 'bg-blue-100 text-blue-800 border border-blue-300' : 
+                                                    'bg-red-100 text-red-800 border border-red-300'}`;
             resultDiv.textContent = message;
             resultDiv.classList.remove('hidden');
         }
-            const url = document.getElementById('sheetsUrl').value.trim();
+        
+        function extractSpreadsheetId(url) {
+            const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            return match ? match[1] : null;
+        }
+
+        async function connectSheets() {
+            const url = document.getElementById('googleSheetsUrl').value.trim();
             
             if (!url) {
-                alert('❌ Por favor ingresa la URL de tu Google Sheets');
+                alert('❌ Por favor ingresa la URL del Google Sheets');
                 return;
             }
             
@@ -438,533 +500,4 @@
                 // Regular spreadsheet URL
                 const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
                 if (match) {
-                    baseId = match[1];
-                    console.log('📄 Documento regular detectado, ID:', baseId);
-                    await connectToRegularCSV(baseId);
-                    return;
-                }
-            }
-            
-            alert('❌ URL no reconocida. Usa una URL de Google Sheets válida.');
-        }
-        
-        async function connectToPublishedCSV(publishedId) {
-            try {
-                // Try to access as published CSV
-                const baseUrl = `https://docs.google.com/spreadsheets/d/e/${publishedId}/pub?output=csv`;
-                
-                console.log('🔗 Intentando URL CSV publicada:', baseUrl);
-                
-                const response = await fetch(baseUrl);
-                if (!response.ok) {
-                    throw new Error(`No se pudo acceder al CSV publicado: HTTP ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('📄 CSV recibido, primeros 500 chars:', csvText.substring(0, 500));
-                
-                if (csvText.includes('<!DOCTYPE html>') || csvText.length < 100) {
-                    throw new Error('El documento no está disponible como CSV público');
-                }
-                
-                // Parse the main CSV (this will be the first sheet)
-                const parsed = Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    transformHeader: (header) => header.trim()
-                });
-                
-                console.log('📊 Datos parseados:', parsed.data.length, 'filas');
-                console.log('📋 Headers encontrados:', parsed.meta.fields);
-                
-                if (parsed.data && parsed.data.length > 0) {
-                    // Process as single agency for now
-                    const processedData = processCSVData(parsed.data, 'Datos Importados');
-                    if (processedData) {
-                        displayResults([processedData]);
-                        showConnectionResult('success', `✅ Datos cargados exitosamente desde CSV publicado`);
-                        showStatus('success', `✅ Conexión exitosa: 1 hoja procesada con ${processedData.kpis.length} KPIs`);
-                        return;
-                    }
-                }
-                
-                throw new Error('No se pudieron procesar los datos del CSV');
-                
-            } catch (error) {
-                console.error('Error con CSV publicado:', error);
-                showConnectionResult('error', `❌ Error CSV: ${error.message}`);
-                showStatus('error', `❌ Error de conexión CSV: ${error.message}`);
-            }
-        }
-        
-        async function connectToRegularCSV(spreadsheetId) {
-            try {
-                const expectedAgencies = [
-                    'GWM Iztapalapa', 'GWM Morelos', 'Honda Cuajimalpa', 'Honda Interlomas', 
-                    'KIA Interlomas', 'KIA Iztapalapa', 'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa'
-                ];
-                
-                const loadedAgencies = [];
-                const errors = [];
-                const successes = [];
-                
-                for (const agencyName of expectedAgencies) {
-                    try {
-                        const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&sheet=${encodeURIComponent(agencyName)}`;
-                        console.log(`🔗 Intentando cargar: ${agencyName} desde ${csvUrl}`);
-                        
-                        const response = await fetch(csvUrl);
-                        if (!response.ok) {
-                            errors.push(`${agencyName}: HTTP ${response.status}`);
-                            continue;
-                        }
-                        
-                        const csvText = await response.text();
-                        if (csvText.includes('<!DOCTYPE html>')) {
-                            errors.push(`${agencyName}: Hoja no encontrada`);
-                            continue;
-                        }
-                        
-                        const parsed = Papa.parse(csvText, {
-                            header: true,
-                            skipEmptyLines: true,
-                            transformHeader: (header) => header.trim()
-                        });
-                        
-                        console.log(`📊 ${agencyName}: ${parsed.data?.length || 0} filas parseadas`);
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            const processedData = processCSVData(parsed.data, agencyName);
-                            if (processedData) {
-                                loadedAgencies.push(processedData);
-                                successes.push(`✅ ${agencyName}: ${processedData.kpis.length} KPIs`);
-                            } else {
-                                errors.push(`${agencyName}: No se pudo procesar`);
-                            }
-                        } else {
-                            errors.push(`${agencyName}: Sin datos válidos`);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`Error con ${agencyName}:`, error);
-                        errors.push(`${agencyName}: ${error.message}`);
-                    }
-                }
-                
-                console.log('📈 Resumen:', { exitosos: successes.length, errores: errors.length });
-                
-                if (loadedAgencies.length > 0) {
-                    displayResults(loadedAgencies);
-                    showConnectionResult('success', `✅ ${loadedAgencies.length} agencias cargadas exitosamente`);
-                    showStatus('success', `✅ Conexión exitosa: ${loadedAgencies.length} agencias procesadas`);
-                    
-                    let message = `🎉 ¡CONEXIÓN EXITOSA!\n\n${successes.join('\n')}`;
-                    if (errors.length > 0) {
-                        message += `\n\n⚠️ Advertencias:\n${errors.slice(0, 3).join('\n')}`;
-                        if (errors.length > 3) message += `\n... y ${errors.length - 3} más`;
-                    }
-                    alert(message);
-                } else {
-                    throw new Error(`No se pudieron cargar datos.\n\nErrores:\n${errors.slice(0, 5).join('\n')}`);
-                }
-                
-            } catch (error) {
-                console.error('Error general:', error);
-                showConnectionResult('error', `❌ Error: ${error.message}`);
-                showStatus('error', `❌ Error de conexión: ${error.message}`);
-            }
-        }
-        
-        function handleFiles() {
-            const files = document.getElementById('csvFiles').files;
-            if (!files || files.length === 0) return;
-            
-            showStatus('loading', '📂 Procesando archivos CSV...');
-            
-            const loadedAgencies = [];
-            let processedFiles = 0;
-            
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const csvText = e.target.result;
-                        const agencyName = file.name.replace('.csv', '');
-                        
-                        const parsed = Papa.parse(csvText, {
-                            header: true,
-                            skipEmptyLines: true
-                        });
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            const processedData = processCSVData(parsed.data, agencyName);
-                            if (processedData) {
-                                loadedAgencies.push(processedData);
-                            }
-                        }
-                        
-                        processedFiles++;
-                        if (processedFiles === files.length) {
-                            if (loadedAgencies.length > 0) {
-                                displayResults(loadedAgencies);
-                                showFileResult('success', `✅ ${loadedAgencies.length} archivos procesados correctamente`);
-                                showStatus('success', `✅ Archivos cargados: ${loadedAgencies.length} agencias procesadas`);
-                            } else {
-                                showFileResult('error', '❌ No se pudieron procesar los archivos');
-                                showStatus('error', '❌ Error procesando archivos CSV');
-                            }
-                        }
-                        
-                    } catch (error) {
-                        console.error('Error procesando archivo:', error);
-                        processedFiles++;
-                    }
-                };
-                reader.readAsText(file);
-            });
-        }
-        
-        function processCSVData(data, agencyName) {
-            try {
-                const headers = Object.keys(data[0] || {});
-                console.log(`Headers en ${agencyName}:`, headers);
-                
-                const kpiColumn = headers.find(h => 
-                    h.toLowerCase().trim() === 'kpi' || 
-                    h.toLowerCase().includes('indicador') ||
-                    h.toLowerCase().includes('metrica')
-                );
-                
-                if (!kpiColumn) {
-                    console.warn(`No se encontró columna KPI en ${agencyName}. Headers disponibles:`, headers);
-                    return null;
-                }
-                
-                console.log(`Columna KPI encontrada: "${kpiColumn}"`);
-                
-                // Definir exactamente los meses que esperas
-                const expectedMonths = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                
-                const monthColumns = headers.filter(h => {
-                    const trimmed = h.trim();
-                    return expectedMonths.includes(trimmed);
-                });
-                
-                console.log(`Columnas de meses encontradas en ${agencyName}:`, monthColumns);
-                
-                if (monthColumns.length === 0) {
-                    console.warn(`No se encontraron columnas de meses en ${agencyName}. Headers:`, headers);
-                    return null;
-                }
-                
-                const kpis = [];
-                data.forEach((row, index) => {
-                    const kpiName = row[kpiColumn];
-                    console.log(`Fila ${index}: KPI="${kpiName}", Datos completos:`, row);
-                    
-                    if (kpiName && kpiName.toString().trim() && kpiName.toString().trim() !== '') {
-                        const kpiData = { name: kpiName.toString().trim() };
-                        
-                        // Store values using exact month names
-                        monthColumns.forEach(month => {
-                            const rawValue = row[month];
-                            let numericValue = 0;
-                            
-                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
-                                const cleanValue = rawValue.toString().replace(/[,%$]/g, '').trim();
-                                numericValue = parseFloat(cleanValue) || 0;
-                            }
-                            
-                            kpiData[month] = numericValue;
-                            console.log(`  ${month}: "${rawValue}" → ${numericValue}`);
-                        });
-                        kpis.push(kpiData);
-                    }
-                });
-                
-                console.log(`KPIs procesados para ${agencyName}:`, kpis);
-                
-                return {
-                    agency: agencyName,
-                    kpis: kpis,
-                    months: monthColumns
-                };
-                
-            } catch (error) {
-                console.error(`Error procesando datos de ${agencyName}:`, error);
-                return null;
-            }
-        }
-        
-        function displayResults(data) {
-            loadedData = data;
-            
-            // Initialize selections
-            selectedAgencies = data.map(agency => agency.agency);
-            
-            // Get all unique months
-            const monthsSet = new Set();
-            data.forEach(agency => {
-                if (agency.months) {
-                    agency.months.forEach(month => monthsSet.add(month));
-                }
-            });
-            allMonths = Array.from(monthsSet);
-            selectedMonths = allMonths.slice(0, 6); // Select first 6 months by default
-            
-            // Get all unique KPIs
-            const kpiSet = new Set();
-            data.forEach(agency => {
-                agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
-            });
-            allKPIs = Array.from(kpiSet);
-            
-            // Show results section
-            document.getElementById('results').classList.remove('hidden');
-            
-            // Update agencies list
-            const agenciesDiv = document.getElementById('agenciesLoaded');
-            agenciesDiv.innerHTML = '';
-            
-            data.forEach((agency, index) => {
-                const agencyDiv = document.createElement('div');
-                agencyDiv.className = 'flex items-center justify-between p-3 bg-amber-50 rounded-lg border-l-4';
-                agencyDiv.style.borderLeftColor = ['#DC2626', '#EA580C', '#D97706', '#CA8A04', '#65A30D'][index % 5];
-                agencyDiv.innerHTML = `
-                    <div>
-                        <h5 class="font-semibold text-gray-800">${agency.agency}</h5>
-                        <p class="text-sm text-gray-600">${agency.kpis.length} KPIs encontrados</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-gray-600">${agency.months ? agency.months.length : 0} períodos</p>
-                    </div>
-                `;
-                agenciesDiv.appendChild(agencyDiv);
-            });
-            
-            // Update checkboxes
-            updateAgenciesCheckboxes();
-            updateMonthsCheckboxes();
-            
-            // Update summary stats
-            updateSummaryStats();
-            
-            // Update table
-            updateTable();
-        }
-        
-        function updateAgenciesCheckboxes() {
-            const container = document.getElementById('agenciesCheckboxes');
-            const countLabel = document.getElementById('agenciesSelectedCount');
-            
-            container.innerHTML = '';
-            countLabel.textContent = `Agencias Seleccionadas (${selectedAgencies.length}/${loadedData.length})`;
-            
-            loadedData.forEach((agency, index) => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-2 rounded';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedAgencies.includes(agency.agency);
-                checkbox.className = 'rounded text-red-600 focus:ring-red-500';
-                checkbox.onchange = () => toggleAgency(agency.agency);
-                
-                const colorDiv = document.createElement('div');
-                colorDiv.className = 'w-3 h-3 rounded-full';
-                colorDiv.style.backgroundColor = ['#DC2626', '#EA580C', '#D97706', '#CA8A04', '#65A30D'][index % 5];
-                
-                const span = document.createElement('span');
-                span.className = 'flex-1';
-                span.textContent = agency.agency;
-                
-                label.appendChild(checkbox);
-                label.appendChild(colorDiv);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-        }
-        
-        function updateMonthsCheckboxes() {
-            const container = document.getElementById('monthsCheckboxes');
-            const countLabel = document.getElementById('monthsSelectedCount');
-            
-            container.innerHTML = '';
-            countLabel.textContent = `Meses Seleccionados (${selectedMonths.length})`;
-            
-            allMonths.forEach(month => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-1 rounded';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedMonths.includes(month);
-                checkbox.className = 'rounded text-red-600 focus:ring-red-500';
-                checkbox.onchange = () => toggleMonth(month);
-                
-                const span = document.createElement('span');
-                span.className = 'flex-1';
-                span.textContent = month;
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-        }
-        
-        function toggleAgency(agencyName) {
-            if (selectedAgencies.includes(agencyName)) {
-                selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
-            } else {
-                if (selectedAgencies.length < 9) {
-                    selectedAgencies.push(agencyName);
-                } else {
-                    alert('❌ Máximo 9 agencias pueden ser seleccionadas para comparación');
-                    return;
-                }
-            }
-            updateAgenciesCheckboxes();
-            updateSummaryStats();
-        }
-        
-        function toggleMonth(month) {
-            if (selectedMonths.includes(month)) {
-                selectedMonths = selectedMonths.filter(m => m !== month);
-            } else {
-                selectedMonths.push(month);
-            }
-            updateMonthsCheckboxes();
-            updateSummaryStats();
-        }
-        
-        function selectAllAgencies() {
-            selectedAgencies = loadedData.map(agency => agency.agency);
-            updateAgenciesCheckboxes();
-            updateSummaryStats();
-        }
-        
-        function deselectAllAgencies() {
-            selectedAgencies = [];
-            updateAgenciesCheckboxes();
-            updateSummaryStats();
-        }
-        
-        function updateAnalysis() {
-            if (selectedAgencies.length === 0) {
-                alert('⚠️ Por favor selecciona al menos una agencia');
-                return;
-            }
-            if (selectedMonths.length === 0) {
-                alert('⚠️ Por favor selecciona al menos un mes');
-                return;
-            }
-            
-            updateTable();
-            showStatus('success', `✅ Análisis actualizado: ${selectedAgencies.length} agencias y ${selectedMonths.length} meses seleccionados`);
-        }
-        
-        function updateSummaryStats() {
-            document.getElementById('totalKPIs').textContent = allKPIs.length;
-            document.getElementById('totalAgencies').textContent = selectedAgencies.length;
-            document.getElementById('totalPeriods').textContent = selectedMonths.length;
-        }
-        
-        function updateTable() {
-            if (!loadedData || loadedData.length === 0 || selectedAgencies.length === 0 || selectedMonths.length === 0) {
-                return;
-            }
-            
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            // Filter data to only selected agencies
-            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
-            
-            // Create header
-            headerRow.innerHTML = `
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">KPI</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mes</th>
-                ${filteredData.map((agency, index) => 
-                    `<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase" style="background-color: ${['#DC2626', '#EA580C', '#D97706', '#CA8A04', '#65A30D'][index % 5]}20">${agency.agency}</th>`
-                ).join('')}
-            `;
-            
-            // Create body
-            tableBody.innerHTML = '';
-            
-            // Get KPIs from selected agencies only
-            const selectedKPIs = new Set();
-            filteredData.forEach(agency => {
-                agency.kpis.forEach(kpi => selectedKPIs.add(kpi.name));
-            });
-            const kpiArray = Array.from(selectedKPIs);
-            
-            kpiArray.slice(0, 10).forEach(kpiName => {
-                selectedMonths.forEach((month, monthIndex) => {
-                    const row = document.createElement('tr');
-                    row.className = monthIndex % 2 === 0 ? 'bg-white' : 'bg-amber-50';
-                    
-                    let rowHTML = `
-                        <td class="px-4 py-4 text-sm font-medium text-gray-800">${kpiName}</td>
-                        <td class="px-4 py-4 text-sm text-gray-700">${month}</td>
-                    `;
-                    
-                    // Get values for this KPI and month from all selected agencies
-                    const values = filteredData.map(agency => {
-                        const kpi = agency.kpis.find(k => k.name === kpiName);
-                        // Use original month name (not lowercase)
-                        const value = kpi ? (kpi[month] || 0) : 0;
-                        console.log(`Buscando valor: Agencia=${agency.agency}, KPI=${kpiName}, Mes=${month}, Valor=${value}`);
-                        return value;
-                    });
-                    
-                    const maxValue = Math.max(...values);
-                    
-                    filteredData.forEach((agency, agencyIndex) => {
-                        const value = values[agencyIndex];
-                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
-                        
-                        rowHTML += `<td class="px-4 py-4 text-center text-sm font-semibold ${
-                            isHighest ? 'bg-green-100 text-green-800' : 'text-gray-900'
-                        }">${value.toLocaleString()}</td>`;
-                    });
-                    
-                    row.innerHTML = rowHTML;
-                    tableBody.appendChild(row);
-                });
-            });
-        }
-        
-        function showStatus(type, message) {
-            const statusDiv = document.getElementById('status');
-            const statusText = document.getElementById('statusText');
-            
-            statusDiv.className = `bg-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-50 border border-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-200 rounded-lg p-4 mb-6`;
-            statusText.textContent = message;
-            statusDiv.classList.remove('hidden');
-        }
-        
-        function showConnectionResult(type, message) {
-            const resultDiv = document.getElementById('connectionResult');
-            resultDiv.className = `p-3 rounded ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-            resultDiv.textContent = message;
-            resultDiv.classList.remove('hidden');
-        }
-        
-        function showFileResult(type, message) {
-            const resultDiv = document.getElementById('fileResult');
-            resultDiv.className = `p-3 rounded ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-            resultDiv.textContent = message;
-            resultDiv.classList.remove('hidden');
-        }
-        
-        // Test on load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard inicializado correctamente');
-            console.log('✅ Papa Parse disponible:', typeof Papa !== 'undefined');
-            console.log('✅ Tailwind CSS cargado');
-        });
-    </script>
-</body>
-</html>
+                    baseId = match[
