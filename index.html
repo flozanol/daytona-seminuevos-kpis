@@ -6,7 +6,6 @@
     <title>Dashboard KPIs - Grupo Daytona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -278,7 +277,7 @@
                 </div>
                 
                 <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
-                    <table class="min-w-full">
+                    <table class="min-w-full text-sm">
                         <thead>
                             <tr id="tableHeader" class="kpi-table"></tr>
                         </thead>
@@ -286,38 +285,30 @@
                     </table>
                 </div>
             </div>
-
-            <!-- Charts Section -->
-            <div class="glass-effect rounded-2xl p-8 card-hover">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-chart-area text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Visualización Gráfica</h3>
-                        <p class="text-gray-300">Gráficos comparativos de rendimiento</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Chart 1: Top KPIs by Agency -->
-                    <div class="bg-white/5 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-white mb-4">Top 5 KPIs por Agencia</h4>
-                        <div class="h-80">
-                            <canvas id="topKPIsChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Chart 2: Monthly Trend -->
-                    <div class="bg-white/5 rounded-xl p-6">
-                        <h4 class="text-lg font-semibold text-white mb-4">Tendencia Mensual</h4>
-                        <div class="h-80">
-                            <canvas id="monthlyTrendChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center">
+            <div class="glass-effect rounded-2xl p-6">
+                <div class="flex items-center justify-center space-x-6 text-gray-300">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-shield-alt text-green-400"></i>
+                        <span>Datos Seguros</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-sync text-blue-400"></i>
+                        <span>Tiempo Real</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-chart-line text-red-400"></i>
+                        <span>Analytics Avanzados</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-4">
+                    © 2025 Grupo Daytona - Dashboard KPIs Seminuevos
+                </p>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -662,7 +653,6 @@
             updateMonthCheckboxes();
             updateStats();
             updateTable();
-            updateCharts();
         }
         
         // Actualizar lista de agencias
@@ -783,7 +773,6 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
-            updateCharts();
         }
         
         function toggleMonth(month) {
@@ -794,7 +783,6 @@
             }
             updateMonthCheckboxes();
             updateStats();
-            updateCharts();
         }
         
         function selectAllAgencies() {
@@ -802,7 +790,6 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
-            updateCharts();
         }
         
         function deselectAllAgencies() {
@@ -810,7 +797,6 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
-            updateCharts();
         }
         
         function updateAnalysis() {
@@ -823,7 +809,6 @@
                 return;
             }
             updateTable();
-            updateCharts();
             showStatus('success', `Análisis actualizado: ${selectedAgencies.length} agencias, ${selectedMonths.length} meses`);
         }
         
@@ -858,16 +843,18 @@
             
             // Header
             headerRow.innerHTML = `
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 border-b border-gray-200">
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
                     KPI
                 </th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 border-b border-gray-200">
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
                     Período
                 </th>
                 ${filteredData.map((agency, index) => 
-                    `<th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider sticky top-0 border-b border-gray-200" 
-                         style="background: linear-gradient(135deg, ${colors[index % colors.length]}15, ${colors[index % colors.length]}25);">
-                         ${agency.agency}
+                    `<th class="px-2 py-4 text-center text-xs font-bold text-white uppercase tracking-wider sticky top-0 border-b border-gray-200 z-30" 
+                         style="background: linear-gradient(135deg, ${colors[index % colors.length]}60, ${colors[index % colors.length]}40);">
+                         <div class="flex items-center justify-center">
+                            <span class="text-white font-semibold text-xs leading-tight">${agency.agency}</span>
+                         </div>
                      </th>`
                 ).join('')}
             `;
@@ -888,15 +875,15 @@
                     const maxValue = Math.max(...values);
                     
                     let rowHTML = `
-                        <td class="px-6 py-4 text-sm font-semibold text-white">${kpiName}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-300">${month}</td>
+                        <td class="px-3 py-3 text-sm font-semibold text-white">${kpiName}</td>
+                        <td class="px-3 py-3 text-sm font-medium text-gray-300">${month}</td>
                     `;
                     
                     values.forEach((value, index) => {
                         const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
-                        rowHTML += `<td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold ${
-                                isHighest ? 'text-yellow-400 bg-yellow-400/20 px-3 py-1 rounded-full' : 'text-gray-300'
+                        rowHTML += `<td class="px-2 py-3 text-center">
+                            <span class="text-xs font-bold ${
+                                isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full shadow-lg' : 'text-gray-300'
                             }">${value.toLocaleString()}</span>
                         </td>`;
                     });
@@ -937,151 +924,34 @@
             statusDiv.classList.remove('hidden');
         }
         
-        // Actualizar gráficos (función simplificada)
-        function updateCharts() {
-            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
+        // Funciones de estado
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            const statusIcon = document.getElementById('statusIcon');
             
-            try {
-                updateTopKPIsChart();
-                updateMonthlyTrendChart();
-            } catch (error) {
-                console.log('Error actualizando gráficos:', error);
-            }
-        }
-        
-        // Gráfico de Top KPIs
-        function updateTopKPIsChart() {
-            try {
-                const ctx = document.getElementById('topKPIsChart');
-                if (!ctx) return;
-                
-                const context = ctx.getContext('2d');
-                
-                // Limpiar gráfico anterior
-                if (window.topKPIsChart) {
-                    window.topKPIsChart.destroy();
+            if (!statusDiv || !statusText || !statusIcon) return;
+            
+            const configs = {
+                success: {
+                    bg: 'bg-green-500/20 border-l-green-500 text-green-300',
+                    icon: 'fas fa-check-circle text-green-400'
+                },
+                error: {
+                    bg: 'bg-red-500/20 border-l-red-500 text-red-300',
+                    icon: 'fas fa-exclamation-circle text-red-400'
+                },
+                loading: {
+                    bg: 'bg-blue-500/20 border-l-blue-500 text-blue-300',
+                    icon: 'fas fa-spinner fa-spin text-blue-400'
                 }
-                
-                const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
-                const topKPIs = allKPIs.slice(0, 5);
-                const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-                
-                const datasets = filteredData.map((agency, index) => {
-                    const color = colors[index % colors.length];
-                    const data = topKPIs.map(kpiName => {
-                        const kpi = agency.kpis.find(k => k.name === kpiName);
-                        if (!kpi) return 0;
-                        const values = selectedMonths.map(month => kpi[month] || 0);
-                        return values.reduce((sum, val) => sum + val, 0) / values.length;
-                    });
-                    
-                    return {
-                        label: agency.agency,
-                        data: data,
-                        backgroundColor: color + '80',
-                        borderColor: color,
-                        borderWidth: 2
-                    };
-                });
-                
-                window.topKPIsChart = new Chart(context, {
-                    type: 'bar',
-                    data: {
-                        labels: topKPIs,
-                        datasets: datasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#ffffff' }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: '#ffffff' },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            },
-                            y: {
-                                ticks: { color: '#ffffff' },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.log('Error en gráfico de barras:', error);
-            }
-        }
-        
-        // Gráfico de tendencia mensual
-        function updateMonthlyTrendChart() {
-            try {
-                const ctx = document.getElementById('monthlyTrendChart');
-                if (!ctx) return;
-                
-                const context = ctx.getContext('2d');
-                
-                // Limpiar gráfico anterior
-                if (window.monthlyTrendChart) {
-                    window.monthlyTrendChart.destroy();
-                }
-                
-                const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
-                const firstKPI = allKPIs[0];
-                const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-                
-                const datasets = filteredData.map((agency, index) => {
-                    const color = colors[index % colors.length];
-                    const kpi = agency.kpis.find(k => k.name === firstKPI);
-                    const data = selectedMonths.map(month => kpi ? (kpi[month] || 0) : 0);
-                    
-                    return {
-                        label: agency.agency,
-                        data: data,
-                        borderColor: color,
-                        backgroundColor: color + '20',
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0.4
-                    };
-                });
-                
-                window.monthlyTrendChart = new Chart(context, {
-                    type: 'line',
-                    data: {
-                        labels: selectedMonths,
-                        datasets: datasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#ffffff' }
-                            },
-                            title: {
-                                display: true,
-                                text: `Tendencia: ${firstKPI}`,
-                                color: '#ffffff'
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: '#ffffff' },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            },
-                            y: {
-                                ticks: { color: '#ffffff' },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.log('Error en gráfico de líneas:', error);
-            }
+            };
+            
+            const config = configs[type];
+            statusDiv.className = `mb-8 glass-effect rounded-xl p-4 border-l-4 ${config.bg}`;
+            statusIcon.className = config.icon;
+            statusText.textContent = message;
+            statusDiv.classList.remove('hidden');
         }
         
         // Inicialización final
