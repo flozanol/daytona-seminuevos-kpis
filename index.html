@@ -83,7 +83,7 @@
                         </div>
                         <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
                             <h5 class="font-medium text-amber-800 mb-2">🏢 Agencias</h5>
-                            <p class="text-2xl font-bold text-amber-600" id="totalAgencies">0</p>
+                            <p class="text-2xl font-bold text-amber-600" id="totalAgencies">9</p>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
                             <h5 class="font-medium text-orange-800 mb-2">📅 Períodos</h5>
@@ -102,7 +102,7 @@
                             <!-- Agency Selection -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    🏢 <span id="agencyCount">Agencias (0/8)</span>
+                                    🏢 <span id="agencyCount">Agencias (0/9)</span>
                                 </label>
                                 <div class="max-h-48 overflow-y-auto border rounded-lg p-3 bg-white">
                                     <div class="mb-2 pb-2 border-b">
@@ -160,7 +160,7 @@
                 <div class="text-sm text-gray-700 space-y-2">
                     <p><strong>🎯 Probar Dashboard:</strong> Carga datos de demostración con 8 agencias y 35 KPIs</p>
                     <p><strong>🚀 Conectar API:</strong> Intenta conectar con Google Sheets real</p>
-                    <p><strong>📊 Agencias:</strong> GWM Iztapalapa, GWM Morelos, Honda Cuajimalpa, Honda Interlomas, KIA Interlomas, KIA Iztapalapa, MG Cuajimalpa, MG Interlomas</p>
+                    <p><strong>📊 Agencias:</strong> Honda Cuajimalpa, Honda Interlomas, KIA Interlomas, KIA Iztapalapa, MG Cuajimalpa, MG Interlomas, MG Iztapalapa, GWM Iztapalapa, GWM Morelos</p>
                 </div>
             </div>
         </div>
@@ -215,7 +215,7 @@
                 'Costo por Lead', 'Valor Cliente', 'Churn Rate', 'NPS', 'Recompras'
             ];
             
-            // 8 agencias
+            // 9 agencias (faltaba MG Iztapalapa)
             const agencies = [
                 { name: 'Honda Cuajimalpa', base: 200 },
                 { name: 'Honda Interlomas', base: 180 },
@@ -223,6 +223,7 @@
                 { name: 'KIA Iztapalapa', base: 140 },
                 { name: 'MG Cuajimalpa', base: 120 },
                 { name: 'MG Interlomas', base: 100 },
+                { name: 'MG Iztapalapa', base: 95 },
                 { name: 'GWM Iztapalapa', base: 80 },
                 { name: 'GWM Morelos', base: 60 }
             ];
@@ -254,12 +255,12 @@
             showStatus('success', `Datos cargados: ${data.length} agencias, ${kpis.length} KPIs`);
             showAPIStatus('success', 'Datos de demostración cargados exitosamente');
             
-            alert(`🎉 ¡DATOS CARGADOS!\n\n✅ ${data.length} agencias\n✅ ${kpis.length} KPIs por agencia\n✅ ${months.length} meses\n✅ ${data.length * kpis.length * months.length} puntos de datos\n\n🎯 Ahora puedes analizar los KPIs!`);
+            alert(`🎉 ¡DATOS CARGADOS!\n\n✅ ${data.length} agencias\n✅ ${kpis.length} KPIs por agencia\n✅ ${months.length} meses\n✅ ${data.length * kpis.length * months.length} puntos de datos\n\n🎯 Ahora puedes analizar los KPIs!\n\n⚠️ NOTA: Estos son datos de demostración.\nPara datos reales, usa "🚀 Conectar API"`);
         }
         
-        // Función para conectar API
+        // Función para conectar API - CONECTAR REALMENTE CON TU GOOGLE SHEETS
         async function connectAPI() {
-            console.log('Intentando conectar API...');
+            console.log('Conectando con tu Google Sheets real...');
             const apiKey = document.getElementById('apiKey').value.trim();
             const spreadsheetId = document.getElementById('spreadsheetId').value.trim();
             
@@ -269,36 +270,203 @@
             }
             
             showStatus('loading', 'Conectando con Google Sheets API...');
-            showAPIStatus('loading', 'Intentando conexión...');
+            showAPIStatus('loading', 'Obteniendo datos reales...');
             
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?key=${apiKey}`;
-                const response = await fetch(url);
+                // Primero obtener metadata del spreadsheet
+                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?key=${apiKey}`;
+                const metadataResponse = await fetch(metadataUrl);
                 
-                if (!response.ok) {
-                    throw new Error(`Error API: ${response.status}`);
+                if (!metadataResponse.ok) {
+                    throw new Error(`Error API: ${metadataResponse.status} - Verifica que el Google Sheets sea público`);
                 }
                 
-                const data = await response.json();
-                console.log('API conectada exitosamente');
-                showAPIStatus('success', 'Conexión API exitosa');
-                showStatus('success', 'API conectada, procesando datos...');
+                const metadata = await metadataResponse.json();
+                console.log('Metadata obtenida:', metadata);
                 
-                // Aquí procesarías los datos reales
-                // Por ahora cargar demo
-                setTimeout(() => {
-                    loadTestData();
-                }, 1000);
+                const sheets = metadata.sheets || [];
+                const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('Hojas encontradas:', sheetNames);
+                
+                // Agencias esperadas (9 agencias)
+                const expectedAgencies = [
+                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
+                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
+                ];
+                
+                // Buscar hojas que coincidan con nuestras agencias
+                const validSheets = sheetNames.filter(name => 
+                    expectedAgencies.includes(name) || 
+                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                );
+                
+                console.log('Hojas válidas encontradas:', validSheets);
+                
+                if (validSheets.length === 0) {
+                    throw new Error(`No se encontraron hojas con nombres de agencias.\nHojas disponibles: ${sheetNames.join(', ')}\nEsperadas: ${expectedAgencies.join(', ')}`);
+                }
+                
+                // Obtener datos de cada hoja
+                const loadedAgencies = [];
+                const errors = [];
+                const successes = [];
+                
+                for (const sheetName of validSheets) {
+                    try {
+                        console.log(`Cargando datos de: ${sheetName}`);
+                        
+                        // Obtener datos de la hoja específica
+                        const range = `${sheetName}!A:Z`; // Rango amplio para capturar todos los datos
+                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${apiKey}`;
+                        
+                        const dataResponse = await fetch(dataUrl);
+                        if (!dataResponse.ok) {
+                            errors.push(`${sheetName}: Error ${dataResponse.status}`);
+                            continue;
+                        }
+                        
+                        const sheetData = await dataResponse.json();
+                        console.log(`Datos de ${sheetName}:`, sheetData);
+                        
+                        if (!sheetData.values || sheetData.values.length < 2) {
+                            errors.push(`${sheetName}: Sin datos suficientes`);
+                            continue;
+                        }
+                        
+                        // Procesar los datos reales
+                        const processedData = processRealSheetData(sheetData.values, sheetName);
+                        if (processedData && processedData.kpis.length > 0) {
+                            loadedAgencies.push(processedData);
+                            successes.push(`✅ ${sheetName}: ${processedData.kpis.length} KPIs cargados`);
+                        } else {
+                            errors.push(`${sheetName}: No se pudieron procesar los KPIs`);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`Error procesando ${sheetName}:`, error);
+                        errors.push(`${sheetName}: ${error.message}`);
+                    }
+                }
+                
+                if (loadedAgencies.length > 0) {
+                    // Guardar datos reales
+                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
+                    
+                    displayResults(loadedAgencies);
+                    showAPIStatus('success', `✅ ${loadedAgencies.length} agencias cargadas desde Google Sheets`);
+                    showStatus('success', `✅ Datos reales cargados: ${loadedAgencies.length} agencias`);
+                    
+                    let message = `🎉 ¡DATOS REALES CARGADOS!\n\n📊 Desde tu Google Sheets:\n${successes.join('\n')}`;
+                    
+                    if (errors.length > 0) {
+                        message += `\n\n⚠️ Advertencias:\n${errors.slice(0, 3).join('\n')}`;
+                    }
+                    
+                    alert(message);
+                } else {
+                    throw new Error(`No se pudieron cargar datos reales.\nErrores: ${errors.join(', ')}`);
+                }
                 
             } catch (error) {
-                console.log('Error API:', error.message);
+                console.log('Error conectando API:', error.message);
                 showAPIStatus('error', `Error: ${error.message}`);
-                showStatus('loading', 'Cargando datos de demostración...');
+                showStatus('loading', 'Cargando datos de demostración como respaldo...');
                 
                 // Cargar demo como respaldo
                 setTimeout(() => {
+                    alert(`⚠️ No se pudo conectar con Google Sheets:\n${error.message}\n\nCargando datos de demostración...`);
                     loadTestData();
                 }, 1000);
+            }
+        }
+        
+        // Función para procesar datos reales del Google Sheets
+        function processRealSheetData(values, agencyName) {
+            try {
+                console.log(`Procesando datos reales de ${agencyName}...`);
+                
+                if (!values || values.length < 2) {
+                    throw new Error('Datos insuficientes');
+                }
+                
+                const headers = values[0];
+                const rows = values.slice(1);
+                
+                console.log(`Headers encontrados en ${agencyName}:`, headers);
+                
+                // Buscar columna de KPI
+                const kpiColumnIndex = headers.findIndex(header => 
+                    header && (
+                        header.toLowerCase().includes('kpi') || 
+                        header.toLowerCase().includes('indicador') ||
+                        header.toLowerCase().includes('métrica') ||
+                        header.toLowerCase().includes('metrica')
+                    )
+                );
+                
+                if (kpiColumnIndex === -1) {
+                    throw new Error(`No se encontró columna de KPI. Headers: ${headers.join(', ')}`);
+                }
+                
+                console.log(`Columna KPI encontrada en índice: ${kpiColumnIndex}`);
+                
+                // Buscar columnas de meses
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                const monthColumns = [];
+                monthNames.forEach(month => {
+                    const index = headers.findIndex(header => 
+                        header && header.trim().toLowerCase() === month.toLowerCase()
+                    );
+                    if (index !== -1) {
+                        monthColumns.push({ name: month, index: index });
+                    }
+                });
+                
+                console.log(`Columnas de meses encontradas en ${agencyName}:`, monthColumns);
+                
+                if (monthColumns.length === 0) {
+                    throw new Error(`No se encontraron columnas de meses. Headers: ${headers.join(', ')}`);
+                }
+                
+                // Procesar KPIs
+                const kpis = [];
+                rows.forEach((row, rowIndex) => {
+                    const kpiName = row[kpiColumnIndex];
+                    
+                    if (kpiName && kpiName.toString().trim()) {
+                        const kpiData = { name: kpiName.toString().trim() };
+                        
+                        monthColumns.forEach(monthCol => {
+                            const rawValue = row[monthCol.index];
+                            let numericValue = 0;
+                            
+                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+                                // Limpiar el valor (remover comas, símbolos, etc.)
+                                const cleanValue = rawValue.toString().replace(/[,$%]/g, '').trim();
+                                numericValue = parseFloat(cleanValue) || 0;
+                            }
+                            
+                            kpiData[monthCol.name] = numericValue;
+                        });
+                        
+                        kpis.push(kpiData);
+                        console.log(`KPI procesado: ${kpiName} con ${monthColumns.length} meses`);
+                    }
+                });
+                
+                console.log(`Total KPIs procesados para ${agencyName}: ${kpis.length}`);
+                
+                return {
+                    agency: agencyName,
+                    kpis: kpis,
+                    months: monthColumns.map(col => col.name)
+                };
+                
+            } catch (error) {
+                console.error(`Error procesando ${agencyName}:`, error);
+                throw error;
             }
         }
         
