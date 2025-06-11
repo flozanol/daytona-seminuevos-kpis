@@ -266,19 +266,81 @@
             
             showStatus('loading', '🔄 Conectando con Google Sheets...');
             
-            // Check if it's a published web URL
+            // Convert published URL to CSV export format
+            let baseId = '';
             if (url.includes('/pubhtml')) {
-                await connectToPublishedSheets(url);
-                return;
+                // Extract the document ID from published URL
+                const match = url.match(/\/d\/e\/([^\/]+)/);
+                if (match) {
+                    baseId = match[1];
+                    console.log('📄 Documento publicado detectado, ID:', baseId);
+                    await connectToPublishedCSV(baseId);
+                    return;
+                }
+            } else if (url.includes('/spreadsheets/d/')) {
+                // Regular spreadsheet URL
+                const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                if (match) {
+                    baseId = match[1];
+                    console.log('📄 Documento regular detectado, ID:', baseId);
+                    await connectToRegularCSV(baseId);
+                    return;
+                }
             }
             
-            // Original CSV method
-            const spreadsheetId = extractSpreadsheetId(url);
-            if (!spreadsheetId) {
-                alert('❌ URL inválida. Debe ser una URL de Google Sheets válida');
-                return;
+            alert('❌ URL no reconocida. Usa una URL de Google Sheets válida.');
+        }
+        
+        async function connectToPublishedCSV(publishedId) {
+            try {
+                // Try to access as published CSV
+                const baseUrl = `https://docs.google.com/spreadsheets/d/e/${publishedId}/pub?output=csv`;
+                
+                console.log('🔗 Intentando URL CSV publicada:', baseUrl);
+                
+                const response = await fetch(baseUrl);
+                if (!response.ok) {
+                    throw new Error(`No se pudo acceder al CSV publicado: HTTP ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('📄 CSV recibido, primeros 500 chars:', csvText.substring(0, 500));
+                
+                if (csvText.includes('<!DOCTYPE html>') || csvText.length < 100) {
+                    throw new Error('El documento no está disponible como CSV público');
+                }
+                
+                // Parse the main CSV (this will be the first sheet)
+                const parsed = Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    transformHeader: (header) => header.trim()
+                });
+                
+                console.log('📊 Datos parseados:', parsed.data.length, 'filas');
+                console.log('📋 Headers encontrados:', parsed.meta.fields);
+                
+                if (parsed.data && parsed.data.length > 0) {
+                    // Process as single agency for now
+                    const processedData = processCSVData(parsed.data, 'Datos Importados');
+                    if (processedData) {
+                        displayResults([processedData]);
+                        showConnectionResult('success', `✅ Datos cargados exitosamente desde CSV publicado`);
+                        showStatus('success', `✅ Conexión exitosa: 1 hoja procesada con ${processedData.kpis.length} KPIs`);
+                        return;
+                    }
+                }
+                
+                throw new Error('No se pudieron procesar los datos del CSV');
+                
+            } catch (error) {
+                console.error('Error con CSV publicado:', error);
+                showConnectionResult('error', `❌ Error CSV: ${error.message}`);
+                showStatus('error', `❌ Error de conexión CSV: ${error.message}`);
             }
-            
+        }
+        
+        async function connectToRegularCSV(spreadsheetId) {
             try {
                 const expectedAgencies = [
                     'GWM Iztapalapa', 'GWM Morelos', 'Honda Cuajimalpa', 'Honda Interlomas', 
@@ -287,10 +349,12 @@
                 
                 const loadedAgencies = [];
                 const errors = [];
+                const successes = [];
                 
                 for (const agencyName of expectedAgencies) {
                     try {
                         const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&sheet=${encodeURIComponent(agencyName)}`;
+                        console.log(`🔗 Intentando cargar: ${agencyName} desde ${csvUrl}`);
                         
                         const response = await fetch(csvUrl);
                         if (!response.ok) {
@@ -306,175 +370,49 @@
                         
                         const parsed = Papa.parse(csvText, {
                             header: true,
-                            skipEmptyLines: true
+                            skipEmptyLines: true,
+                            transformHeader: (header) => header.trim()
                         });
+                        
+                        console.log(`📊 ${agencyName}: ${parsed.data?.length || 0} filas parseadas`);
                         
                         if (parsed.data && parsed.data.length > 0) {
                             const processedData = processCSVData(parsed.data, agencyName);
                             if (processedData) {
                                 loadedAgencies.push(processedData);
+                                successes.push(`✅ ${agencyName}: ${processedData.kpis.length} KPIs`);
+                            } else {
+                                errors.push(`${agencyName}: No se pudo procesar`);
                             }
+                        } else {
+                            errors.push(`${agencyName}: Sin datos válidos`);
                         }
                         
                     } catch (error) {
+                        console.error(`Error con ${agencyName}:`, error);
                         errors.push(`${agencyName}: ${error.message}`);
                     }
                 }
+                
+                console.log('📈 Resumen:', { exitosos: successes.length, errores: errors.length });
                 
                 if (loadedAgencies.length > 0) {
                     displayResults(loadedAgencies);
                     showConnectionResult('success', `✅ ${loadedAgencies.length} agencias cargadas exitosamente`);
                     showStatus('success', `✅ Conexión exitosa: ${loadedAgencies.length} agencias procesadas`);
-                } else {
-                    throw new Error('No se pudieron cargar datos de ninguna agencia');
-                }
-                
-                if (errors.length > 0) {
-                    console.warn('Errores encontrados:', errors);
-                }
-                
-            } catch (error) {
-                showConnectionResult('error', `❌ Error: ${error.message}`);
-                showStatus('error', `❌ Error de conexión: ${error.message}`);
-            }
-        }
-        
-        async function connectToPublishedSheets(url) {
-            try {
-                console.log('🔗 Conectando a documento publicado:', url);
-                
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const htmlText = await response.text();
-                console.log('📄 HTML recibido, length:', htmlText.length);
-                
-                // Parse the published HTML to extract data
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                
-                // Find all tables (each represents a sheet)
-                const tables = doc.querySelectorAll('table');
-                console.log('📊 Tablas encontradas:', tables.length);
-                
-                const loadedAgencies = [];
-                const expectedAgencies = [
-                    'GWM Iztapalapa', 'GWM Morelos', 'Honda Cuajimalpa', 'Honda Interlomas', 
-                    'KIA Interlomas', 'KIA Iztapalapa', 'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa'
-                ];
-                
-                let tableIndex = 0;
-                
-                for (const table of tables) {
-                    try {
-                        const rows = table.querySelectorAll('tr');
-                        if (rows.length < 2) continue; // Skip tables without data
-                        
-                        // Get the agency name (use expected names in order)
-                        const agencyName = expectedAgencies[tableIndex] || `Agencia ${tableIndex + 1}`;
-                        console.log(`📋 Procesando tabla ${tableIndex}: ${agencyName}`);
-                        
-                        // Extract headers from first row
-                        const headerRow = rows[0];
-                        const headerCells = headerRow.querySelectorAll('td, th');
-                        const headers = Array.from(headerCells).map(cell => cell.textContent.trim());
-                        
-                        console.log(`Headers en ${agencyName}:`, headers);
-                        
-                        // Find KPI column
-                        const kpiColumnIndex = headers.findIndex(h => 
-                            h.toLowerCase().trim() === 'kpi' || 
-                            h.toLowerCase().includes('indicador')
-                        );
-                        
-                        if (kpiColumnIndex === -1) {
-                            console.warn(`No se encontró columna KPI en ${agencyName}`);
-                            tableIndex++;
-                            continue;
-                        }
-                        
-                        // Find month columns
-                        const expectedMonths = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                                               'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                        
-                        const monthColumns = [];
-                        expectedMonths.forEach(month => {
-                            const index = headers.findIndex(h => h.trim() === month);
-                            if (index !== -1) {
-                                monthColumns.push({ name: month, index });
-                            }
-                        });
-                        
-                        console.log(`Columnas de meses en ${agencyName}:`, monthColumns.map(m => m.name));
-                        
-                        if (monthColumns.length === 0) {
-                            console.warn(`No se encontraron columnas de meses en ${agencyName}`);
-                            tableIndex++;
-                            continue;
-                        }
-                        
-                        // Extract data from rows
-                        const kpis = [];
-                        for (let i = 1; i < rows.length; i++) {
-                            const row = rows[i];
-                            const cells = row.querySelectorAll('td, th');
-                            
-                            if (cells.length <= kpiColumnIndex) continue;
-                            
-                            const kpiName = cells[kpiColumnIndex].textContent.trim();
-                            if (!kpiName || kpiName === '' || kpiName.includes('#DIV/0!')) continue;
-                            
-                            const kpiData = { name: kpiName };
-                            
-                            monthColumns.forEach(monthCol => {
-                                if (cells.length > monthCol.index) {
-                                    const cellText = cells[monthCol.index].textContent.trim();
-                                    let numericValue = 0;
-                                    
-                                    if (cellText && cellText !== '' && !cellText.includes('#DIV/0!')) {
-                                        const cleanValue = cellText.replace(/[$,%]/g, '').trim();
-                                        numericValue = parseFloat(cleanValue) || 0;
-                                    }
-                                    
-                                    kpiData[monthCol.name] = numericValue;
-                                    console.log(`  ${monthCol.name}: "${cellText}" → ${numericValue}`);
-                                }
-                            });
-                            
-                            kpis.push(kpiData);
-                        }
-                        
-                        if (kpis.length > 0) {
-                            const processedData = {
-                                agency: agencyName,
-                                kpis: kpis,
-                                months: monthColumns.map(m => m.name)
-                            };
-                            
-                            loadedAgencies.push(processedData);
-                            console.log(`✅ ${agencyName}: ${kpis.length} KPIs procesados`);
-                        }
-                        
-                        tableIndex++;
-                        
-                    } catch (error) {
-                        console.error(`Error procesando tabla ${tableIndex}:`, error);
-                        tableIndex++;
+                    
+                    let message = `🎉 ¡CONEXIÓN EXITOSA!\n\n${successes.join('\n')}`;
+                    if (errors.length > 0) {
+                        message += `\n\n⚠️ Advertencias:\n${errors.slice(0, 3).join('\n')}`;
+                        if (errors.length > 3) message += `\n... y ${errors.length - 3} más`;
                     }
-                }
-                
-                if (loadedAgencies.length > 0) {
-                    displayResults(loadedAgencies);
-                    showConnectionResult('success', `✅ ${loadedAgencies.length} agencias cargadas desde documento publicado`);
-                    showStatus('success', `✅ Conexión exitosa: ${loadedAgencies.length} agencias procesadas desde documento publicado`);
+                    alert(message);
                 } else {
-                    throw new Error('No se pudieron extraer datos del documento publicado');
+                    throw new Error(`No se pudieron cargar datos.\n\nErrores:\n${errors.slice(0, 5).join('\n')}`);
                 }
                 
             } catch (error) {
-                console.error('Error conectando a documento publicado:', error);
+                console.error('Error general:', error);
                 showConnectionResult('error', `❌ Error: ${error.message}`);
                 showStatus('error', `❌ Error de conexión: ${error.message}`);
             }
