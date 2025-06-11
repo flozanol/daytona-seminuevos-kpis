@@ -396,18 +396,227 @@
             alert(`🎉 Demo cargada exitosamente!\n\n✅ ${data.length} agencias\n✅ ${kpis.length} KPIs por agencia\n✅ ${months.length} meses de datos`);
         }
         
-        // FUNCIÓN PRINCIPAL: Conectar API
-        function connectToAPI() {
-            console.log('🚀 Conectando API...');
-            alert('Conectando con Google Sheets...');
+        // FUNCIÓN PRINCIPAL: Conectar API REAL
+        async function connectToAPI() {
+            console.log('🚀 Conectando con Google Sheets REAL...');
+            alert('Conectando con tu Google Sheets real...');
             
             showStatus('loading', 'Conectando con Google Sheets API...');
             
-            // Simular conexión API (puedes implementar la real después)
-            setTimeout(() => {
-                console.log('⚠️ API demo - cargando datos de prueba');
-                loadDemo();
-            }, 2000);
+            try {
+                // Obtener metadata del spreadsheet REAL
+                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
+                console.log('📡 URL Metadata:', metadataUrl);
+                
+                const metadataResponse = await fetch(metadataUrl);
+                
+                if (!metadataResponse.ok) {
+                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
+                }
+                
+                const metadata = await metadataResponse.json();
+                console.log('📊 Metadata recibida:', metadata);
+                
+                const sheets = metadata.sheets || [];
+                const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('📋 Hojas encontradas:', sheetNames);
+                
+                // Agencias esperadas (9 agencias)
+                const expectedAgencies = [
+                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
+                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
+                ];
+                
+                // Buscar hojas válidas
+                const validSheets = sheetNames.filter(name => 
+                    expectedAgencies.includes(name) || 
+                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                );
+                
+                console.log('✅ Hojas válidas encontradas:', validSheets);
+                
+                if (validSheets.length === 0) {
+                    throw new Error(`No se encontraron hojas de agencias.\nHojas disponibles: ${sheetNames.join(', ')}\nEsperadas: ${expectedAgencies.join(', ')}`);
+                }
+                
+                // Procesar cada hoja
+                const loadedAgencies = [];
+                const errors = [];
+                const successes = [];
+                
+                for (const sheetName of validSheets) {
+                    try {
+                        console.log(`📊 Procesando hoja: ${sheetName}`);
+                        
+                        const range = `${sheetName}!A:Z`;
+                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+                        
+                        console.log(`🔗 URL datos: ${dataUrl}`);
+                        
+                        const dataResponse = await fetch(dataUrl);
+                        if (!dataResponse.ok) {
+                            errors.push(`${sheetName}: Error ${dataResponse.status}`);
+                            continue;
+                        }
+                        
+                        const sheetData = await dataResponse.json();
+                        console.log(`📈 Datos brutos de ${sheetName}:`, sheetData);
+                        
+                        if (!sheetData.values || sheetData.values.length < 2) {
+                            errors.push(`${sheetName}: Sin datos suficientes`);
+                            continue;
+                        }
+                        
+                        // Procesar datos reales
+                        const processedData = processRealSheetData(sheetData.values, sheetName);
+                        if (processedData && processedData.kpis.length > 0) {
+                            loadedAgencies.push(processedData);
+                            successes.push(`✅ ${sheetName}: ${processedData.kpis.length} KPIs cargados`);
+                            console.log(`✅ ${sheetName} procesada correctamente`);
+                        } else {
+                            errors.push(`${sheetName}: Error procesando KPIs`);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`❌ Error procesando ${sheetName}:`, error);
+                        errors.push(`${sheetName}: ${error.message}`);
+                    }
+                }
+                
+                // Mostrar resultados
+                if (loadedAgencies.length > 0) {
+                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                    
+                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
+                    displayResults(loadedAgencies);
+                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
+                    
+                    let message = `🎉 ¡CONEXIÓN API EXITOSA!\n\n📊 Agencias cargadas desde Google Sheets:\n${successes.join('\n')}`;
+                    if (errors.length > 0) {
+                        message += `\n\n⚠️ Advertencias:\n${errors.slice(0, 3).join('\n')}`;
+                    }
+                    message += `\n\n✅ ${loadedAgencies.length} agencias conectadas con datos REALES`;
+                    
+                    alert(message);
+                } else {
+                    throw new Error(`No se pudieron cargar datos reales.\nErrores: ${errors.join(', ')}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error completo en API:', error);
+                showStatus('error', `Error API: ${error.message}`);
+                alert(`❌ Error conectando con Google Sheets:\n${error.message}\n\n¿Quieres cargar datos de demostración?`);
+                
+                // NO cargar demo automáticamente - que el usuario decida
+                // setTimeout(() => loadDemo(), 1000);
+            }
+        }
+        
+        // Función para procesar datos reales del Google Sheets
+        function processRealSheetData(values, agencyName) {
+            try {
+                console.log(`🔄 Procesando datos reales de: ${agencyName}`);
+                console.log('📊 Datos recibidos:', values);
+                
+                if (!values || values.length < 2) {
+                    throw new Error('Datos insuficientes en la hoja');
+                }
+                
+                const headers = values[0];
+                const rows = values.slice(1);
+                
+                console.log(`📋 Headers encontrados:`, headers);
+                console.log(`📊 Filas de datos:`, rows.length);
+                
+                // Buscar columna de KPI (más flexible)
+                const kpiColumnIndex = headers.findIndex(header => 
+                    header && (
+                        header.toLowerCase().trim().includes('kpi') || 
+                        header.toLowerCase().trim().includes('indicador') ||
+                        header.toLowerCase().trim().includes('metrica') ||
+                        header.toLowerCase().trim().includes('métrica') ||
+                        header.toLowerCase().trim() === 'concepto' ||
+                        header.toLowerCase().trim() === 'nombre'
+                    )
+                );
+                
+                if (kpiColumnIndex === -1) {
+                    console.error('❌ Headers disponibles:', headers);
+                    throw new Error(`No se encontró columna de KPI en ${agencyName}. Headers disponibles: ${headers.join(', ')}`);
+                }
+                
+                console.log(`✅ Columna KPI encontrada en índice ${kpiColumnIndex}: "${headers[kpiColumnIndex]}"`);
+                
+                // Buscar columnas de meses (más flexible)
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                const monthColumns = [];
+                headers.forEach((header, index) => {
+                    if (header && header.trim()) {
+                        const normalizedHeader = header.trim().toLowerCase();
+                        const matchingMonth = monthNames.find(month => 
+                            normalizedHeader === month.toLowerCase() ||
+                            normalizedHeader.includes(month.toLowerCase())
+                        );
+                        if (matchingMonth) {
+                            monthColumns.push({ name: matchingMonth, index: index });
+                        }
+                    }
+                });
+                
+                console.log(`📅 Columnas de meses encontradas:`, monthColumns);
+                
+                if (monthColumns.length === 0) {
+                    throw new Error(`No se encontraron columnas de meses en ${agencyName}. Headers: ${headers.join(', ')}`);
+                }
+                
+                // Procesar KPIs
+                const kpis = [];
+                rows.forEach((row, rowIndex) => {
+                    const kpiName = row[kpiColumnIndex];
+                    
+                    if (kpiName && kpiName.toString().trim() && kpiName.toString().trim() !== '') {
+                        const kpiData = { name: kpiName.toString().trim() };
+                        
+                        monthColumns.forEach(monthCol => {
+                            const rawValue = row[monthCol.index];
+                            let numericValue = 0;
+                            
+                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+                                // Limpiar el valor (remover comas, símbolos, espacios)
+                                const cleanValue = rawValue.toString()
+                                    .replace(/[,$%\s]/g, '')
+                                    .replace(/[^\d.-]/g, '')
+                                    .trim();
+                                    
+                                numericValue = parseFloat(cleanValue) || 0;
+                            }
+                            
+                            kpiData[monthCol.name] = numericValue;
+                        });
+                        
+                        kpis.push(kpiData);
+                        console.log(`✅ KPI procesado: ${kpiName}`);
+                    }
+                });
+                
+                console.log(`📊 Total KPIs procesados para ${agencyName}: ${kpis.length}`);
+                
+                if (kpis.length === 0) {
+                    throw new Error(`No se encontraron KPIs válidos en ${agencyName}`);
+                }
+                
+                return {
+                    agency: agencyName,
+                    kpis: kpis,
+                    months: monthColumns.map(col => col.name)
+                };
+                
+            } catch (error) {
+                console.error(`❌ Error procesando ${agencyName}:`, error);
+                throw error;
+            }
         }
         
         // Actualizar reloj
@@ -453,9 +662,7 @@
             updateMonthCheckboxes();
             updateStats();
             updateTable();
-            if (typeof updateCharts === 'function') {
-                updateCharts();
-            }
+            updateCharts();
         }
         
         // Actualizar lista de agencias
@@ -576,6 +783,7 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
+            updateCharts();
         }
         
         function toggleMonth(month) {
@@ -586,6 +794,7 @@
             }
             updateMonthCheckboxes();
             updateStats();
+            updateCharts();
         }
         
         function selectAllAgencies() {
@@ -593,6 +802,7 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
+            updateCharts();
         }
         
         function deselectAllAgencies() {
@@ -600,6 +810,7 @@
             updateAgencyCheckboxes();
             updateAgenciesList();
             updateStats();
+            updateCharts();
         }
         
         function updateAnalysis() {
@@ -612,6 +823,7 @@
                 return;
             }
             updateTable();
+            updateCharts();
             showStatus('success', `Análisis actualizado: ${selectedAgencies.length} agencias, ${selectedMonths.length} meses`);
         }
         
@@ -888,6 +1100,9 @@
                 }
             }
         });
+    </script>
+</body>
+</html>
     </script>warn(`⚠️ Error en ${sheetName}:`, dataResponse.status);
                             continue;
                         }
