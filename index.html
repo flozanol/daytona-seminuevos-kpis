@@ -201,29 +201,54 @@
         }
         
         function loadDemoData() {
+            // Demo data that matches your exact structure
             const demoData = [
                 {
                     agency: 'Honda Cuajimalpa (DEMO)',
                     kpis: [
-                        { name: 'Ventas Totales', Enero: 150, Febrero: 180, Marzo: 200 },
-                        { name: 'Leads Generados', Enero: 45, Febrero: 52, Marzo: 48 },
-                        { name: 'Conversión %', Enero: 12.5, Febrero: 15.2, Marzo: 14.8 }
+                        { 
+                            name: 'Ventas Totales', 
+                            Enero: 150, Febrero: 180, Marzo: 200, Abril: 175, Mayo: 220, Junio: 195,
+                            Julio: 210, Agosto: 185, Septiembre: 205, Octubre: 190, Noviembre: 225, Diciembre: 240
+                        },
+                        { 
+                            name: 'Leads Generados', 
+                            Enero: 45, Febrero: 52, Marzo: 48, Abril: 55, Mayo: 62, Junio: 58,
+                            Julio: 60, Agosto: 54, Septiembre: 59, Octubre: 56, Noviembre: 65, Diciembre: 70
+                        },
+                        { 
+                            name: 'Conversión %', 
+                            Enero: 12.5, Febrero: 15.2, Marzo: 14.8, Abril: 16.1, Mayo: 18.3, Junio: 17.2,
+                            Julio: 19.0, Agosto: 16.8, Septiembre: 17.9, Octubre: 18.1, Noviembre: 19.8, Diciembre: 21.2
+                        }
                     ],
-                    months: ['Enero', 'Febrero', 'Marzo']
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
                 },
                 {
                     agency: 'KIA Interlomas (DEMO)',
                     kpis: [
-                        { name: 'Ventas Totales', Enero: 120, Febrero: 160, Marzo: 190 },
-                        { name: 'Leads Generados', Enero: 40, Febrero: 48, Marzo: 55 },
-                        { name: 'Conversión %', Enero: 10.8, Febrero: 13.7, Marzo: 16.2 }
+                        { 
+                            name: 'Ventas Totales', 
+                            Enero: 120, Febrero: 160, Marzo: 190, Abril: 145, Mayo: 200, Junio: 175,
+                            Julio: 195, Agosto: 170, Septiembre: 185, Octubre: 180, Noviembre: 210, Diciembre: 220
+                        },
+                        { 
+                            name: 'Leads Generados', 
+                            Enero: 40, Febrero: 48, Marzo: 55, Abril: 52, Mayo: 58, Junio: 54,
+                            Julio: 56, Agosto: 50, Septiembre: 53, Octubre: 51, Noviembre: 60, Diciembre: 65
+                        },
+                        { 
+                            name: 'Conversión %', 
+                            Enero: 10.8, Febrero: 13.7, Marzo: 16.2, Abril: 14.5, Mayo: 17.1, Junio: 15.8,
+                            Julio: 16.9, Agosto: 15.2, Septiembre: 16.5, Octubre: 15.9, Noviembre: 18.3, Diciembre: 19.1
+                        }
                     ],
-                    months: ['Enero', 'Febrero', 'Marzo']
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
                 }
             ];
             
             displayResults(demoData);
-            showStatus('success', '✅ Datos de demostración cargados correctamente');
+            showStatus('success', '✅ Datos de demostración cargados correctamente - Estructura: KPI,Enero,Febrero,Marzo...');
         }
         
         function extractSpreadsheetId(url) {
@@ -362,58 +387,65 @@
                 console.log(`Headers en ${agencyName}:`, headers);
                 
                 const kpiColumn = headers.find(h => 
-                    h.toLowerCase().includes('kpi') || 
+                    h.toLowerCase().trim() === 'kpi' || 
                     h.toLowerCase().includes('indicador') ||
                     h.toLowerCase().includes('metrica')
                 );
                 
                 if (!kpiColumn) {
-                    console.warn(`No se encontró columna KPI en ${agencyName}`);
+                    console.warn(`No se encontró columna KPI en ${agencyName}. Headers disponibles:`, headers);
                     return null;
                 }
                 
+                console.log(`Columna KPI encontrada: "${kpiColumn}"`);
+                
+                // Definir exactamente los meses que esperas
+                const expectedMonths = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
                 const monthColumns = headers.filter(h => {
-                    const lower = h.toLowerCase();
-                    return lower.includes('enero') || lower.includes('febrero') || lower.includes('marzo') ||
-                           lower.includes('abril') || lower.includes('mayo') || lower.includes('junio') ||
-                           lower.includes('julio') || lower.includes('agosto') || lower.includes('septiembre') ||
-                           lower.includes('octubre') || lower.includes('noviembre') || lower.includes('diciembre') ||
-                           lower.includes('jan') || lower.includes('feb') || lower.includes('mar') ||
-                           lower.includes('apr') || lower.includes('may') || lower.includes('jun') ||
-                           lower.includes('jul') || lower.includes('aug') || lower.includes('sep') ||
-                           lower.includes('oct') || lower.includes('nov') || lower.includes('dec') ||
-                           /\d{4}/.test(h) || /q[1-4]/i.test(h);
+                    const trimmed = h.trim();
+                    return expectedMonths.includes(trimmed);
                 });
                 
                 console.log(`Columnas de meses encontradas en ${agencyName}:`, monthColumns);
                 
                 if (monthColumns.length === 0) {
-                    console.warn(`No se encontraron columnas de meses en ${agencyName}`);
+                    console.warn(`No se encontraron columnas de meses en ${agencyName}. Headers:`, headers);
                     return null;
                 }
                 
                 const kpis = [];
-                data.forEach(row => {
+                data.forEach((row, index) => {
                     const kpiName = row[kpiColumn];
-                    if (kpiName && kpiName.toString().trim()) {
+                    console.log(`Fila ${index}: KPI="${kpiName}", Datos completos:`, row);
+                    
+                    if (kpiName && kpiName.toString().trim() && kpiName.toString().trim() !== '') {
                         const kpiData = { name: kpiName.toString().trim() };
                         
-                        // Store original month names (not lowercase)
+                        // Store values using exact month names
                         monthColumns.forEach(month => {
-                            const value = row[month];
-                            console.log(`${agencyName} - ${kpiName} - ${month}: ${value}`);
-                            kpiData[month] = value ? parseFloat(value.toString().replace(/[,%$]/g, '')) || 0 : 0;
+                            const rawValue = row[month];
+                            let numericValue = 0;
+                            
+                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+                                const cleanValue = rawValue.toString().replace(/[,%$]/g, '').trim();
+                                numericValue = parseFloat(cleanValue) || 0;
+                            }
+                            
+                            kpiData[month] = numericValue;
+                            console.log(`  ${month}: "${rawValue}" → ${numericValue}`);
                         });
                         kpis.push(kpiData);
                     }
                 });
                 
-                console.log(`Datos procesados para ${agencyName}:`, kpis);
+                console.log(`KPIs procesados para ${agencyName}:`, kpis);
                 
                 return {
                     agency: agencyName,
                     kpis: kpis,
-                    months: monthColumns // Store original month names
+                    months: monthColumns
                 };
                 
             } catch (error) {
