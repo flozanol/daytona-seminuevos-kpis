@@ -99,9 +99,7 @@
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-chart-line text-white text-lg"></i>
-                    </div>
+                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-10 h-10 rounded-lg object-contain bg-white/10 p-1">
                     <div>
                         <h1 class="text-xl font-bold text-white">Grupo Daytona</h1>
                         <p class="text-sm text-gray-300">Dashboard KPIs Seminuevos</p>
@@ -124,7 +122,7 @@
         <!-- Hero Section -->
         <div class="text-center mb-12">
             <h2 class="text-5xl font-bold gradient-text mb-4">
-                Dashboard de KPIs
+                Dashboard KPIs Seminuevos Daytona
             </h2>
             <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
                 Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
@@ -644,12 +642,25 @@
             updateTable();
         }
         
-        // Actualizar lista de agencias
+        // Actualizar lista de agencias con fotos reales
         function updateAgenciesList() {
             const container = document.getElementById('agenciesList');
             if (!container) return;
             
             container.innerHTML = '';
+            
+            // URLs de fotos reales de las agencias
+            const agencyImages = {
+                'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
+                'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
+                'KIA Interlomas': 'https://api.grupodaytona.com/files/images/full-SVRzg-mH5a-1694311813102.jpg',
+                'KIA Iztapalapa': 'https://api.grupodaytona.com/files/images/full-NYSe9ky8Es-1694496101625.jpg',
+                'MG Cuajimalpa': 'https://api.grupodaytona.com/files/images/full-BuCGnVgNRs-1694497075960.jpg',
+                'MG Interlomas': 'https://api.grupodaytona.com/files/images/large-LkGvLDc6m3-1696379783532.png',
+                'MG Iztapalapa': 'https://api.grupodaytona.com/files/images/full-Li4Y-eqSkt-1694454220488.png',
+                'GWM Iztapalapa': 'https://api.grupodaytona.com/files/images/large-O491MhYAB8-1723762761679.jpg',
+                'GWM Morelos': 'https://api.grupodaytona.com/files/images/large-N1FaJzm1rW-1701102100287.jpg'
+            };
             
             const colors = [
                 'from-red-500 to-pink-500',
@@ -667,10 +678,19 @@
                 const div = document.createElement('div');
                 div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all card-hover cursor-pointer';
                 div.onclick = () => toggleAgency(agency.agency);
+                
+                const agencyPhoto = agencyImages[agency.agency] || '';
+                
                 div.innerHTML = `
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
-                            <i class="fas fa-store text-white"></i>
+                        <div class="relative">
+                            ${agencyPhoto ? 
+                                `<img src="${agencyPhoto}" alt="${agency.agency}" class="w-12 h-12 rounded-lg object-cover shadow-lg">
+                                 <div class="absolute inset-0 w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg opacity-20"></div>` :
+                                `<div class="w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-store text-white"></i>
+                                 </div>`
+                            }
                         </div>
                         <div class="flex-1">
                             <h4 class="font-semibold text-white">${agency.agency}</h4>
@@ -685,7 +705,7 @@
             });
         }
         
-        // Actualizar checkboxes de agencias
+        // Actualizar checkboxes de agencias con fotos
         function updateAgencyCheckboxes() {
             const container = document.getElementById('agencyCheckboxes');
             const count = document.getElementById('agencyCount');
@@ -694,6 +714,19 @@
             
             container.innerHTML = '';
             count.textContent = `Agencias (${selectedAgencies.length}/${loadedData.length})`;
+            
+            // URLs de fotos reales de las agencias
+            const agencyImages = {
+                'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
+                'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
+                'KIA Interlomas': 'https://api.grupodaytona.com/files/images/full-SVRzg-mH5a-1694311813102.jpg',
+                'KIA Iztapalapa': 'https://api.grupodaytona.com/files/images/full-NYSe9ky8Es-1694496101625.jpg',
+                'MG Cuajimalpa': 'https://api.grupodaytona.com/files/images/full-BuCGnVgNRs-1694497075960.jpg',
+                'MG Interlomas': 'https://api.grupodaytona.com/files/images/large-LkGvLDc6m3-1696379783532.png',
+                'MG Iztapalapa': 'https://api.grupodaytona.com/files/images/full-Li4Y-eqSkt-1694454220488.png',
+                'GWM Iztapalapa': 'https://api.grupodaytona.com/files/images/large-O491MhYAB8-1723762761679.jpg',
+                'GWM Morelos': 'https://api.grupodaytona.com/files/images/large-N1FaJzm1rW-1701102100287.jpg'
+            };
             
             const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
             
@@ -707,16 +740,23 @@
                 checkbox.className = 'w-4 h-4 text-red-500 bg-white/10 border-white/20 rounded focus:ring-red-500 focus:ring-2';
                 checkbox.onchange = () => toggleAgency(agency.agency);
                 
-                const colorDiv = document.createElement('div');
-                colorDiv.className = 'w-3 h-3 rounded-full';
-                colorDiv.style.backgroundColor = colors[index % colors.length];
+                const agencyPhoto = agencyImages[agency.agency];
+                
+                // Foto de la agencia o círculo de color
+                const imageDiv = document.createElement('div');
+                if (agencyPhoto) {
+                    imageDiv.innerHTML = `<img src="${agencyPhoto}" alt="${agency.agency}" class="w-6 h-6 rounded object-cover">`;
+                } else {
+                    imageDiv.className = 'w-3 h-3 rounded-full';
+                    imageDiv.style.backgroundColor = colors[index % colors.length];
+                }
                 
                 const span = document.createElement('span');
                 span.className = 'text-gray-300 text-sm font-medium';
                 span.textContent = agency.agency;
                 
                 label.appendChild(checkbox);
-                label.appendChild(colorDiv);
+                label.appendChild(imageDiv);
                 label.appendChild(span);
                 container.appendChild(label);
             });
