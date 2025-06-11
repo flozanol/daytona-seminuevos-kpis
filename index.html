@@ -205,18 +205,20 @@
                 {
                     agency: 'Honda Cuajimalpa (DEMO)',
                     kpis: [
-                        { name: 'Ventas Totales', enero: 150, febrero: 180, marzo: 200 },
-                        { name: 'Leads Generados', enero: 45, febrero: 52, marzo: 48 },
-                        { name: 'Conversión %', enero: 12.5, febrero: 15.2, marzo: 14.8 }
-                    ]
+                        { name: 'Ventas Totales', Enero: 150, Febrero: 180, Marzo: 200 },
+                        { name: 'Leads Generados', Enero: 45, Febrero: 52, Marzo: 48 },
+                        { name: 'Conversión %', Enero: 12.5, Febrero: 15.2, Marzo: 14.8 }
+                    ],
+                    months: ['Enero', 'Febrero', 'Marzo']
                 },
                 {
                     agency: 'KIA Interlomas (DEMO)',
                     kpis: [
-                        { name: 'Ventas Totales', enero: 120, febrero: 160, marzo: 190 },
-                        { name: 'Leads Generados', enero: 40, febrero: 48, marzo: 55 },
-                        { name: 'Conversión %', enero: 10.8, febrero: 13.7, marzo: 16.2 }
-                    ]
+                        { name: 'Ventas Totales', Enero: 120, Febrero: 160, Marzo: 190 },
+                        { name: 'Leads Generados', Enero: 40, Febrero: 48, Marzo: 55 },
+                        { name: 'Conversión %', Enero: 10.8, Febrero: 13.7, Marzo: 16.2 }
+                    ],
+                    months: ['Enero', 'Febrero', 'Marzo']
                 }
             ];
             
@@ -357,6 +359,8 @@
         function processCSVData(data, agencyName) {
             try {
                 const headers = Object.keys(data[0] || {});
+                console.log(`Headers en ${agencyName}:`, headers);
+                
                 const kpiColumn = headers.find(h => 
                     h.toLowerCase().includes('kpi') || 
                     h.toLowerCase().includes('indicador') ||
@@ -381,6 +385,8 @@
                            /\d{4}/.test(h) || /q[1-4]/i.test(h);
                 });
                 
+                console.log(`Columnas de meses encontradas en ${agencyName}:`, monthColumns);
+                
                 if (monthColumns.length === 0) {
                     console.warn(`No se encontraron columnas de meses en ${agencyName}`);
                     return null;
@@ -391,18 +397,23 @@
                     const kpiName = row[kpiColumn];
                     if (kpiName && kpiName.toString().trim()) {
                         const kpiData = { name: kpiName.toString().trim() };
+                        
+                        // Store original month names (not lowercase)
                         monthColumns.forEach(month => {
                             const value = row[month];
-                            kpiData[month.toLowerCase()] = value ? parseFloat(value.toString().replace(/[,%$]/g, '')) || 0 : 0;
+                            console.log(`${agencyName} - ${kpiName} - ${month}: ${value}`);
+                            kpiData[month] = value ? parseFloat(value.toString().replace(/[,%$]/g, '')) || 0 : 0;
                         });
                         kpis.push(kpiData);
                     }
                 });
                 
+                console.log(`Datos procesados para ${agencyName}:`, kpis);
+                
                 return {
                     agency: agencyName,
                     kpis: kpis,
-                    months: monthColumns
+                    months: monthColumns // Store original month names
                 };
                 
             } catch (error) {
@@ -627,7 +638,10 @@
                     // Get values for this KPI and month from all selected agencies
                     const values = filteredData.map(agency => {
                         const kpi = agency.kpis.find(k => k.name === kpiName);
-                        return kpi ? (kpi[month.toLowerCase()] || 0) : 0;
+                        // Use original month name (not lowercase)
+                        const value = kpi ? (kpi[month] || 0) : 0;
+                        console.log(`Buscando valor: Agencia=${agency.agency}, KPI=${kpiName}, Mes=${month}, Valor=${value}`);
+                        return value;
                     });
                     
                     const maxValue = Math.max(...values);
