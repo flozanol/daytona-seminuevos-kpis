@@ -5,708 +5,824 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KPIs Seminuevos - Grupo Daytona</title>
     
-    <!-- React y librerías -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
-    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Iconos -->
-    <script>
-        // Iconos simplificados inline
-        window.Icons = {
-            BarChart3: () => React.createElement('svg', { 
-                width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M3 3v18h18' }),
-                React.createElement('path', { d: 'M18 17V9' }),
-                React.createElement('path', { d: 'M13 17V5' }),
-                React.createElement('path', { d: 'M8 17v-3' })
-            ),
-            Upload: () => React.createElement('svg', { 
-                width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }),
-                React.createElement('polyline', { points: '17,8 12,3 7,8' }),
-                React.createElement('line', { x1: 12, y1: 3, x2: 12, y2: 15 })
-            ),
-            Link: () => React.createElement('svg', { 
-                width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
-                React.createElement('path', { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' })
-            ),
-            Building2: () => React.createElement('svg', { 
-                width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z' }),
-                React.createElement('path', { d: 'M6 12H4a2 2 0 0 0-2 2v8h4' }),
-                React.createElement('path', { d: 'M18 9h2a2 2 0 0 1 2 2v11h-4' }),
-                React.createElement('path', { d: 'M10 6h4' }),
-                React.createElement('path', { d: 'M10 10h4' }),
-                React.createElement('path', { d: 'M10 14h4' }),
-                React.createElement('path', { d: 'M10 18h4' })
-            ),
-            Calendar: () => React.createElement('svg', { 
-                width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('rect', { x: 3, y: 4, width: 18, height: 18, rx: 2, ry: 2 }),
-                React.createElement('line', { x1: 16, y1: 2, x2: 16, y2: 6 }),
-                React.createElement('line', { x1: 8, y1: 2, x2: 8, y2: 6 }),
-                React.createElement('line', { x1: 3, y1: 10, x2: 21, y2: 10 })
-            ),
-            FileSpreadsheet: () => React.createElement('svg', { 
-                width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' }),
-                React.createElement('polyline', { points: '14,2 14,8 20,8' }),
-                React.createElement('path', { d: 'M8 13h2' }),
-                React.createElement('path', { d: 'M14 13h2' }),
-                React.createElement('path', { d: 'M8 17h2' }),
-                React.createElement('path', { d: 'M14 17h2' })
-            ),
-            TrendingUp: () => React.createElement('svg', { 
-                width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('polyline', { points: '22,7 13.5,15.5 8.5,10.5 2,17' }),
-                React.createElement('polyline', { points: '16,7 22,7 22,13' })
-            ),
-            X: () => React.createElement('svg', { 
-                width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('line', { x1: 18, y1: 6, x2: 6, y2: 18 }),
-                React.createElement('line', { x1: 6, y1: 6, x2: 18, y2: 18 })
-            ),
-            RefreshCw: () => React.createElement('svg', { 
-                width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('path', { d: 'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8' }),
-                React.createElement('path', { d: 'M21 3v5h-5' }),
-                React.createElement('path', { d: 'M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16' }),
-                React.createElement('path', { d: 'M8 16l-5-5 5-5' })
-            ),
-            AlertCircle: () => React.createElement('svg', { 
-                width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 
-            }, 
-                React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
-                React.createElement('line', { x1: 12, y1: 8, x2: 12, y2: 12 }),
-                React.createElement('line', { x1: 12, y1: 16, x2: 12.01, y2: 16 })
-            )
-        };
-    </script>
+    <!-- PapaParse para CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzFGMjkzNyIvPgo8cGF0aCBkPSJNOCAxNkgyNE04IDE2QzggMTMuNzkwOSA5Ljc5MDg2IDEyIDEyIDEySDIwQzIyLjIwOTEgMTIgMjQgMTMuNzkwOSAyNCAxNlMyMi4yMDkxIDIwIDIwIDIwSDEyQzkuNzkwODYgMjAgOCAxOC4yMDkxIDggMTZaIiBzdHJva2U9IiNGRjY1MDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K">
-    <meta name="description" content="Dashboard interactivo de KPIs para agencias de seminuevos de Grupo Daytona">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #dc2626;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .shadow-r {
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black min-h-screen">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-2xl shadow-2xl border border-gray-200 p-8 mb-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
+                    <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    KPIs Seminuevos - Grupo Daytona
+                </h1>
+                <p class="text-gray-700 text-lg">Conecta tu Google Sheets y genera comparativas automáticas de tus agencias automotrices</p>
+            </div>
 
-    <script type="text/babel">
-        const { useState, useCallback } = React;
-        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer } = Recharts;
+            <!-- Conexión Google Sheets -->
+            <div class="mb-8">
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-800">Conectar Google Sheets (RECOMENDADO)</h3>
+                    </div>
+                    <div class="text-sm text-gray-700 space-y-2 mb-4">
+                        <p><strong>📋 Paso 1:</strong> Haz tu Google Sheets PÚBLICO para lectura</p>
+                        <p><strong>🔗 Paso 2:</strong> Compartir → Cualquier persona con el enlace → Visor</p>
+                        <p><strong>📝 Paso 3:</strong> Copia la URL de tu Google Sheets y pégala aquí:</p>
+                        <p class="text-xs text-green-600 font-mono">Ejemplo: https://docs.google.com/spreadsheets/d/TU_ID_AQUI/edit</p>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="googleSheetsUrl"
+                            placeholder="https://docs.google.com/spreadsheets/d/TU_SPREADSHEET_ID/edit"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        >
+                        <button 
+                            id="connectBtn"
+                            onclick="connectToGoogleSheets()"
+                            class="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                            Conectar
+                        </button>
+                    </div>
 
-        const KPIAnalyzer = () => {
-          const [agencies, setAgencies] = useState([]);
-          const [selectedAgencies, setSelectedAgencies] = useState([]);
-          const [selectedMonths, setSelectedMonths] = useState([]);
-          const [loading, setLoading] = useState(false);
-          const [allKPIs, setAllKPIs] = useState([]);
-          const [allMonths, setAllMonths] = useState([]);
-          const [googleSheetsUrl, setGoogleSheetsUrl] = useState('');
-          const [connectionStatus, setConnectionStatus] = useState('');
+                    <div id="connectionStatus" class="mt-3 hidden"></div>
+                </div>
 
-          const extractSpreadsheetId = (url) => {
+                <!-- File Upload -->
+                <div class="mb-8">
+                    <label for="fileInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-red-300 border-dashed rounded-xl cursor-pointer bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-10 h-10 mb-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="mb-2 text-sm text-red-600">
+                                <span class="font-semibold">Clic para subir</span> archivos CSV de agencias
+                            </p>
+                            <p class="text-xs text-red-500">CSV - Múltiples archivos permitidos</p>
+                        </div>
+                        <input type="file" id="fileInput" class="hidden" accept=".csv" multiple onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="text-center py-8 hidden">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Procesando datos...</p>
+            </div>
+
+            <!-- Agencias Cargadas -->
+            <div id="agenciesSection" class="hidden">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    <span id="agenciesTitle">Agencias Cargadas (0/9)</span>
+                </h3>
+                <div id="agenciesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"></div>
+
+                <!-- Configuración -->
+                <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border border-gray-200 mb-8">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Configuración de Análisis
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                <span id="agenciesCount">Agencias (0/9)</span>
+                            </label>
+                            <div class="max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-white shadow-inner">
+                                <div class="mb-2 pb-2 border-b border-gray-200">
+                                    <button onclick="selectAllAgencies()" class="text-xs text-red-600 hover:text-red-800 mr-2 font-medium">Seleccionar todas</button>
+                                    <button onclick="deselectAllAgencies()" class="text-xs text-gray-600 hover:text-gray-800 font-medium">Deseleccionar todas</button>
+                                </div>
+                                <div id="agenciesCheckboxes"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span id="monthsCount">Meses (0)</span>
+                            </label>
+                            <div class="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-white">
+                                <div id="monthsCheckboxes"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de KPIs -->
+                <div id="kpiTable" class="bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200 mb-8 hidden">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold flex items-center gap-2">
+                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Comparativa de KPIs por Agencia
+                        </h3>
+                        <div class="text-sm text-gray-600" id="tableStats"></div>
+                    </div>
+                    <div class="overflow-auto max-h-96">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr id="tableHeader"></tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="tableBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-lg border border-red-200">
+                            <h4 class="font-medium text-red-800 mb-2">Total de KPIs</h4>
+                            <p class="text-2xl font-bold text-red-600" id="totalKPIs">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-lg border border-amber-200">
+                            <h4 class="font-medium text-amber-800 mb-2">Agencias Analizadas</h4>
+                            <p class="text-2xl font-bold text-amber-600" id="totalAgencies">0</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
+                            <h4 class="font-medium text-orange-800 mb-2">Períodos Analizados</h4>
+                            <p class="text-2xl font-bold text-orange-600" id="totalMonths">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div id="chartsSection" class="space-y-8 hidden">
+                    <div class="bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200">
+                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            Comparativa de KPIs por Agencia
+                        </h3>
+                        <div class="h-96">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200">
+                        <h3 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            Tendencias Mensuales por Agencia
+                        </h3>
+                        <div class="h-96">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let agencies = [];
+        let selectedAgencies = [];
+        let selectedMonths = [];
+        let allKPIs = [];
+        let allMonths = [];
+        
+        const colors = ['#DC2626', '#EA580C', '#D97706', '#CA8A04', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED'];
+
+        // Utilidades
+        function extractSpreadsheetId(url) {
             const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
             return match ? match[1] : null;
-          };
+        }
 
-          const fetchGoogleSheet = async (spreadsheetId, sheetName) => {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
-            
-            try {
-              const response = await fetch(csvUrl);
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-              }
-              
-              const csvText = await response.text();
-              if (csvText.includes('<!DOCTYPE html>') || csvText.includes('<html')) {
-                throw new Error(`La hoja "${sheetName}" no existe o no es accesible`);
-              }
-              
-              return csvText;
-            } catch (error) {
-              throw new Error(`No se pudo cargar la hoja "${sheetName}": ${error.message}`);
-            }
-          };
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
 
-          const processParsedData = (data, agencyName) => {
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        function showConnectionStatus(type, message) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.className = `mt-3 p-2 border rounded text-sm flex items-center gap-2 ${
+                type === 'success' ? 'bg-green-100 border-green-300 text-green-800' : 
+                'bg-red-100 border-red-300 text-red-800'
+            }`;
+            statusDiv.innerHTML = `
+                <div class="w-2 h-2 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} rounded-full"></div>
+                ${message}
+            `;
+            statusDiv.classList.remove('hidden');
+        }
+
+        // Procesar datos
+        function processParsedData(data, agencyName) {
             if (!data || data.length === 0) {
-              throw new Error(`La hoja "${agencyName}" está vacía`);
+                throw new Error(`La hoja "${agencyName}" está vacía`);
             }
 
             const headers = Object.keys(data[0]);
             const kpiColumn = headers.find(h => 
-              h.toLowerCase().includes('kpi') || 
-              h.toLowerCase().includes('indicador') ||
-              h.toLowerCase().includes('metrica') ||
-              h.toLowerCase().includes('metric')
+                h.toLowerCase().includes('kpi') || 
+                h.toLowerCase().includes('indicador') ||
+                h.toLowerCase().includes('metrica') ||
+                h.toLowerCase().includes('metric')
             );
             
             if (!kpiColumn) {
-              throw new Error(`No se encontró una columna de KPIs en "${agencyName}"`);
+                throw new Error(`No se encontró una columna de KPIs en "${agencyName}"`);
             }
 
             const monthColumns = headers.filter(header => {
-              const monthRegex = /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}\/\d{4}|\d{4}-\d{2})/i;
-              return monthRegex.test(header) || /^(Q[1-4]|T[1-4])/.test(header);
+                const monthRegex = /(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}\/\d{4}|\d{4}-\d{2})/i;
+                return monthRegex.test(header) || /^(Q[1-4]|T[1-4])/.test(header);
             });
 
             if (monthColumns.length === 0) {
-              throw new Error(`No se encontraron columnas de meses en "${agencyName}"`);
+                throw new Error(`No se encontraron columnas de meses en "${agencyName}"`);
             }
 
             const monthlyData = {};
             const kpis = [];
 
             data.forEach(row => {
-              const kpiName = row[kpiColumn];
-              if (kpiName && kpiName.toString().trim() !== '' && kpiName.toString().trim() !== 'undefined') {
-                kpis.push(kpiName.toString().trim());
-                monthlyData[kpiName] = {};
-                
-                monthColumns.forEach(month => {
-                  const value = row[month];
-                  monthlyData[kpiName][month] = value ? parseFloat(value.toString().replace(/[,%$]/g, '')) || 0 : 0;
-                });
-              }
+                const kpiName = row[kpiColumn];
+                if (kpiName && kpiName.toString().trim() !== '' && kpiName.toString().trim() !== 'undefined') {
+                    kpis.push(kpiName.toString().trim());
+                    monthlyData[kpiName] = {};
+                    
+                    monthColumns.forEach(month => {
+                        const value = row[month];
+                        monthlyData[kpiName][month] = value ? parseFloat(value.toString().replace(/[,%$]/g, '')) || 0 : 0;
+                    });
+                }
             });
 
             return {
-              name: agencyName,
-              kpis,
-              months: monthColumns,
-              monthlyData,
-              fileName: agencyName
+                name: agencyName,
+                kpis,
+                months: monthColumns,
+                monthlyData,
+                fileName: agencyName
             };
-          };
+        }
 
-          const connectToGoogleSheets = async () => {
-            if (!googleSheetsUrl.trim()) {
-              alert('Por favor ingresa la URL del Google Sheets');
-              return;
+        // Conectar a Google Sheets
+        async function connectToGoogleSheets() {
+            const url = document.getElementById('googleSheetsUrl').value.trim();
+            
+            if (!url) {
+                alert('Por favor ingresa la URL del Google Sheets');
+                return;
             }
 
-            const spreadsheetId = extractSpreadsheetId(googleSheetsUrl);
+            const spreadsheetId = extractSpreadsheetId(url);
             if (!spreadsheetId) {
-              alert('❌ URL inválida. Asegúrate de usar una URL válida de Google Sheets');
-              return;
+                alert('❌ URL inválida. Asegúrate de usar una URL válida de Google Sheets');
+                return;
             }
 
-            setLoading(true);
-            setConnectionStatus('loading');
+            showLoading();
             
             try {
-              const expectedAgencies = [
-                'GWM Iztapalapa', 'GWM Morelos', 'Honda Cuajimalpa', 'Honda Interlomas', 
-                'KIA Interlomas', 'KIA Iztapalapa', 'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa'
-              ];
+                const expectedAgencies = [
+                    'GWM Iztapalapa', 'GWM Morelos', 'Honda Cuajimalpa', 'Honda Interlomas', 
+                    'KIA Interlomas', 'KIA Iztapalapa', 'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa'
+                ];
 
-              const loadedAgencies = [];
-              const allKPIsSet = new Set();
-              const allMonthsSet = new Set();
-              const errors = [];
-              const successes = [];
+                const loadedAgencies = [];
+                const allKPIsSet = new Set();
+                const allMonthsSet = new Set();
+                const errors = [];
+                const successes = [];
 
-              for (const agencyName of expectedAgencies) {
-                try {
-                  const csvData = await fetchGoogleSheet(spreadsheetId, agencyName);
-                  
-                  if (csvData && csvData.trim().length > 0) {
-                    const parsedData = Papa.parse(csvData, {
-                      header: true,
-                      skipEmptyLines: true,
-                      transformHeader: (header) => header.trim(),
-                      delimiter: ','
-                    });
+                for (const agencyName of expectedAgencies) {
+                    try {
+                        const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&sheet=${encodeURIComponent(agencyName)}`;
+                        const response = await fetch(csvUrl);
+                        
+                        if (!response.ok) continue;
+                        
+                        const csvText = await response.text();
+                        if (csvText.includes('<!DOCTYPE html>') || csvText.includes('<html')) continue;
+                        
+                        const parsedData = Papa.parse(csvText, {
+                            header: true,
+                            skipEmptyLines: true,
+                            transformHeader: (header) => header.trim()
+                        });
 
-                    if (parsedData.data && parsedData.data.length > 0) {
-                      const processedData = processParsedData(parsedData.data, agencyName);
-                      loadedAgencies.push(processedData);
-                      
-                      processedData.kpis.forEach(kpi => allKPIsSet.add(kpi));
-                      processedData.months.forEach(month => allMonthsSet.add(month));
-                      
-                      successes.push(`✅ ${agencyName}: ${processedData.kpis.length} KPIs, ${processedData.months.length} meses`);
-                    } else {
-                      errors.push(`❌ ${agencyName}: Hoja vacía`);
+                        if (parsedData.data && parsedData.data.length > 0) {
+                            const processedData = processParsedData(parsedData.data, agencyName);
+                            loadedAgencies.push(processedData);
+                            
+                            processedData.kpis.forEach(kpi => allKPIsSet.add(kpi));
+                            processedData.months.forEach(month => allMonthsSet.add(month));
+                            
+                            successes.push(`✅ ${agencyName}: ${processedData.kpis.length} KPIs, ${processedData.months.length} meses`);
+                        } else {
+                            errors.push(`❌ ${agencyName}: Hoja vacía`);
+                        }
+                    } catch (error) {
+                        errors.push(`❌ ${agencyName}: ${error.message}`);
                     }
-                  } else {
-                    errors.push(`❌ ${agencyName}: Sin datos`);
-                  }
-                } catch (error) {
-                  errors.push(`❌ ${agencyName}: ${error.message}`);
                 }
-              }
 
-              if (loadedAgencies.length === 0) {
-                throw new Error(`❌ No se pudo cargar ninguna hoja.\n\n${errors.join('\n')}\n\nVerifica que el documento sea público y las hojas tengan nombres correctos.`);
-              }
+                if (loadedAgencies.length === 0) {
+                    throw new Error(`❌ No se pudo cargar ninguna hoja.\n\n${errors.join('\n')}\n\nVerifica que el documento sea público y las hojas tengan nombres correctos.`);
+                }
 
-              setAgencies(loadedAgencies);
-              setAllKPIs(Array.from(allKPIsSet));
-              setAllMonths(Array.from(allMonthsSet));
-              setSelectedAgencies(loadedAgencies.map(a => a.name));
-              setSelectedMonths(Array.from(allMonthsSet).slice(0, 6));
-              setConnectionStatus('success');
-              
-              alert(`🎉 ¡CONEXIÓN EXITOSA!\n\n${successes.join('\n')}\n\n${errors.length > 0 ? '\n⚠️ Advertencias:\n' + errors.join('\n') : ''}`);
+                agencies = loadedAgencies;
+                allKPIs = Array.from(allKPIsSet);
+                allMonths = Array.from(allMonthsSet);
+                selectedAgencies = loadedAgencies.map(a => a.name);
+                selectedMonths = allMonths.slice(0, 6);
+                
+                showConnectionStatus('success', `Conectado exitosamente - ${agencies.length} agencias cargadas`);
+                updateUI();
+                
+                alert(`🎉 ¡CONEXIÓN EXITOSA!\n\n${successes.join('\n')}\n\n${errors.length > 0 ? '\n⚠️ Advertencias:\n' + errors.join('\n') : ''}`);
 
             } catch (error) {
-              setConnectionStatus('error');
-              alert(`❌ Error: ${error.message}`);
+                showConnectionStatus('error', 'Error de conexión - Verifica que el documento sea público');
+                alert(`❌ Error: ${error.message}`);
             }
             
-            setLoading(false);
-          };
+            hideLoading();
+        }
 
-          const handleFileUpload = useCallback(async (files) => {
+        // Subir archivos CSV
+        async function handleFileUpload(event) {
+            const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            setLoading(true);
+            showLoading();
             const newAgencies = [];
 
             try {
-              for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const agencyName = file.name.split('.')[0];
-                
-                try {
-                  const csvData = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsText(file);
-                  });
-                  
-                  const parsedData = Papa.parse(csvData, {
-                    header: true,
-                    skipEmptyLines: true,
-                    transformHeader: (header) => header.trim()
-                  });
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const agencyName = file.name.split('.')[0];
+                    
+                    try {
+                        const csvData = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.readAsText(file);
+                        });
+                        
+                        const parsedData = Papa.parse(csvData, {
+                            header: true,
+                            skipEmptyLines: true,
+                            transformHeader: (header) => header.trim()
+                        });
 
-                  if (parsedData.data && parsedData.data.length > 0) {
-                    const processedData = processParsedData(parsedData.data, agencyName);
-                    newAgencies.push(processedData);
-                  }
-                } catch (error) {
-                  alert(`Error procesando ${file.name}: ${error.message}`);
+                        if (parsedData.data && parsedData.data.length > 0) {
+                            const processedData = processParsedData(parsedData.data, agencyName);
+                            newAgencies.push(processedData);
+                        }
+                    } catch (error) {
+                        alert(`Error procesando ${file.name}: ${error.message}`);
+                    }
                 }
-              }
 
-              if (newAgencies.length > 0) {
-                setAgencies(newAgencies);
-                const allKPIsSet = new Set();
-                const allMonthsSet = new Set();
-                newAgencies.forEach(agency => {
-                  agency.kpis.forEach(kpi => allKPIsSet.add(kpi));
-                  agency.months.forEach(month => allMonthsSet.add(month));
-                });
-                setAllKPIs(Array.from(allKPIsSet));
-                setAllMonths(Array.from(allMonthsSet));
-                setSelectedAgencies(newAgencies.map(a => a.name));
-                setSelectedMonths(Array.from(allMonthsSet).slice(0, 6));
-              }
+                if (newAgencies.length > 0) {
+                    agencies = newAgencies;
+                    const allKPIsSet = new Set();
+                    const allMonthsSet = new Set();
+                    agencies.forEach(agency => {
+                        agency.kpis.forEach(kpi => allKPIsSet.add(kpi));
+                        agency.months.forEach(month => allMonthsSet.add(month));
+                    });
+                    allKPIs = Array.from(allKPIsSet);
+                    allMonths = Array.from(allMonthsSet);
+                    selectedAgencies = agencies.map(a => a.name);
+                    selectedMonths = allMonths.slice(0, 6);
+                    updateUI();
+                }
             } catch (error) {
-              alert('Error procesando archivos');
+                alert('Error procesando archivos');
             }
-            setLoading(false);
-          }, []);
+            hideLoading();
+        }
 
-          const removeAgency = (agencyName) => {
-            const updatedAgencies = agencies.filter(a => a.name !== agencyName);
-            setAgencies(updatedAgencies);
-            setSelectedAgencies(selectedAgencies.filter(name => name !== agencyName));
-          };
+        // Actualizar interfaz
+        function updateUI() {
+            if (agencies.length === 0) return;
 
-          const colors = ['#DC2626', '#EA580C', '#D97706', '#CA8A04', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED'];
+            // Mostrar sección de agencias
+            document.getElementById('agenciesSection').classList.remove('hidden');
+            
+            // Actualizar título
+            document.getElementById('agenciesTitle').textContent = `Agencias Cargadas (${agencies.length}/9)`;
+            
+            // Lista de agencias
+            const agenciesList = document.getElementById('agenciesList');
+            agenciesList.innerHTML = '';
+            
+            agencies.forEach((agency, index) => {
+                const agencyCard = document.createElement('div');
+                agencyCard.className = 'bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 relative border-l-4 shadow-md';
+                agencyCard.style.borderLeftColor = colors[index % colors.length];
+                agencyCard.innerHTML = `
+                    <button onclick="removeAgency('${agency.name}')" class="absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full p-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center mb-2">
+                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: ${colors[index % colors.length]}"></div>
+                        <h4 class="font-semibold text-gray-800 pr-6">${agency.name}</h4>
+                    </div>
+                    <p class="text-sm text-gray-600">${agency.kpis.length} KPIs</p>
+                    <p class="text-sm text-gray-600">${agency.months.length} meses</p>
+                `;
+                agenciesList.appendChild(agencyCard);
+            });
+            
+            // Checkboxes de agencias
+            updateAgenciesCheckboxes();
+            updateMonthsCheckboxes();
+            updateTable();
+            updateCharts();
+        }
 
-          return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-6" },
-            React.createElement('div', { className: "max-w-7xl mx-auto" },
-              React.createElement('div', { className: "bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-2xl shadow-2xl border border-gray-200 p-8 mb-8" },
-                React.createElement('div', { className: "text-center mb-8" },
-                  React.createElement('h1', { className: "text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3" },
-                    React.createElement(Icons.BarChart3, { className: "text-red-500" }),
-                    "KPIs Seminuevos - Grupo Daytona"
-                  ),
-                  React.createElement('p', { className: "text-gray-700 text-lg" }, "Conecta tu Google Sheets y genera comparativas automáticas de tus agencias automotrices")
-                ),
+        function updateAgenciesCheckboxes() {
+            const container = document.getElementById('agenciesCheckboxes');
+            const countLabel = document.getElementById('agenciesCount');
+            
+            container.innerHTML = '';
+            countLabel.textContent = `Agencias (${selectedAgencies.length}/9)`;
+            
+            agencies.forEach((agency, index) => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-2 rounded';
+                label.innerHTML = `
+                    <input type="checkbox" ${selectedAgencies.includes(agency.name) ? 'checked' : ''} 
+                           onchange="toggleAgency('${agency.name}')" 
+                           class="rounded text-red-600 focus:ring-red-500">
+                    <div class="w-3 h-3 rounded-full" style="background-color: ${colors[index % colors.length]}"></div>
+                    <span class="flex-1">${agency.name}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
 
-                React.createElement('div', { className: "mb-8" },
-                  React.createElement('div', { className: "bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4" },
-                    React.createElement('div', { className: "flex items-center gap-2 mb-2" },
-                      React.createElement(Icons.Link, { className: "text-green-600" }),
-                      React.createElement('h3', { className: "font-semibold text-gray-800" }, "Conectar Google Sheets (RECOMENDADO)")
-                    ),
-                    React.createElement('div', { className: "text-sm text-gray-700 space-y-2 mb-4" },
-                      React.createElement('p', null, React.createElement('strong', null, "📋 Paso 1:"), " Haz tu Google Sheets PÚBLICO para lectura"),
-                      React.createElement('p', null, React.createElement('strong', null, "🔗 Paso 2:"), " Compartir → Cualquier persona con el enlace → Visor"),
-                      React.createElement('p', null, React.createElement('strong', null, "📝 Paso 3:"), " Copia la URL de tu Google Sheets y pégala aquí:")
-                    ),
+        function updateMonthsCheckboxes() {
+            const container = document.getElementById('monthsCheckboxes');
+            const countLabel = document.getElementById('monthsCount');
+            
+            container.innerHTML = '';
+            countLabel.textContent = `Meses (${selectedMonths.length})`;
+            
+            allMonths.forEach(month => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-1 rounded';
+                label.innerHTML = `
+                    <input type="checkbox" ${selectedMonths.includes(month) ? 'checked' : ''} 
+                           onchange="toggleMonth('${month}')" 
+                           class="rounded text-red-600 focus:ring-red-500">
+                    <span class="flex-1">${month}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function updateTable() {
+            if (selectedAgencies.length === 0 || selectedMonths.length === 0) {
+                document.getElementById('kpiTable').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('kpiTable').classList.remove('hidden');
+            
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            const tableStats = document.getElementById('tableStats');
+            
+            // Stats
+            tableStats.textContent = `${selectedAgencies.length} de ${agencies.length} agencias | ${selectedMonths.length} meses | ${allKPIs.length} KPIs`;
+            
+            // Header
+            tableHeader.innerHTML = `
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KPI</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mes</th>
+                ${selectedAgencies.map((agency, index) => 
+                    `<th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" 
+                         style="background-color: ${colors[index % colors.length]}20">${agency}</th>`
+                ).join('')}
+            `;
+            
+            // Body
+            tableBody.innerHTML = '';
+            allKPIs.forEach(kpi => {
+                selectedMonths.forEach((month, monthIndex) => {
+                    const row = document.createElement('tr');
+                    row.className = monthIndex % 2 === 0 ? 'bg-white' : 'bg-amber-50';
                     
-                    React.createElement('div', { className: "flex gap-2" },
-                      React.createElement('input', {
-                        type: "text",
-                        placeholder: "https://docs.google.com/spreadsheets/d/TU_SPREADSHEET_ID/edit",
-                        value: googleSheetsUrl,
-                        onChange: (e) => setGoogleSheetsUrl(e.target.value),
-                        className: "flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      }),
-                      React.createElement('button', {
-                        onClick: connectToGoogleSheets,
-                        disabled: loading,
-                        className: "px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
-                      },
-                        loading ? 
-                          React.createElement(React.Fragment, null,
-                            React.createElement(Icons.RefreshCw, { className: "animate-spin" }),
-                            "Conectando..."
-                          ) :
-                          React.createElement(React.Fragment, null,
-                            React.createElement(Icons.Link),
-                            "Conectar"
-                          )
-                      )
-                    ),
-
-                    connectionStatus === 'success' && React.createElement('div', { className: "mt-3 p-2 bg-green-100 border border-green-300 rounded text-green-800 text-sm flex items-center gap-2" },
-                      React.createElement('div', { className: "w-2 h-2 bg-green-500 rounded-full" }),
-                      `Conectado exitosamente - ${agencies.length} agencias cargadas`
-                    ),
-
-                    connectionStatus === 'error' && React.createElement('div', { className: "mt-3 p-2 bg-red-100 border border-red-300 rounded text-red-800 text-sm flex items-center gap-2" },
-                      React.createElement(Icons.AlertCircle),
-                      "Error de conexión - Verifica que el documento sea público"
-                    )
-                  ),
-
-                  React.createElement('div', { className: "mb-8" },
-                    React.createElement('label', { className: "flex flex-col items-center justify-center w-full h-32 border-2 border-red-300 border-dashed rounded-xl cursor-pointer bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors" },
-                      React.createElement('div', { className: "flex flex-col items-center justify-center pt-5 pb-6" },
-                        React.createElement(Icons.Upload, { className: "w-10 h-10 mb-3 text-red-500" }),
-                        React.createElement('p', { className: "mb-2 text-sm text-red-600" },
-                          React.createElement('span', { className: "font-semibold" }, "Clic para subir"), " archivos CSV de agencias"
-                        ),
-                        React.createElement('p', { className: "text-xs text-red-500" }, "CSV - Múltiples archivos permitidos")
-                      ),
-                      React.createElement('input', {
-                        type: "file",
-                        className: "hidden",
-                        accept: ".csv",
-                        multiple: true,
-                        onChange: (e) => handleFileUpload(e.target.files)
-                      })
-                    )
-                  )
-                ),
-
-                agencies.length > 0 && React.createElement('div', { className: "space-y-8" },
-                  React.createElement('div', { className: "mb-8" },
-                    React.createElement('h3', { className: "text-lg font-semibold mb-4 flex items-center gap-2" },
-                      React.createElement(Icons.Building2, { className: "text-red-500" }),
-                      `Agencias Cargadas (${agencies.length}/9)`
-                    ),
-                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" },
-                      agencies.map((agency, index) => 
-                        React.createElement('div', { 
-                          key: agency.name, 
-                          className: "bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 relative border-l-4 shadow-md",
-                          style: { borderLeftColor: colors[index % colors.length] }
-                        },
-                          React.createElement('button', {
-                            onClick: () => removeAgency(agency.name),
-                            className: "absolute top-2 right-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full p-1"
-                          },
-                            React.createElement(Icons.X)
-                          ),
-                          React.createElement('div', { className: "flex items-center mb-2" },
-                            React.createElement('div', { 
-                              className: "w-3 h-3 rounded-full mr-2",
-                              style: { backgroundColor: colors[index % colors.length] }
-                            }),
-                            React.createElement('h4', { className: "font-semibold text-gray-800 pr-6" }, agency.name)
-                          ),
-                          React.createElement('p', { className: "text-sm text-gray-600" }, `${agency.kpis.length} KPIs`),
-                          React.createElement('p', { className: "text-sm text-gray-600" }, `${agency.months.length} meses`)
-                        )
-                      )
-                    )
-                  ),
-
-                  loading && React.createElement('div', { className: "text-center py-8" },
-                    React.createElement('div', { className: "inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" }),
-                    React.createElement('p', { className: "mt-2 text-gray-600" }, "Procesando datos...")
-                  ),
-
-                  // Configuración
-                  React.createElement('div', { className: "bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border border-gray-200" },
-                    React.createElement('h3', { className: "text-xl font-semibold mb-4 flex items-center gap-2" },
-                      React.createElement(Icons.FileSpreadsheet, { className: "text-red-500" }),
-                      "Configuración de Análisis"
-                    ),
+                    let rowHTML = `
+                        <td class="px-4 py-4 text-sm font-medium text-gray-800">${kpi}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">${month}</td>
+                    `;
                     
-                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-6" },
-                      React.createElement('div', null,
-                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-2" },
-                          React.createElement(Icons.Building2, { className: "inline mr-1" }),
-                          `Agencias (${selectedAgencies.length}/9)`
-                        ),
-                        React.createElement('div', { className: "max-h-48 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-white shadow-inner" },
-                          React.createElement('div', { className: "mb-2 pb-2 border-b border-gray-200" },
-                            React.createElement('button', {
-                              onClick: () => setSelectedAgencies(agencies.map(a => a.name)),
-                              className: "text-xs text-red-600 hover:text-red-800 mr-2 font-medium"
-                            }, "Seleccionar todas"),
-                            React.createElement('button', {
-                              onClick: () => setSelectedAgencies([]),
-                              className: "text-xs text-gray-600 hover:text-gray-800 font-medium"
-                            }, "Deseleccionar todas")
-                          ),
-                          agencies.map((agency, index) => 
-                            React.createElement('label', { 
-                              key: agency.name, 
-                              className: "flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-2 rounded" 
-                            },
-                              React.createElement('input', {
-                                type: "checkbox",
-                                checked: selectedAgencies.includes(agency.name),
-                                onChange: (e) => {
-                                  if (e.target.checked) {
-                                    if (selectedAgencies.length < 9) {
-                                      setSelectedAgencies([...selectedAgencies, agency.name]);
-                                    } else {
-                                      alert('Máximo 9 agencias pueden ser seleccionadas para comparación');
-                                    }
-                                  } else {
-                                    setSelectedAgencies(selectedAgencies.filter(a => a !== agency.name));
-                                  }
-                                },
-                                className: "rounded text-red-600 focus:ring-red-500"
-                              }),
-                              React.createElement('div', { 
-                                className: "w-3 h-3 rounded-full",
-                                style: { backgroundColor: colors[index % colors.length] }
-                              }),
-                              React.createElement('span', { className: "flex-1" }, agency.name)
-                            )
-                          )
-                        )
-                      ),
-
-                      React.createElement('div', null,
-                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-2" },
-                          React.createElement(Icons.Calendar, { className: "inline mr-1" }),
-                          `Meses (${selectedMonths.length})`
-                        ),
-                        React.createElement('div', { className: "max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-3 bg-white" },
-                          allMonths.map(month => 
-                            React.createElement('label', { 
-                              key: month, 
-                              className: "flex items-center space-x-2 text-sm mb-2 cursor-pointer hover:bg-orange-50 p-1 rounded" 
-                            },
-                              React.createElement('input', {
-                                type: "checkbox",
-                                checked: selectedMonths.includes(month),
-                                onChange: (e) => {
-                                  if (e.target.checked) {
-                                    setSelectedMonths([...selectedMonths, month]);
-                                  } else {
-                                    setSelectedMonths(selectedMonths.filter(m => m !== month));
-                                  }
-                                },
-                                className: "rounded text-red-600 focus:ring-red-500"
-                              }),
-                              React.createElement('span', { className: "flex-1" }, month)
-                            )
-                          )
-                        )
-                      )
-                    )
-                  ),
-
-                  // Tabla de KPIs
-                  allKPIs.length > 0 && selectedAgencies.length > 0 && React.createElement('div', { className: "bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200" },
-                    React.createElement('div', { className: "flex items-center justify-between mb-4" },
-                      React.createElement('h3', { className: "text-xl font-semibold flex items-center gap-2" },
-                        React.createElement(Icons.FileSpreadsheet, { className: "text-red-500" }),
-                        "Comparativa de KPIs por Agencia"
-                      ),
-                      React.createElement('div', { className: "text-sm text-gray-600" },
-                        `${selectedAgencies.length} de ${agencies.length} agencias | ${selectedMonths.length} meses | ${allKPIs.length} KPIs`
-                      )
-                    ),
-                    React.createElement('div', { className: "overflow-auto max-h-96" },
-                      React.createElement('table', { className: "min-w-full divide-y divide-gray-200" },
-                        React.createElement('thead', { className: "bg-gray-50" },
-                          React.createElement('tr', null,
-                            React.createElement('th', { className: "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "KPI"),
-                            React.createElement('th', { className: "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "Mes"),
-                            selectedAgencies.map((agency, index) => 
-                              React.createElement('th', { 
-                                key: agency, 
-                                className: "px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider",
-                                style: { backgroundColor: colors[index % colors.length] + '20' }
-                              }, agency)
-                            )
-                          )
-                        ),
-                        React.createElement('tbody', { className: "bg-white divide-y divide-gray-200" },
-                          allKPIs.map(kpi => 
-                            selectedMonths.map((month, monthIndex) => 
-                              React.createElement('tr', { 
-                                key: `${kpi}-${month}`, 
-                                className: monthIndex % 2 === 0 ? 'bg-white' : 'bg-amber-50' 
-                              },
-                                React.createElement('td', { className: "px-4 py-4 text-sm font-medium text-gray-800" }, kpi),
-                                React.createElement('td', { className: "px-4 py-4 text-sm text-gray-800 font-medium" }, month),
-                                selectedAgencies.map((agencyName) => {
-                                  const agency = agencies.find(a => a.name === agencyName);
-                                  const value = agency?.monthlyData[kpi]?.[month] || 0;
-                                  const isHighest = selectedAgencies.length > 1 && value > 0 && 
-                                    value === Math.max(...selectedAgencies.map(an => {
-                                      const ag = agencies.find(a => a.name === an);
-                                      return ag?.monthlyData[kpi]?.[month] || 0;
-                                    }));
-                                  
-                                  return React.createElement('td', { 
-                                    key: agencyName, 
-                                    className: `px-4 py-4 text-center text-sm font-semibold ${isHighest ? 'bg-green-100 text-green-800' : 'text-gray-900'}` 
-                                  }, value.toLocaleString());
-                                })
-                              )
-                            )
-                          )
-                        )
-                      )
-                    ),
+                    const values = selectedAgencies.map(agencyName => {
+                        const agency = agencies.find(a => a.name === agencyName);
+                        return agency?.monthlyData[kpi]?.[month] || 0;
+                    });
                     
-                    React.createElement('div', { className: "mt-6 grid grid-cols-1 md:grid-cols-3 gap-4" },
-                      React.createElement('div', { className: "bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-lg border border-red-200" },
-                        React.createElement('h4', { className: "font-medium text-red-800 mb-2" }, "Total de KPIs"),
-                        React.createElement('p', { className: "text-2xl font-bold text-red-600" }, allKPIs.length)
-                      ),
-                      React.createElement('div', { className: "bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-lg border border-amber-200" },
-                        React.createElement('h4', { className: "font-medium text-amber-800 mb-2" }, "Agencias Analizadas"),
-                        React.createElement('p', { className: "text-2xl font-bold text-amber-600" }, selectedAgencies.length)
-                      ),
-                      React.createElement('div', { className: "bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200" },
-                        React.createElement('h4', { className: "font-medium text-orange-800 mb-2" }, "Períodos Analizados"),
-                        React.createElement('p', { className: "text-2xl font-bold text-orange-600" }, selectedMonths.length)
-                      )
-                    )
-                  ),
+                    const maxValue = Math.max(...values);
+                    
+                    selectedAgencies.forEach((agencyName, agencyIndex) => {
+                        const value = values[agencyIndex];
+                        const isHighest = selectedAgencies.length > 1 && value > 0 && value === maxValue;
+                        
+                        rowHTML += `
+                            <td class="px-4 py-4 text-center text-sm font-semibold ${
+                                isHighest ? 'bg-green-100 text-green-800' : 'text-gray-900'
+                            }">${value.toLocaleString()}</td>
+                        `;
+                    });
+                    
+                    row.innerHTML = rowHTML;
+                    tableBody.appendChild(row);
+                });
+            });
+            
+            // Update summary stats
+            document.getElementById('totalKPIs').textContent = allKPIs.length;
+            document.getElementById('totalAgencies').textContent = selectedAgencies.length;
+            document.getElementById('totalMonths').textContent = selectedMonths.length;
+        }
 
-                  // Gráficos
-                  allKPIs.length > 0 && selectedAgencies.length > 0 && React.createElement('div', { className: "space-y-8" },
-                    React.createElement('div', { className: "bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200" },
-                      React.createElement('h3', { className: "text-xl font-semibold mb-6 flex items-center gap-2" },
-                        React.createElement(Icons.TrendingUp, { className: "text-red-500" }),
-                        "Comparativa de KPIs por Agencia"
-                      ),
-                      React.createElement('div', { className: "h-96" },
-                        React.createElement(ResponsiveContainer, { width: "100%", height: "100%" },
-                          React.createElement(BarChart, { 
-                            data: (() => {
-                              const chartData = [];
-                              allKPIs.slice(0, 6).forEach(kpi => {
-                                const kpiData = { kpi: kpi.substring(0, 25) + (kpi.length > 25 ? '...' : '') };
-                                selectedAgencies.forEach(agencyName => {
-                                  const agency = agencies.find(a => a.name === agencyName);
-                                  const totalValue = selectedMonths.reduce((sum, month) => {
-                                    return sum + (agency?.monthlyData[kpi]?.[month] || 0);
-                                  }, 0);
-                                  kpiData[agencyName] = totalValue;
-                                });
-                                chartData.push(kpiData);
-                              });
-                              return chartData;
-                            })(),
-                            margin: { top: 20, right: 30, left: 20, bottom: 80 }
-                          },
-                            React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
-                            React.createElement(XAxis, { dataKey: "kpi", angle: -45, textAnchor: "end", height: 100 }),
-                            React.createElement(YAxis),
-                            React.createElement(Tooltip),
-                            React.createElement(Legend),
-                            selectedAgencies.map((agency, index) => 
-                              React.createElement(Bar, { 
-                                key: agency, 
-                                dataKey: agency,
-                                name: agency,
-                                fill: colors[index % colors.length]
-                              })
-                            )
-                          )
-                        )
-                      )
-                    ),
+        function updateCharts() {
+            if (selectedAgencies.length === 0 || selectedMonths.length === 0) {
+                document.getElementById('chartsSection').classList.add('hidden');
+                return;
+            }
 
-                    React.createElement('div', { className: "bg-gradient-to-r from-gray-50 via-amber-50 to-gray-50 rounded-xl shadow-lg p-6 border border-gray-200" },
-                      React.createElement('h3', { className: "text-xl font-semibold mb-6 flex items-center gap-2" },
-                        React.createElement(Icons.TrendingUp, { className: "text-red-500" }),
-                        "Tendencias Mensuales por Agencia"
-                      ),
-                      React.createElement('div', { className: "h-96" },
-                        React.createElement(ResponsiveContainer, { width: "100%", height: "100%" },
-                          React.createElement(LineChart, { 
-                            data: (() => {
-                              const chartData = [];
-                              selectedMonths.forEach(month => {
-                                const monthData = { month };
-                                selectedAgencies.forEach(agencyName => {
-                                  const agency = agencies.find(a => a.name === agencyName);
-                                  const monthTotal = allKPIs.reduce((sum, kpi) => {
-                                    return sum + (agency?.monthlyData[kpi]?.[month] || 0);
-                                  }, 0);
-                                  monthData[agencyName] = monthTotal;
-                                });
-                                chartData.push(monthData);
-                              });
-                              return chartData;
-                            })()
-                          },
-                            React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
-                            React.createElement(XAxis, { dataKey: "month" }),
-                            React.createElement(YAxis),
-                            React.createElement(Tooltip),
-                            React.createElement(Legend),
-                            selectedAgencies.map((agency, index) => 
-                              React.createElement(Line, { 
-                                key: agency,
-                                type: "monotone", 
-                                dataKey: agency, 
-                                stroke: colors[index % colors.length],
-                                strokeWidth: 3,
-                                dot: { r: 6 }
-                              })
-                            )
-                          )
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          );
-        };
+            document.getElementById('chartsSection').classList.remove('hidden');
+            updateBarChart();
+            updateLineChart();
+        }
 
-        // Render the app
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(React.createElement(KPIAnalyzer));
+        function updateBarChart() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (window.barChartInstance) {
+                window.barChartInstance.destroy();
+            }
+            
+            const chartData = [];
+            allKPIs.slice(0, 6).forEach(kpi => {
+                const kpiData = { kpi: kpi.substring(0, 25) + (kpi.length > 25 ? '...' : '') };
+                selectedAgencies.forEach(agencyName => {
+                    const agency = agencies.find(a => a.name === agencyName);
+                    const totalValue = selectedMonths.reduce((sum, month) => {
+                        return sum + (agency?.monthlyData[kpi]?.[month] || 0);
+                    }, 0);
+                    kpiData[agencyName] = totalValue;
+                });
+                chartData.push(kpiData);
+            });
+            
+            const datasets = selectedAgencies.map((agency, index) => ({
+                label: agency,
+                data: chartData.map(item => item[agency]),
+                backgroundColor: colors[index % colors.length],
+                borderColor: colors[index % colors.length],
+                borderWidth: 1
+            }));
+            
+            window.barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(item => item.kpi),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLineChart() {
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (window.lineChartInstance) {
+                window.lineChartInstance.destroy();
+            }
+            
+            const chartData = [];
+            selectedMonths.forEach(month => {
+                const monthData = { month };
+                selectedAgencies.forEach(agencyName => {
+                    const agency = agencies.find(a => a.name === agencyName);
+                    const monthTotal = allKPIs.reduce((sum, kpi) => {
+                        return sum + (agency?.monthlyData[kpi]?.[month] || 0);
+                    }, 0);
+                    monthData[agencyName] = monthTotal;
+                });
+                chartData.push(monthData);
+            });
+            
+            const datasets = selectedAgencies.map((agency, index) => ({
+                label: agency,
+                data: chartData.map(item => item[agency]),
+                borderColor: colors[index % colors.length],
+                backgroundColor: colors[index % colors.length] + '20',
+                tension: 0.1,
+                borderWidth: 3,
+                pointRadius: 6
+            }));
+            
+            window.lineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(item => item.month),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event handlers
+        function toggleAgency(agencyName) {
+            if (selectedAgencies.includes(agencyName)) {
+                selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
+            } else {
+                if (selectedAgencies.length < 9) {
+                    selectedAgencies.push(agencyName);
+                } else {
+                    alert('Máximo 9 agencias pueden ser seleccionadas para comparación');
+                    return;
+                }
+            }
+            updateAgenciesCheckboxes();
+            updateTable();
+            updateCharts();
+        }
+
+        function toggleMonth(month) {
+            if (selectedMonths.includes(month)) {
+                selectedMonths = selectedMonths.filter(m => m !== month);
+            } else {
+                selectedMonths.push(month);
+            }
+            updateMonthsCheckboxes();
+            updateTable();
+            updateCharts();
+        }
+
+        function selectAllAgencies() {
+            selectedAgencies = agencies.map(a => a.name);
+            updateAgenciesCheckboxes();
+            updateTable();
+            updateCharts();
+        }
+
+        function deselectAllAgencies() {
+            selectedAgencies = [];
+            updateAgenciesCheckboxes();
+            updateTable();
+            updateCharts();
+        }
+
+        function removeAgency(agencyName) {
+            agencies = agencies.filter(a => a.name !== agencyName);
+            selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
+            
+            const allKPIsSet = new Set();
+            const allMonthsSet = new Set();
+            agencies.forEach(agency => {
+                agency.kpis.forEach(kpi => allKPIsSet.add(kpi));
+                agency.months.forEach(month => allMonthsSet.add(month));
+            });
+            allKPIs = Array.from(allKPIsSet);
+            allMonths = Array.from(allMonthsSet);
+            
+            if (agencies.length === 0) {
+                document.getElementById('agenciesSection').classList.add('hidden');
+            } else {
+                updateUI();
+            }
+        }
+
+        // Demo function for testing
+        function loadDemoData() {
+            const demoData = [
+                {
+                    name: 'Honda Cuajimalpa',
+                    kpis: ['Ventas Totales', 'Leads Generados', 'Conversión %'],
+                    months: ['Enero', 'Febrero', 'Marzo'],
+                    monthlyData: {
+                        'Ventas Totales': { 'Enero': 150, 'Febrero': 180, 'Marzo': 200 },
+                        'Leads Generados': { 'Enero': 45, 'Febrero': 52, 'Marzo': 48 },
+                        'Conversión %': { 'Enero': 12.5, 'Febrero': 15.2, 'Marzo': 14.8 }
+                    }
+                },
+                {
+                    name: 'KIA Interlomas',
+                    kpis: ['Ventas Totales', 'Leads Generados', 'Conversión %'],
+                    months: ['Enero', 'Febrero', 'Marzo'],
+                    monthlyData: {
+                        'Ventas Totales': { 'Enero': 120, 'Febrero': 160, 'Marzo': 190 },
+                        'Leads Generados': { 'Enero': 40, 'Febrero': 48, 'Marzo': 55 },
+                        'Conversión %': { 'Enero': 10.8, 'Febrero': 13.7, 'Marzo': 16.2 }
+                    }
+                }
+            ];
+            
+            agencies = demoData;
+            allKPIs = ['Ventas Totales', 'Leads Generados', 'Conversión %'];
+            allMonths = ['Enero', 'Febrero', 'Marzo'];
+            selectedAgencies = agencies.map(a => a.name);
+            selectedMonths = allMonths;
+            
+            updateUI();
+            showConnectionStatus('success', 'Datos de demostración cargados');
+        }
+
+        // Add demo button for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoBtn = document.createElement('button');
+            demoBtn.textContent = '🎯 Cargar Datos Demo';
+            demoBtn.className = 'mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600';
+            demoBtn.onclick = loadDemoData;
+            document.querySelector('.bg-gradient-to-r.from-green-50').appendChild(demoBtn);
+        });
     </script>
 </body>
 </html>
