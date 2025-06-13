@@ -6,6 +6,7 @@
     <title>Dashboard KPIs - Grupo Daytona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -264,6 +265,10 @@
                             <p class="text-gray-300">Vista completa de todos los indicadores</p>
                         </div>
                     </div>
+                    <button onclick="exportMainTableToExcel()" class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        Exportar a Excel
+                    </button>
                 </div>
                 
                 <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
@@ -278,14 +283,20 @@
 
             <!-- NUEVA SECCIÓN: Análisis Individual de Agencia -->
             <div class="glass-effect rounded-2xl p-8 card-hover mb-8">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-chart-pie text-white text-xl"></i>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-chart-pie text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Análisis Individual por Agencia</h3>
+                            <p class="text-gray-300">Comparación mensual de una agencia específica</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Análisis Individual por Agencia</h3>
-                        <p class="text-gray-300">Comparación mensual de una agencia específica</p>
-                    </div>
+                    <button onclick="exportSingleTableToExcel()" class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        Exportar a Excel
+                    </button>
                 </div>
 
                 <!-- Controles -->
@@ -1130,6 +1141,116 @@
             });
             
             showStatus('success', `Tabla individual generada: ${singleSelectedAgency} - ${singleSelectedMonths.length} meses`);
+        }
+        
+        // NUEVAS FUNCIONES PARA EXPORTAR A EXCEL
+        
+        // Exportar tabla principal a Excel
+        function exportMainTableToExcel() {
+            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) {
+                showStatus('error', 'No hay datos para exportar. Genera primero el análisis.');
+                return;
+            }
+            
+            try {
+                // Crear datos para Excel
+                const excelData = [];
+                const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
+                
+                // Header
+                const header = ['KPI', 'Período', ...filteredData.map(agency => agency.agency)];
+                excelData.push(header);
+                
+                // Datos
+                allKPIs.forEach(kpiName => {
+                    selectedMonths.forEach(month => {
+                        const row = [kpiName, month];
+                        
+                        filteredData.forEach(agency => {
+                            const kpi = agency.kpis.find(k => k.name === kpiName);
+                            const value = kpi ? (kpi[month] || 0) : 0;
+                            row.push(value);
+                        });
+                        
+                        excelData.push(row);
+                    });
+                });
+                
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                // Agregar hoja al workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'Análisis Comparativo');
+                
+                // Generar nombre de archivo
+                const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+                const filename = `Daytona_Analisis_Comparativo_${fecha}.xlsx`;
+                
+                // Descargar archivo
+                XLSX.writeFile(wb, filename);
+                
+                showStatus('success', `Tabla principal exportada exitosamente: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error exportando tabla principal:', error);
+                showStatus('error', 'Error al exportar la tabla principal');
+            }
+        }
+        
+        // Exportar tabla individual a Excel
+        function exportSingleTableToExcel() {
+            if (!singleSelectedAgency || singleSelectedMonths.length === 0) {
+                showStatus('error', 'No hay datos individuales para exportar. Genera primero el análisis individual.');
+                return;
+            }
+            
+            try {
+                // Encontrar datos de la agencia
+                const agencyData = loadedData.find(agency => agency.agency === singleSelectedAgency);
+                if (!agencyData) {
+                    showStatus('error', 'No se encontraron datos para la agencia seleccionada');
+                    return;
+                }
+                
+                // Crear datos para Excel
+                const excelData = [];
+                
+                // Header
+                const header = ['KPI', ...singleSelectedMonths];
+                excelData.push(header);
+                
+                // Datos
+                agencyData.kpis.forEach(kpi => {
+                    const row = [kpi.name];
+                    singleSelectedMonths.forEach(month => {
+                        const value = kpi[month] || 0;
+                        row.push(value);
+                    });
+                    excelData.push(row);
+                });
+                
+                // Crear workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                // Agregar hoja al workbook
+                XLSX.utils.book_append_sheet(wb, ws, singleSelectedAgency);
+                
+                // Generar nombre de archivo
+                const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+                const agencyName = singleSelectedAgency.replace(/\s+/g, '_');
+                const filename = `Daytona_${agencyName}_Individual_${fecha}.xlsx`;
+                
+                // Descargar archivo
+                XLSX.writeFile(wb, filename);
+                
+                showStatus('success', `Análisis individual exportado exitosamente: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error exportando tabla individual:', error);
+                showStatus('error', 'Error al exportar el análisis individual');
+            }
         }
         
         // Funciones de estado
