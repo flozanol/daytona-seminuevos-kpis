@@ -395,7 +395,7 @@
     </div>
 
     <script>
-        // Variables globales
+        // Variables globales declaradas correctamente
         let loadedData = [];
         let selectedAgencies = [];
         let selectedMonths = [];
@@ -406,151 +406,175 @@
         let unidadesChart = null;
         let utilidadChart = null;
         
-        // API Configuration
-        const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
-        const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ";
+        console.log('🚀 Iniciando Dashboard KPIs Daytona - Versión 72');
         
-        console.log('🚀 Dashboard iniciado - Versión 72');
-        
-        // Actualizar reloj
+        // Función para actualizar el reloj
         function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = timeString;
+            try {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                const clockElement = document.getElementById('currentTime');
+                if (clockElement) {
+                    clockElement.textContent = timeString;
+                }
+            } catch (error) {
+                console.log('Error actualizando reloj:', error);
             }
         }
+        
+        // Iniciar reloj
         setInterval(updateClock, 1000);
         updateClock();
         
         // FUNCIÓN PRINCIPAL: Cargar Demo
         function loadDemo() {
-            console.log('🎯 Cargando demo...');
-            
-            showStatus('loading', 'Cargando datos de demostración...');
-            
-            // KPIs del sector automotriz
-            const kpis = [
-                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
-                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
-                'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos',
-                'Llamadas Perdidas', 'Tiempo Venta', 'Margen Utilidad', 'Devoluciones', 'Quejas Resueltas',
-                'Capacitación', 'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención',
-                'Tráfico Showroom', 'Conversión Digital', 'Social Media', 'Email Marketing', 'WhatsApp',
-                'Costo por Lead', 'Valor Cliente', 'Churn Rate', 'NPS', 'Recompras',
-                'Unidades Facturadas', 'Utilidad Bruta'
-            ];
-            
-            // 9 agencias
-            const agencies = [
-                { name: 'Honda Cuajimalpa', base: 200 },
-                { name: 'Honda Interlomas', base: 180 },
-                { name: 'KIA Interlomas', base: 160 },
-                { name: 'KIA Iztapalapa', base: 140 },
-                { name: 'MG Cuajimalpa', base: 120 },
-                { name: 'MG Interlomas', base: 100 },
-                { name: 'MG Iztapalapa', base: 95 },
-                { name: 'GWM Iztapalapa', base: 80 },
-                { name: 'GWM Morelos', base: 60 }
-            ];
-
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            // Generar datos
-            const data = agencies.map(agency => {
-                const agencyKPIs = kpis.map(kpiName => {
-                    const kpi = { name: kpiName };
-                    months.forEach(month => {
-                        let variation = (Math.random() - 0.5) * 0.4;
-                        
-                        // Dar valores más realistas a KPIs específicos
-                        if (kpiName === 'Unidades Facturadas') {
-                            kpi[month] = Math.max(10, Math.round(agency.base * 0.3 * (1 + variation)));
-                        } else if (kpiName === 'Utilidad Bruta') {
-                            kpi[month] = Math.max(50000, Math.round(agency.base * 1000 * (1 + variation)));
-                        } else {
-                            kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
-                        }
-                    });
-                    return kpi;
-                });
-
-                return {
-                    agency: agency.name,
-                    kpis: agencyKPIs,
-                    months: months
-                };
-            });
-
-            console.log('✅ Datos generados:', data.length, 'agencias');
-            
-            // Guardar y mostrar
-            loadedData = data;
-            displayResults(data);
-            showStatus('success', `Demo cargada: ${data.length} agencias, ${kpis.length} KPIs`);
-        }
-        
-        // FUNCIÓN PRINCIPAL: Conectar API REAL
-        async function connectToAPI() {
-            console.log('🚀 Conectando con Google Sheets REAL...');
-            
-            showStatus('loading', 'Conectando con Google Sheets API...');
+            console.log('🎯 Iniciando carga de demo...');
             
             try {
-                // Generar datos demo para testing
-                loadDemo();
-                showStatus('success', 'Conectado exitosamente (modo demo)');
+                showStatus('loading', 'Cargando datos de demostración...');
+                
+                // KPIs del sector automotriz (incluye los específicos solicitados)
+                const kpis = [
+                    'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
+                    'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
+                    'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos',
+                    'Llamadas Perdidas', 'Tiempo Venta', 'Margen Utilidad', 'Devoluciones', 'Quejas Resueltas',
+                    'Capacitación', 'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención',
+                    'Tráfico Showroom', 'Conversión Digital', 'Social Media', 'Email Marketing', 'WhatsApp',
+                    'Costo por Lead', 'Valor Cliente', 'Churn Rate', 'NPS', 'Recompras',
+                    'Unidades Facturadas', 'Utilidad Bruta'
+                ];
+                
+                // 9 agencias de Grupo Daytona
+                const agencies = [
+                    { name: 'Honda Cuajimalpa', base: 200 },
+                    { name: 'Honda Interlomas', base: 180 },
+                    { name: 'KIA Interlomas', base: 160 },
+                    { name: 'KIA Iztapalapa', base: 140 },
+                    { name: 'MG Cuajimalpa', base: 120 },
+                    { name: 'MG Interlomas', base: 100 },
+                    { name: 'MG Iztapalapa', base: 95 },
+                    { name: 'GWM Iztapalapa', base: 80 },
+                    { name: 'GWM Morelos', base: 60 }
+                ];
+
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+                // Generar datos realistas para cada agencia
+                const data = agencies.map(agency => {
+                    const agencyKPIs = kpis.map(kpiName => {
+                        const kpi = { name: kpiName };
+                        months.forEach(month => {
+                            let variation = (Math.random() - 0.5) * 0.4;
+                            
+                            // Valores específicos para KPIs importantes
+                            if (kpiName === 'Unidades Facturadas') {
+                                kpi[month] = Math.max(10, Math.round(agency.base * 0.3 * (1 + variation)));
+                            } else if (kpiName === 'Utilidad Bruta') {
+                                kpi[month] = Math.max(50000, Math.round(agency.base * 1000 * (1 + variation)));
+                            } else {
+                                kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
+                            }
+                        });
+                        return kpi;
+                    });
+
+                    return {
+                        agency: agency.name,
+                        kpis: agencyKPIs,
+                        months: months
+                    };
+                });
+
+                console.log('✅ Datos generados exitosamente:', data.length, 'agencias con', kpis.length, 'KPIs cada una');
+                
+                // Asignar a variable global y mostrar resultados
+                loadedData = data;
+                displayResults(data);
+                showStatus('success', `Demo cargada exitosamente: ${data.length} agencias, ${kpis.length} KPIs`);
                 
             } catch (error) {
-                console.error('❌ Error en API:', error);
-                showStatus('error', `Error API: ${error.message}`);
+                console.error('❌ Error cargando demo:', error);
+                showStatus('error', 'Error cargando demo: ' + error.message);
             }
         }
         
-        // Mostrar resultados
+        // FUNCIÓN PRINCIPAL: Conectar API (simplificada para demo)
+        function connectToAPI() {
+            console.log('🚀 Simulando conexión API...');
+            showStatus('loading', 'Conectando con Google Sheets API...');
+            
+            // Por ahora carga demo, se puede implementar API real después
+            setTimeout(() => {
+                loadDemo();
+                showStatus('success', 'Conectado exitosamente (modo demo)');
+            }, 1000);
+        }
+        
+        // Mostrar resultados en pantalla
         function displayResults(data) {
-            console.log('📊 Mostrando resultados...');
-            loadedData = data;
-            selectedAgencies = data.map(agency => agency.agency);
-            allMonths = data[0].months;
-            selectedMonths = allMonths.slice(0, 6);
+            console.log('📊 Mostrando resultados en pantalla...');
             
-            // Obtener KPIs únicos
-            const kpiSet = new Set();
-            data.forEach(agency => {
-                agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
-            });
-            allKPIs = Array.from(kpiSet);
-            
-            // Mostrar sección
-            const resultsDiv = document.getElementById('results');
-            if (resultsDiv) {
-                resultsDiv.classList.remove('hidden');
+            try {
+                // Configurar variables globales
+                loadedData = data;
+                selectedAgencies = data.map(agency => agency.agency);
+                allMonths = data[0].months;
+                selectedMonths = allMonths.slice(0, 6); // Primeros 6 meses seleccionados por defecto
+                
+                // Obtener KPIs únicos de todas las agencias
+                const kpiSet = new Set();
+                data.forEach(agency => {
+                    agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
+                });
+                allKPIs = Array.from(kpiSet);
+                
+                console.log('✅ Variables configuradas:', {
+                    agencias: selectedAgencies.length,
+                    kpis: allKPIs.length,
+                    meses: allMonths.length
+                });
+                
+                // Mostrar sección de resultados
+                const resultsDiv = document.getElementById('results');
+                if (resultsDiv) {
+                    resultsDiv.classList.remove('hidden');
+                    console.log('✅ Sección de resultados mostrada');
+                }
+                
+                // Actualizar todos los componentes
+                updateAgenciesList();
+                updateAgencyCheckboxes();
+                updateMonthCheckboxes();
+                updateSingleAgencyControls();
+                updateStats();
+                updateTable();
+                updateCharts();
+                
+                console.log('✅ Todos los componentes actualizados');
+                
+            } catch (error) {
+                console.error('❌ Error mostrando resultados:', error);
+                showStatus('error', 'Error mostrando resultados: ' + error.message);
             }
-            
-            // Actualizar componentes
-            updateAgenciesList();
-            updateAgencyCheckboxes();
-            updateMonthCheckboxes();
-            updateSingleAgencyControls();
-            updateStats();
-            updateTable();
-            updateCharts();
         }
         
-        // Actualizar lista de agencias con fotos reales
+        // Actualizar lista visual de agencias
         function updateAgenciesList() {
             const container = document.getElementById('agenciesList');
-            if (!container) return;
+            if (!container) {
+                console.log('❌ No se encontró contenedor agenciesList');
+                return;
+            }
             
             container.innerHTML = '';
             
+            // URLs reales de fotos de agencias
             const agencyImages = {
                 'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
                 'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
@@ -604,14 +628,19 @@
                 `;
                 container.appendChild(div);
             });
+            
+            console.log('✅ Lista de agencias actualizada:', loadedData.length, 'agencias');
         }
         
-        // Actualizar checkboxes de agencias con fotos
+        // Actualizar checkboxes de selección de agencias
         function updateAgencyCheckboxes() {
             const container = document.getElementById('agencyCheckboxes');
             const count = document.getElementById('agencyCount');
             
-            if (!container || !count) return;
+            if (!container || !count) {
+                console.log('❌ No se encontraron elementos agencyCheckboxes o agencyCount');
+                return;
+            }
             
             container.innerHTML = '';
             count.textContent = `Agencias (${selectedAgencies.length}/${loadedData.length})`;
@@ -659,14 +688,19 @@
                 label.appendChild(span);
                 container.appendChild(label);
             });
+            
+            console.log('✅ Checkboxes de agencias actualizados');
         }
         
-        // Actualizar checkboxes de meses
+        // Actualizar checkboxes de selección de meses
         function updateMonthCheckboxes() {
             const container = document.getElementById('monthCheckboxes');
             const count = document.getElementById('monthCount');
             
-            if (!container || !count) return;
+            if (!container || !count) {
+                console.log('❌ No se encontraron elementos monthCheckboxes o monthCount');
+                return;
+            }
             
             container.innerHTML = '';
             count.textContent = `Meses (${selectedMonths.length})`;
@@ -689,14 +723,19 @@
                 label.appendChild(span);
                 container.appendChild(label);
             });
+            
+            console.log('✅ Checkboxes de meses actualizados');
         }
 
         // NUEVAS FUNCIONES PARA ANÁLISIS INDIVIDUAL
 
-        // Actualizar controles de análisis individual
+        // Actualizar controles para análisis individual
         function updateSingleAgencyControls() {
             const select = document.getElementById('singleAgencySelect');
-            if (!select) return;
+            if (!select) {
+                console.log('❌ No se encontró elemento singleAgencySelect');
+                return;
+            }
 
             select.innerHTML = '<option value="">Selecciona una agencia...</option>';
             
@@ -709,10 +748,12 @@
 
             select.onchange = function() {
                 selectedSingleAgency = this.value;
+                selectedSingleAgencyMonths = []; // Reset meses al cambiar agencia
                 updateSingleAgencyMonthCheckboxes();
             };
 
             updateSingleAgencyMonthCheckboxes();
+            console.log('✅ Controles de análisis individual actualizados');
         }
 
         // Actualizar checkboxes de meses para análisis individual
@@ -720,7 +761,10 @@
             const container = document.getElementById('singleAgencyMonthCheckboxes');
             const count = document.getElementById('singleAgencyMonthCount');
             
-            if (!container || !count) return;
+            if (!container || !count) {
+                console.log('❌ No se encontraron elementos para análisis individual de meses');
+                return;
+            }
             
             container.innerHTML = '';
             count.textContent = `Meses a Comparar (${selectedSingleAgencyMonths.length})`;
@@ -760,8 +804,10 @@
             updateSingleAgencyMonthCheckboxes();
         }
 
-        // Actualizar análisis individual
+        // Generar análisis individual
         function updateSingleAgencyAnalysis() {
+            console.log('🔄 Generando análisis individual...');
+            
             if (!selectedSingleAgency) {
                 showStatus('error', 'Selecciona una agencia para el análisis individual');
                 return;
@@ -787,7 +833,10 @@
             const headerRow = document.getElementById('singleAgencyTableHeader');
             const tableBody = document.getElementById('singleAgencyTableBody');
             
-            if (!tableDiv || !headerRow || !tableBody) return;
+            if (!tableDiv || !headerRow || !tableBody) {
+                console.log('❌ No se encontraron elementos de tabla individual');
+                return;
+            }
             
             tableDiv.classList.remove('hidden');
             
@@ -811,7 +860,7 @@
             
             tableBody.innerHTML = '';
             
-            // Mostrar todos los KPIs de la agencia
+            // Generar filas para cada KPI
             agencyData.kpis.forEach(kpi => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white/5 hover:bg-white/10 transition-colors';
@@ -820,7 +869,7 @@
                 const values = selectedSingleAgencyMonths.map(month => kpi[month] || 0);
                 const average = values.reduce((sum, val) => sum + val, 0) / values.length;
                 
-                // Calcular tendencia (simple: comparar primer vs último valor)
+                // Calcular tendencia (comparar primer vs último valor)
                 const trend = values.length > 1 ? 
                     (values[values.length - 1] > values[0] ? '📈' : 
                      values[values.length - 1] < values[0] ? '📉' : '➡️') : '➡️';
@@ -849,9 +898,13 @@
                 row.innerHTML = rowHTML;
                 tableBody.appendChild(row);
             });
+            
+            console.log('✅ Tabla de análisis individual actualizada');
         }
         
-        // Toggle functions
+        // FUNCIONES DE TOGGLE Y CONTROL
+
+        // Alternar selección de agencia
         function toggleAgency(agencyName) {
             if (selectedAgencies.includes(agencyName)) {
                 selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
@@ -863,6 +916,7 @@
             updateStats();
         }
         
+        // Alternar selección de mes
         function toggleMonth(month) {
             if (selectedMonths.includes(month)) {
                 selectedMonths = selectedMonths.filter(m => m !== month);
@@ -873,6 +927,7 @@
             updateStats();
         }
         
+        // Seleccionar todas las agencias
         function selectAllAgencies() {
             selectedAgencies = loadedData.map(agency => agency.agency);
             updateAgencyCheckboxes();
@@ -880,6 +935,7 @@
             updateStats();
         }
         
+        // Deseleccionar todas las agencias
         function deselectAllAgencies() {
             selectedAgencies = [];
             updateAgencyCheckboxes();
@@ -887,6 +943,7 @@
             updateStats();
         }
         
+        // Actualizar análisis principal
         function updateAnalysis() {
             if (selectedAgencies.length === 0) {
                 showStatus('error', 'Selecciona al menos una agencia');
@@ -901,6 +958,7 @@
             showStatus('success', `Análisis actualizado: ${selectedAgencies.length} agencias, ${selectedMonths.length} meses`);
         }
         
+        // Refrescar datos
         function refreshData() {
             showStatus('loading', 'Refrescando datos...');
             setTimeout(() => {
@@ -908,7 +966,7 @@
             }, 500);
         }
         
-        // Actualizar estadísticas
+        // Actualizar estadísticas en las tarjetas
         function updateStats() {
             const totalKPIsEl = document.getElementById('totalKPIs');
             const totalAgenciesEl = document.getElementById('totalAgencies');
@@ -919,19 +977,25 @@
             if (totalPeriodsEl) totalPeriodsEl.textContent = selectedMonths.length;
         }
         
-        // Actualizar tabla principal
+        // Actualizar tabla principal de comparación
         function updateTable() {
-            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
+            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) {
+                console.log('❌ No hay datos suficientes para actualizar tabla');
+                return;
+            }
             
             const headerRow = document.getElementById('tableHeader');
             const tableBody = document.getElementById('tableBody');
             
-            if (!headerRow || !tableBody) return;
+            if (!headerRow || !tableBody) {
+                console.log('❌ No se encontraron elementos de tabla principal');
+                return;
+            }
             
             const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
             const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
             
-            // Header con nombres en blanco
+            // Crear header de tabla
             headerRow.innerHTML = `
                 <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
                     KPI
@@ -951,7 +1015,7 @@
             
             tableBody.innerHTML = '';
             
-            // Mostrar todos los KPIs
+            // Crear filas para cada KPI y mes
             allKPIs.forEach(kpiName => {
                 selectedMonths.forEach((month, monthIndex) => {
                     const row = document.createElement('tr');
@@ -982,11 +1046,13 @@
                     tableBody.appendChild(row);
                 });
             });
+            
+            console.log('✅ Tabla principal actualizada');
         }
 
-        // NUEVAS FUNCIONES PARA GRÁFICAS
+        // FUNCIONES PARA GRÁFICAS
 
-        // Actualizar gráficas
+        // Actualizar todas las gráficas
         function updateCharts() {
             updateUnidadesChart();
             updateUtilidadChart();
@@ -995,7 +1061,10 @@
         // Gráfica de Unidades Facturadas
         function updateUnidadesChart() {
             const canvas = document.getElementById('unidadesChart');
-            if (!canvas) return;
+            if (!canvas) {
+                console.log('❌ No se encontró canvas unidadesChart');
+                return;
+            }
 
             // Destruir gráfica anterior si existe
             if (unidadesChart) {
@@ -1064,12 +1133,17 @@
                     }
                 }
             });
+            
+            console.log('✅ Gráfica de Unidades Facturadas actualizada');
         }
 
         // Gráfica de Utilidad Bruta
         function updateUtilidadChart() {
             const canvas = document.getElementById('utilidadChart');
-            if (!canvas) return;
+            if (!canvas) {
+                console.log('❌ No se encontró canvas utilidadChart');
+                return;
+            }
 
             // Destruir gráfica anterior si existe
             if (utilidadChart) {
@@ -1143,15 +1217,20 @@
                     }
                 }
             });
+            
+            console.log('✅ Gráfica de Utilidad Bruta actualizada');
         }
         
-        // Funciones de estado
+        // Mostrar mensajes de estado
         function showStatus(type, message) {
             const statusDiv = document.getElementById('status');
             const statusText = document.getElementById('statusText');
             const statusIcon = document.getElementById('statusIcon');
             
-            if (!statusDiv || !statusText || !statusIcon) return;
+            if (!statusDiv || !statusText || !statusIcon) {
+                console.log('❌ No se encontraron elementos de status');
+                return;
+            }
             
             const configs = {
                 success: {
@@ -1168,17 +1247,27 @@
                 }
             };
             
-            const config = configs[type];
+            const config = configs[type] || configs.loading;
             statusDiv.className = `mb-8 glass-effect rounded-xl p-4 border-l-4 ${config.bg}`;
             statusIcon.className = config.icon;
             statusText.textContent = message;
             statusDiv.classList.remove('hidden');
+            
+            console.log('✅ Status mostrado:', type, '-', message);
         }
         
-        // Inicialización
+        // Inicialización cuando la página se carga completamente
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard completamente cargado - Versión 72');
+            console.log('✅ Dashboard KPIs Daytona - Versión 72 - Completamente cargado');
+            console.log('🎯 Listo para usar - Haz clic en "Cargar Demo" para comenzar');
         });
+        
+        // Debug: Log de errores globales
+        window.addEventListener('error', function(e) {
+            console.error('❌ Error global capturado:', e.error);
+            showStatus('error', 'Error inesperado: ' + e.error.message);
+        });
+        
     </script>
 </body>
 </html>
