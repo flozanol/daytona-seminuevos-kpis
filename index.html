@@ -1,126 +1,432 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Test Básico - Botones</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard KPIs Seminuevos - Grupo Daytona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+    </style>
 </head>
-<body style="font-family: Arial; padding: 20px; background: #333; color: white;">
+<body class="min-h-screen">
     
-    <h1>🔧 TEST DIAGNÓSTICO - Dashboard Seminuevos</h1>
-    
-    <div style="margin: 20px 0;">
-        <h2>📋 Estado del Sistema:</h2>
-        <div id="status" style="background: #555; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            Iniciando diagnóstico...
+    <!-- Navigation -->
+    <nav class="glass-effect border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-10 h-10 rounded-lg object-contain bg-white/10 p-1">
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Grupo Daytona</h1>
+                        <p class="text-sm text-gray-300">Dashboard KPIs Seminuevos</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="openNewCarsPage()" class="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all">
+                        <i class="fas fa-car mr-2"></i>Dashboard Nuevos
+                    </button>
+                    <div class="text-gray-300 text-sm" id="currentTime"></div>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <div style="margin: 20px 0;">
-        <h2>🎯 Pruebas de Botones:</h2>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
         
-        <!-- Test 1: Función inline -->
-        <button onclick="alert('✅ Botón 1 funciona!')" style="background: red; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer;">
-            TEST 1: Alert Directo
-        </button>
-        
-        <!-- Test 2: Función definida -->
-        <button onclick="testFunction()" style="background: blue; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer;">
-            TEST 2: Función Definida
-        </button>
-        
-        <!-- Test 3: Función principal -->
-        <button onclick="loadDemo()" style="background: green; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer;">
-            TEST 3: loadDemo()
-        </button>
-        
-        <!-- Test 4: Event listener -->
-        <button id="test4" style="background: orange; color: white; padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer;">
-            TEST 4: Event Listener
-        </button>
-    </div>
-    
-    <div style="margin: 20px 0;">
-        <h2>📊 Log de Eventos:</h2>
-        <div id="log" style="background: #222; padding: 10px; border-radius: 5px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
-            <!-- Los logs aparecerán aquí -->
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <div class="flex justify-center mb-6">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                    <i class="fas fa-recycle mr-2"></i>SEMINUEVOS
+                </span>
+            </div>
+            <h2 class="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent mb-4">
+                Dashboard KPIs Seminuevos Daytona
+            </h2>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias de seminuevos
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-6 mb-12">
+            <button onclick="loadDemo()" class="btn-primary px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+                <i class="fas fa-play mr-3"></i>Cargar Demo
+            </button>
+            <button onclick="connectToAPI()" class="btn-secondary px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+                <i class="fas fa-link mr-3"></i>Conectar API
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="status" class="hidden mb-8">
+            <div class="glass-effect rounded-xl p-4 border-l-4">
+                <div class="flex items-center">
+                    <i id="statusIcon" class="text-2xl mr-3"></i>
+                    <p id="statusText" class="text-lg font-medium"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden">
+            
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-effect rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalKPIs">0</h3>
+                    <p class="text-gray-300 font-medium">Total KPIs</p>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-building text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalAgencies">0</h3>
+                    <p class="text-gray-300 font-medium">Agencias Activas</p>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalPeriods">0</h3>
+                    <p class="text-gray-300 font-medium">Períodos Activos</p>
+                </div>
+            </div>
+
+            <!-- Agencies List -->
+            <div class="glass-effect rounded-2xl p-8 mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6">
+                    <i class="fas fa-store text-amber-400 mr-3"></i>Agencias Conectadas
+                </h3>
+                <div id="agenciesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="glass-effect rounded-2xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-white">
+                        <i class="fas fa-table text-indigo-400 mr-3"></i>Análisis de KPIs
+                    </h3>
+                    <button onclick="exportToExcel()" class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all">
+                        <i class="fas fa-file-excel mr-2"></i>Exportar Excel
+                    </button>
+                </div>
+                
+                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl">
+                    <table id="dataTable" class="min-w-full text-sm">
+                        <thead id="tableHeader"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Función para logging
-        function log(message) {
-            const logDiv = document.getElementById('log');
-            const time = new Date().toLocaleTimeString();
-            const logEntry = `[${time}] ${message}\n`;
-            
-            console.log(logEntry);
-            
-            if (logDiv) {
-                logDiv.innerHTML += logEntry;
-                logDiv.scrollTop = logDiv.scrollHeight;
-            }
-        }
+        console.log('🚀 Dashboard Seminuevos iniciado');
         
-        // Función para actualizar status
-        function updateStatus(message) {
+        // Variables globales
+        let loadedData = [];
+        let allKPIs = [];
+        let allMonths = [];
+        
+        // Función para mostrar status
+        function showStatus(type, message) {
+            console.log(`Status: ${type} - ${message}`);
+            
             const statusDiv = document.getElementById('status');
-            if (statusDiv) {
-                statusDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
-            }
-            log(`STATUS: ${message}`);
+            const statusText = document.getElementById('statusText');
+            const statusIcon = document.getElementById('statusIcon');
+            
+            if (!statusDiv || !statusText || !statusIcon) return;
+            
+            const configs = {
+                success: { bg: 'bg-green-500/20 border-l-green-500 text-green-300', icon: 'fas fa-check-circle text-green-400' },
+                error: { bg: 'bg-red-500/20 border-l-red-500 text-red-300', icon: 'fas fa-exclamation-circle text-red-400' },
+                loading: { bg: 'bg-blue-500/20 border-l-blue-500 text-blue-300', icon: 'fas fa-spinner fa-spin text-blue-400' }
+            };
+            
+            const config = configs[type] || configs.error;
+            statusDiv.className = `mb-8 glass-effect rounded-xl p-4 border-l-4 ${config.bg}`;
+            statusIcon.className = config.icon;
+            statusText.textContent = message;
+            statusDiv.classList.remove('hidden');
         }
         
-        // TEST: Función básica
-        function testFunction() {
-            log("🎯 testFunction() ejecutada correctamente");
-            updateStatus("✅ Función testFunction() funciona");
-            alert("✅ testFunction() ejecutada!");
-        }
-        
-        // FUNCIÓN PRINCIPAL: loadDemo
+        // Función principal: Cargar Demo
         function loadDemo() {
-            log("🚀 loadDemo() iniciada");
-            updateStatus("⏳ Ejecutando loadDemo()...");
+            console.log('🎯 Ejecutando loadDemo()');
+            showStatus('loading', 'Cargando datos de demostración...');
             
             try {
-                // Simular trabajo
-                setTimeout(() => {
-                    log("✅ loadDemo() completada exitosamente");
-                    updateStatus("✅ loadDemo() ejecutada correctamente");
-                    alert("🎉 ¡loadDemo() funciona perfectamente!");
-                }, 500);
+                // Datos de demo
+                const kpis = [
+                    'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
+                    'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
+                    'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos'
+                ];
+                
+                const agencies = [
+                    { name: 'Honda Cuajimalpa', base: 200 },
+                    { name: 'Honda Interlomas', base: 180 },
+                    { name: 'KIA Interlomas', base: 160 },
+                    { name: 'KIA Iztapalapa', base: 140 },
+                    { name: 'MG Cuajimalpa', base: 120 },
+                    { name: 'MG Interlomas', base: 100 },
+                    { name: 'MG Iztapalapa', base: 95 }
+                ];
+
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+
+                // Generar datos
+                const data = agencies.map(agency => {
+                    const agencyKPIs = kpis.map(kpiName => {
+                        const kpi = { name: kpiName };
+                        months.forEach(month => {
+                            const variation = (Math.random() - 0.5) * 0.4;
+                            kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
+                        });
+                        return kpi;
+                    });
+
+                    return {
+                        agency: agency.name,
+                        kpis: agencyKPIs,
+                        months: months
+                    };
+                });
+
+                // Guardar datos
+                loadedData = data;
+                allKPIs = kpis;
+                allMonths = months;
+                
+                console.log('✅ Datos generados:', data.length, 'agencias');
+                
+                // Mostrar resultados
+                displayResults();
+                showStatus('success', `Demo cargada: ${data.length} agencias, ${kpis.length} KPIs`);
+                
+                alert(`🎉 Demo cargada exitosamente!\n\n✅ ${data.length} agencias\n✅ ${kpis.length} KPIs\n✅ ${months.length} meses`);
                 
             } catch (error) {
-                log(`❌ Error en loadDemo(): ${error.message}`);
-                updateStatus(`❌ Error: ${error.message}`);
+                console.error('❌ Error en loadDemo:', error);
+                showStatus('error', 'Error cargando demo: ' + error.message);
+                alert('❌ Error cargando demo: ' + error.message);
+            }
+        }
+        
+        // Función: Conectar API
+        function connectToAPI() {
+            console.log('🔗 Ejecutando connectToAPI()');
+            showStatus('loading', 'Conectando con Google Sheets API...');
+            
+            // Simular conexión
+            setTimeout(() => {
+                showStatus('success', 'Conexión API simulada exitosa');
+                alert('🎉 Conexión API exitosa!\n\nUsando datos de demo...');
+                loadDemo();
+            }, 1500);
+        }
+        
+        // Función: Mostrar resultados
+        function displayResults() {
+            console.log('📊 Mostrando resultados');
+            
+            // Mostrar sección de resultados
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv) {
+                resultsDiv.classList.remove('hidden');
+            }
+            
+            // Actualizar estadísticas
+            updateStats();
+            updateAgenciesList();
+            updateTable();
+        }
+        
+        // Actualizar estadísticas
+        function updateStats() {
+            const totalKPIsEl = document.getElementById('totalKPIs');
+            const totalAgenciesEl = document.getElementById('totalAgencies');
+            const totalPeriodsEl = document.getElementById('totalPeriods');
+            
+            if (totalKPIsEl) totalKPIsEl.textContent = allKPIs.length;
+            if (totalAgenciesEl) totalAgenciesEl.textContent = loadedData.length;
+            if (totalPeriodsEl) totalPeriodsEl.textContent = allMonths.length;
+        }
+        
+        // Actualizar lista de agencias
+        function updateAgenciesList() {
+            const container = document.getElementById('agenciesList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const colors = ['from-red-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-orange-500', 'from-purple-500 to-indigo-500', 'from-indigo-500 to-blue-500', 'from-pink-500 to-rose-500'];
+            
+            loadedData.forEach((agency, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all cursor-pointer';
+                
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
+                            <i class="fas fa-store text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-white">${agency.agency}</h4>
+                            <p class="text-sm text-gray-400">${agency.kpis.length} KPIs • ${agency.months.length} meses</p>
+                        </div>
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // Actualizar tabla
+        function updateTable() {
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            if (!tableHeader || !tableBody) return;
+            
+            // Header
+            tableHeader.innerHTML = `
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800">KPI</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800">Período</th>
+                    ${loadedData.map(agency => 
+                        `<th class="px-4 py-3 text-center text-xs font-bold text-white uppercase bg-gray-700">${agency.agency}</th>`
+                    ).join('')}
+                </tr>
+            `;
+            
+            // Body
+            tableBody.innerHTML = '';
+            
+            allKPIs.forEach(kpiName => {
+                allMonths.forEach((month, monthIndex) => {
+                    const row = document.createElement('tr');
+                    row.className = monthIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10';
+                    
+                    const values = loadedData.map(agency => {
+                        const kpi = agency.kpis.find(k => k.name === kpiName);
+                        return kpi ? (kpi[month] || 0) : 0;
+                    });
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3 text-sm font-semibold text-white">${kpiName}</td>
+                        <td class="px-4 py-3 text-sm text-gray-300">${month}</td>
+                        ${values.map(value => 
+                            `<td class="px-4 py-3 text-center text-sm text-gray-300">${value.toLocaleString()}</td>`
+                        ).join('')}
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+        
+        // Navegación
+        function openNewCarsPage() {
+            window.open('https://flozanol.github.io/daytona-autos-nuevos-kpis/', '_blank');
+        }
+        
+        // Exportar a Excel
+        function exportToExcel() {
+            if (!loadedData.length) {
+                alert('❌ No hay datos para exportar');
+                return;
+            }
+            
+            try {
+                const excelData = [];
+                const header = ['KPI', 'Período', ...loadedData.map(agency => agency.agency)];
+                excelData.push(header);
+                
+                allKPIs.forEach(kpiName => {
+                    allMonths.forEach(month => {
+                        const row = [kpiName, month];
+                        loadedData.forEach(agency => {
+                            const kpi = agency.kpis.find(k => k.name === kpiName);
+                            row.push(kpi ? (kpi[month] || 0) : 0);
+                        });
+                        excelData.push(row);
+                    });
+                });
+                
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                XLSX.utils.book_append_sheet(wb, ws, 'KPIs Seminuevos');
+                
+                const filename = `Daytona_Seminuevos_KPIs_${new Date().toLocaleDateString('es-ES').replace(/\//g, '-')}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                
+                showStatus('success', 'Datos exportados exitosamente');
+                
+            } catch (error) {
+                console.error('Error exportando:', error);
+                alert('❌ Error al exportar: ' + error.message);
+            }
+        }
+        
+        // Reloj
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            const clockElement = document.getElementById('currentTime');
+            if (clockElement) {
+                clockElement.textContent = timeString;
             }
         }
         
         // Inicialización
+        setInterval(updateClock, 1000);
+        updateClock();
+        
         document.addEventListener('DOMContentLoaded', function() {
-            log("📜 DOM completamente cargado");
-            updateStatus("✅ Sistema inicializado");
-            
-            // Asignar event listener al botón 4
-            const test4Button = document.getElementById('test4');
-            if (test4Button) {
-                test4Button.addEventListener('click', function() {
-                    log("🎯 Event listener del botón 4 ejecutado");
-                    updateStatus("✅ Event listener funciona");
-                    alert("✅ Event listener funciona!");
-                });
-                log("🔗 Event listener asignado al botón 4");
-            }
+            console.log('✅ Dashboard Seminuevos inicializado');
         });
         
-        // Capturar errores globales
-        window.addEventListener('error', function(e) {
-            log(`❌ ERROR GLOBAL: ${e.message} en ${e.filename}:${e.lineno}`);
-            updateStatus(`❌ Error global capturado`);
-        });
-        
-        // Log inicial
-        log("🚀 Script iniciado");
-        updateStatus("⏳ Cargando sistema...");
+        console.log('📜 Script cargado completamente');
     </script>
 </body>
 </html>
