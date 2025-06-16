@@ -1324,6 +1324,131 @@
             if (totalPeriodsEl) totalPeriodsEl.textContent = selectedMonths.length;
         }
         
+        // FUNCIONES DE NAVEGACIÓN Y MENÚS MÓVILES
+        
+        // Navegación a dashboard de autos nuevos
+        function openNewCarsPage() {
+            window.open('https://flozanol.github.io/daytona-autos-nuevos-kpis/', '_blank');
+        }
+        
+        // Función para reportes (placeholder)
+        function openReportsPage() {
+            alert('🚧 Sección de reportes en desarrollo...\n\nPróximamente: Reportes avanzados y análisis predictivo');
+        }
+        
+        // Menú móvil
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) {
+                menu.classList.toggle('open');
+            }
+        }
+        
+        // Menú de usuario (placeholder)
+        function toggleUserMenu() {
+            alert('👤 Menú de usuario\n\n• Configuración\n• Notificaciones\n• Ayuda\n• Cerrar sesión');
+        }
+        
+        // Menú de acciones rápidas
+        function toggleQuickActions() {
+            const menu = document.getElementById('quickActionsMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+        
+        // Funciones de exportación y utilidades
+        function exportData() {
+            if (!loadedData || loadedData.length === 0) {
+                alert('❌ No hay datos para exportar. Carga datos primero.');
+                return;
+            }
+            
+            try {
+                // Crear CSV básico
+                let csvContent = "Agencia,KPI,";
+                if (selectedMonths.length > 0) {
+                    csvContent += selectedMonths.join(',');
+                } else {
+                    csvContent += allMonths.join(',');
+                }
+                csvContent += "\n";
+                
+                const filteredData = loadedData.filter(agency => 
+                    selectedAgencies.length === 0 || selectedAgencies.includes(agency.agency)
+                );
+                
+                filteredData.forEach(agency => {
+                    agency.kpis.forEach(kpi => {
+                        csvContent += `"${agency.agency}","${kpi.name}",`;
+                        const months = selectedMonths.length > 0 ? selectedMonths : allMonths;
+                        const values = months.map(month => kpi[month] || 0);
+                        csvContent += values.join(',') + "\n";
+                    });
+                });
+                
+                // Descargar archivo
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `daytona-seminuevos-kpis-${new Date().toISOString().split('T')[0]}.csv`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('success', 'Datos exportados exitosamente');
+                toggleQuickActions();
+                
+            } catch (error) {
+                console.error('Error exportando:', error);
+                alert('❌ Error al exportar datos');
+            }
+        }
+        
+        function shareData() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Dashboard KPIs Seminuevos - Grupo Daytona',
+                    text: 'Análisis de KPIs en tiempo real para agencias de seminuevos',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback para navegadores sin soporte
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('🔗 URL copiada al portapapeles');
+                });
+            }
+            toggleQuickActions();
+        }
+        
+        function printReport() {
+            window.print();
+            toggleQuickActions();
+        }
+        
+        // Cerrar menús al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const quickActions = document.getElementById('quickActionsMenu');
+            const floatingBtn = document.querySelector('.floating-action-btn');
+            
+            // Cerrar menú móvil si se hace clic fuera
+            if (mobileMenu && mobileMenu.classList.contains('open') && !mobileMenu.contains(event.target)) {
+                const menuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+                if (!menuButton || !menuButton.contains(event.target)) {
+                    toggleMobileMenu();
+                }
+            }
+            
+            // Cerrar acciones rápidas si se hace clic fuera
+            if (quickActions && !quickActions.classList.contains('hidden') && 
+                !quickActions.contains(event.target) && 
+                floatingBtn && !floatingBtn.contains(event.target)) {
+                toggleQuickActions();
+            }
+        });
+        
         // Función para categorizar KPIs
         function categorizeKPI(kpiName) {
             const ventas = ['ventas', 'leads', 'conversión', 'test drive', 'cotizaciones', 'financiamientos', 'seguros', 'recompras'];
