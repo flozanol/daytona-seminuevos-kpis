@@ -14,9 +14,641 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        
+        // ==========================================
+        // FUNCIONES DE INTERFAZ Y VISUALIZACIÓN
+        // ==========================================
+        
+        function displayResults(data) {
+            console.log('📊 Mostrando resultados...');
+            loadedData = data;
+            selectedAgencies = data.map(agency => agency.agency);
+            allMonths = data[0].months;
+            selectedMonths = allMonths.slice(0, 6);
+            
+            const kpiSet = new Set();
+            data.forEach(agency => {
+                agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
+            });
+            allKPIs = Array.from(kpiSet);
+            
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv) {
+                resultsDiv.classList.remove('hidden');
+            }
+            
+            updateAgenciesList();
+            updateAgencyCheckboxes();
+            updateMonthCheckboxes();
+            updateStats();
+            updateTable();
+            updateSingleAgencySelect();
         }
         
-        .glass-effect {
+        function categorizeKPI(kpiName) {
+            const ventas = ['ventas', 'leads', 'conversión', 'test drive', 'cotizaciones', 'financiamientos', 'seguros', 'recompras'];
+            const marketing = ['marketing', 'social media', 'email', 'whatsapp', 'costo por lead', 'roi', 'digital'];
+            const servicio = ['satisfacción', 'post-venta', 'quejas', 'tiempo respuesta', 'llamadas atendidas', 'nps'];
+            const financiero = ['margen', 'valor cliente', 'cross-selling', 'up-selling', 'retención', 'devoluciones'];
+            const operativo = ['inventario', 'capacitación', 'metas', 'tráfico', 'churn', 'llamadas perdidas'];
+            
+            const kpiLower = kpiName.toLowerCase();
+            
+            if (ventas.some(term => kpiLower.includes(term))) return 'ventas';
+            if (marketing.some(term => kpiLower.includes(term))) return 'marketing';
+            if (servicio.some(term => kpiLower.includes(term))) return 'servicio';
+            if (financiero.some(term => kpiLower.includes(term))) return 'financiero';
+            if (operativo.some(term => kpiLower.includes(term))) return 'operativo';
+            
+            return 'general';
+        }
+        
+        function formatCellValue(value, values, isComparison = true) {
+            if (value === 0) return { class: 'zero-value', text: 'N/A' };
+            
+            if (isComparison && values.length > 1) {
+                const maxValue = Math.max(...values.filter(v => v > 0));
+                const minValue = Math.min(...values.filter(v => v > 0));
+                const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
+                
+                if (value === maxValue && maxValue > minValue) {
+                    return { class: 'highest-value', text: value.toLocaleString() };
+                } else if (value === minValue && maxValue > minValue) {
+                    return { class: 'lowest-value', text: value.toLocaleString() };
+                } else if (Math.abs(value - avgValue) <= avgValue * 0.1) {
+                    return { class: 'medium-value', text: value.toLocaleString() };
+                }
+            }
+            
+            return { class: 'value-cell', text: value.toLocaleString() };
+        }
+        
+        function updateAgenciesList() {
+            const container = document.getElementById('agenciesList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const agencyImages = {
+                'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
+                'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
+                'KIA Interlomas': 'https://api.grupodaytona.com/files/images/full-SVRzg-mH5a-1694311813102.jpg',
+                'KIA Iztapalapa': 'https://api.grupodaytona.com/files/images/full-NYSe9ky8Es-1694496101625.jpg',
+                'MG Cuajimalpa': 'https://api.grupodaytona.com/files/images/full-BuCGnVgNRs-1694497075960.jpg',
+                'MG Interlomas': 'https://api.grupodaytona.com/files/images/large-LkGvLDc6m3-1696379783532.png',
+                'MG Iztapalapa': 'https://api.grupodaytona.com/files/images/full-Li4Y-eqSkt-1694454220488.png',
+                'GWM Iztapalapa': 'https://api.grupodaytona.com/files/images/large-O491MhYAB8-1723762761679.jpg',
+                'GWM Morelos': 'https://api.grupodaytona.com/files/images/large-N1FaJzm1rW-1701102100287.jpg'
+            };
+            
+            const colors = [
+                'from-red-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500',
+                'from-yellow-500 to-orange-500', 'from-purple-500 to-indigo-500', 'from-indigo-500 to-blue-500',
+                'from-pink-500 to-rose-500', 'from-teal-500 to-cyan-500', 'from-orange-500 to-red-500'
+            ];
+            
+            loadedData.forEach((agency, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all card-hover cursor-pointer';
+                div.onclick = () => toggleAgency(agency.agency);
+                
+                const agencyPhoto = agencyImages[agency.agency] || '';
+                
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            ${agencyPhoto ? 
+                                `<img src="${agencyPhoto}" alt="${agency.agency}" class="w-12 h-12 rounded-lg object-cover shadow-lg">
+                                 <div class="absolute inset-0 w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg opacity-20"></div>` :
+                                `<div class="w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-store text-white"></i>
+                                 </div>`
+                            }
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-white">${agency.agency}</h4>
+                            <p class="text-sm text-gray-400">${agency.kpis.length} KPIs • ${agency.months.length} meses</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="w-3 h-3 ${selectedAgencies.includes(agency.agency) ? 'bg-green-400 animate-pulse' : 'bg-gray-400'} rounded-full"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function updateAgencyCheckboxes() {
+            const container = document.getElementById('agencyCheckboxes');
+            const count = document.getElementById('agencyCount');
+            
+            if (!container || !count) return;
+            
+            container.innerHTML = '';
+            count.textContent = `Agencias (${selectedAgencies.length}/${loadedData.length})`;
+            
+            const agencyImages = {
+                'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
+                'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
+                'KIA Interlomas': 'https://api.grupodaytona.com/files/images/full-SVRzg-mH5a-1694311813102.jpg',
+                'KIA Iztapalapa': 'https://api.grupodaytona.com/files/images/full-NYSe9ky8Es-1694496101625.jpg',
+                'MG Cuajimalpa': 'https://api.grupodaytona.com/files/images/full-BuCGnVgNRs-1694497075960.jpg',
+                'MG Interlomas': 'https://api.grupodaytona.com/files/images/large-LkGvLDc6m3-1696379783532.png',
+                'MG Iztapalapa': 'https://api.grupodaytona.com/files/images/full-Li4Y-eqSkt-1694454220488.png',
+                'GWM Iztapalapa': 'https://api.grupodaytona.com/files/images/large-O491MhYAB8-1723762761679.jpg',
+                'GWM Morelos': 'https://api.grupodaytona.com/files/images/large-N1FaJzm1rW-1701102100287.jpg'
+            };
+            
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
+            
+            loadedData.forEach((agency, index) => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedAgencies.includes(agency.agency);
+                checkbox.className = 'w-4 h-4 text-red-500 bg-white/10 border-white/20 rounded focus:ring-red-500 focus:ring-2';
+                checkbox.onchange = () => toggleAgency(agency.agency);
+                
+                const agencyPhoto = agencyImages[agency.agency];
+                
+                const imageDiv = document.createElement('div');
+                if (agencyPhoto) {
+                    imageDiv.innerHTML = `<img src="${agencyPhoto}" alt="${agency.agency}" class="w-6 h-6 rounded object-cover">`;
+                } else {
+                    imageDiv.className = 'w-3 h-3 rounded-full';
+                    imageDiv.style.backgroundColor = colors[index % colors.length];
+                }
+                
+                const span = document.createElement('span');
+                span.className = 'text-gray-300 text-sm font-medium';
+                span.textContent = agency.agency;
+                
+                label.appendChild(checkbox);
+                label.appendChild(imageDiv);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+        }
+        
+        function updateMonthCheckboxes() {
+            const container = document.getElementById('monthCheckboxes');
+            const count = document.getElementById('monthCount');
+            
+            if (!container || !count) return;
+            
+            container.innerHTML = '';
+            count.textContent = `Meses (${selectedMonths.length})`;
+            
+            allMonths.forEach(month => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedMonths.includes(month);
+                checkbox.className = 'w-4 h-4 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2';
+                checkbox.onchange = () => toggleMonth(month);
+                
+                const span = document.createElement('span');
+                span.className = 'text-gray-300 text-sm font-medium';
+                span.textContent = month;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+        }
+        
+        function updateStats() {
+            const totalKPIsEl = document.getElementById('totalKPIs');
+            const totalAgenciesEl = document.getElementById('totalAgencies');
+            const totalPeriodsEl = document.getElementById('totalPeriods');
+            
+            if (totalKPIsEl) totalKPIsEl.textContent = allKPIs.length;
+            if (totalAgenciesEl) totalAgenciesEl.textContent = selectedAgencies.length;
+            if (totalPeriodsEl) totalPeriodsEl.textContent = selectedMonths.length;
+        }
+        
+        // ==========================================
+        // FUNCIONES DE CONTROL Y NAVEGACIÓN
+        // ==========================================
+        
+        function toggleAgency(agencyName) {
+            if (selectedAgencies.includes(agencyName)) {
+                selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
+            } else {
+                selectedAgencies.push(agencyName);
+            }
+            updateAgencyCheckboxes();
+            updateAgenciesList();
+            updateStats();
+        }
+        
+        function toggleMonth(month) {
+            if (selectedMonths.includes(month)) {
+                selectedMonths = selectedMonths.filter(m => m !== month);
+            } else {
+                selectedMonths.push(month);
+            }
+            updateMonthCheckboxes();
+            updateStats();
+        }
+        
+        function selectAllAgencies() {
+            selectedAgencies = loadedData.map(agency => agency.agency);
+            updateAgencyCheckboxes();
+            updateAgenciesList();
+            updateStats();
+        }
+        
+        function deselectAllAgencies() {
+            selectedAgencies = [];
+            updateAgencyCheckboxes();
+            updateAgenciesList();
+            updateStats();
+        }
+        
+        function updateAnalysis() {
+            if (selectedAgencies.length === 0) {
+                showStatus('error', 'Selecciona al menos una agencia');
+                return;
+            }
+            if (selectedMonths.length === 0) {
+                showStatus('error', 'Selecciona al menos un mes');
+                return;
+            }
+            updateTable();
+            showStatus('success', `Análisis actualizado: ${selectedAgencies.length} agencias, ${selectedMonths.length} meses`);
+        }
+        
+        function refreshData() {
+            sessionStorage.removeItem('daytonaDashboardData');
+            showStatus('loading', 'Refrescando datos...');
+            setTimeout(loadDemo, 500);
+        }
+        
+        // ==========================================
+        // FUNCIONES DE TABLAS
+        // ==========================================
+        
+        function updateTable() {
+            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
+            
+            const headerRow = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            if (!headerRow || !tableBody) return;
+            
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
+            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
+            
+            headerRow.innerHTML = `
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
+                    KPI
+                </th>
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
+                    Período
+                </th>
+                ${filteredData.map((agency, index) => 
+                    `<th class="px-2 py-4 text-center text-xs font-bold text-white uppercase tracking-wider sticky top-0 border-b border-gray-200 z-30" 
+                         style="background: linear-gradient(135deg, ${colors[index % colors.length]}60, ${colors[index % colors.length]}40);">
+                         <div class="flex items-center justify-center">
+                            <span class="text-white font-semibold text-xs leading-tight">${agency.agency}</span>
+                         </div>
+                     </th>`
+                ).join('')}
+            `;
+            
+            tableBody.innerHTML = '';
+            
+            allKPIs.forEach((kpiName, kpiIndex) => {
+                selectedMonths.forEach((month, monthIndex) => {
+                    const row = document.createElement('tr');
+                    
+                    const isEven = (kpiIndex * selectedMonths.length + monthIndex) % 2 === 0;
+                    row.className = `table-row-hover transition-all duration-300 ${isEven ? 'table-row-even' : 'table-row-odd'}`;
+                    
+                    const values = filteredData.map(agency => {
+                        const kpi = agency.kpis.find(k => k.name === kpiName);
+                        return kpi ? (kpi[month] || 0) : 0;
+                    });
+                    
+                    const category = categorizeKPI(kpiName);
+                    
+                    let rowHTML = `
+                        <td class="px-3 py-3 text-sm font-semibold text-white kpi-cell kpi-category-${category}">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 rounded-full mr-2 bg-current opacity-60"></div>
+                                ${kpiName}
+                            </div>
+                        </td>
+                        <td class="px-3 py-3 text-sm font-medium text-gray-300 month-cell">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-day mr-2 text-green-400 text-xs"></i>
+                                ${month}
+                            </div>
+                        </td>
+                    `;
+                    
+                    values.forEach((value, index) => {
+                        const formatResult = formatCellValue(value, values, filteredData.length > 1);
+                        rowHTML += `<td class="px-2 py-3 text-center value-cell">
+                            <span class="text-xs font-bold ${formatResult.class}">${formatResult.text}</span>
+                        </td>`;
+                    });
+                    
+                    row.innerHTML = rowHTML;
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+        
+        // ==========================================
+        // FUNCIONES DE ANÁLISIS INDIVIDUAL
+        // ==========================================
+        
+        function updateSingleAgencySelect() {
+            const select = document.getElementById('singleAgencySelect');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Selecciona una agencia...</option>';
+            
+            loadedData.forEach(agency => {
+                const option = document.createElement('option');
+                option.value = agency.agency;
+                option.textContent = agency.agency;
+                select.appendChild(option);
+            });
+        }
+        
+        function updateSingleAgencyMonths() {
+            const select = document.getElementById('singleAgencySelect');
+            const container = document.getElementById('singleMonthCheckboxes');
+            const count = document.getElementById('singleMonthCount');
+            
+            if (!select || !container || !count) return;
+            
+            singleSelectedAgency = select.value;
+            singleSelectedMonths = [];
+            
+            container.innerHTML = '';
+            count.textContent = 'Meses (0)';
+            
+            if (!singleSelectedAgency) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">Primero selecciona una agencia</p>';
+                return;
+            }
+            
+            allMonths.forEach(month => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = false;
+                checkbox.className = 'w-4 h-4 text-orange-500 bg-white/10 border-white/20 rounded focus:ring-orange-500 focus:ring-2';
+                checkbox.onchange = () => toggleSingleMonth(month);
+                
+                const span = document.createElement('span');
+                span.className = 'text-gray-300 text-sm font-medium';
+                span.textContent = month;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+        }
+        
+        function toggleSingleMonth(month) {
+            if (singleSelectedMonths.includes(month)) {
+                singleSelectedMonths = singleSelectedMonths.filter(m => m !== month);
+            } else {
+                singleSelectedMonths.push(month);
+            }
+            
+            const count = document.getElementById('singleMonthCount');
+            if (count) {
+                count.textContent = `Meses (${singleSelectedMonths.length})`;
+            }
+        }
+        
+        function generateSingleAgencyTable() {
+            if (!singleSelectedAgency) {
+                showStatus('error', 'Selecciona una agencia para el análisis individual');
+                return;
+            }
+            
+            if (singleSelectedMonths.length === 0) {
+                showStatus('error', 'Selecciona al menos un mes para comparar');
+                return;
+            }
+            
+            const agencyData = loadedData.find(agency => agency.agency === singleSelectedAgency);
+            if (!agencyData) {
+                showStatus('error', 'No se encontraron datos para la agencia seleccionada');
+                return;
+            }
+            
+            const tableContainer = document.getElementById('singleAgencyTableContainer');
+            const headerRow = document.getElementById('singleTableHeader');
+            const tableBody = document.getElementById('singleTableBody');
+            
+            if (!tableContainer || !headerRow || !tableBody) {
+                showStatus('error', 'Error en elementos de la tabla');
+                return;
+            }
+            
+            tableContainer.classList.remove('hidden');
+            
+            headerRow.innerHTML = `
+                <th class="px-4 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200">
+                    <i class="fas fa-chart-bar mr-2"></i>KPI
+                </th>
+                ${singleSelectedMonths.map(month => 
+                    `<th class="px-3 py-4 text-center text-xs font-bold text-white uppercase tracking-wider bg-gradient-to-r from-orange-600 to-yellow-600 sticky top-0 border-b border-gray-200">
+                        <i class="fas fa-calendar mr-1"></i>${month}
+                    </th>`
+                ).join('')}
+            `;
+            
+            tableBody.innerHTML = '';
+            
+            agencyData.kpis.forEach((kpi, index) => {
+                const row = document.createElement('tr');
+                
+                const category = categorizeKPI(kpi.name);
+                row.className = `table-row-hover transition-all duration-300 ${
+                    index % 2 === 0 ? 'table-row-even' : 'table-row-odd'
+                }`;
+                
+                let rowHTML = `
+                    <td class="px-4 py-3 text-sm font-semibold text-white kpi-cell kpi-category-${category}">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full mr-2 bg-current opacity-60"></div>
+                            ${kpi.name}
+                        </div>
+                    </td>
+                `;
+                
+                const rowValues = singleSelectedMonths.map(month => kpi[month] || 0);
+                
+                singleSelectedMonths.forEach(month => {
+                    const value = kpi[month] || 0;
+                    const formatResult = formatCellValue(value, rowValues, singleSelectedMonths.length > 1);
+                    
+                    rowHTML += `<td class="px-3 py-3 text-center value-cell">
+                        <span class="text-sm font-medium ${formatResult.class}">${formatResult.text}</span>
+                    </td>`;
+                });
+                
+                row.innerHTML = rowHTML;
+                tableBody.appendChild(row);
+            });
+            
+            showStatus('success', `Tabla individual generada: ${singleSelectedAgency} - ${singleSelectedMonths.length} meses`);
+        }
+        
+        // ==========================================
+        // FUNCIONES DE EXPORTACIÓN EXCEL
+        // ==========================================
+        
+        function exportMainTableToExcel() {
+            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) {
+                showStatus('error', 'No hay datos para exportar. Genera primero el análisis.');
+                return;
+            }
+            
+            try {
+                const excelData = [];
+                const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
+                
+                const header = ['KPI', 'Período', ...filteredData.map(agency => agency.agency)];
+                excelData.push(header);
+                
+                allKPIs.forEach(kpiName => {
+                    selectedMonths.forEach(month => {
+                        const row = [kpiName, month];
+                        
+                        filteredData.forEach(agency => {
+                            const kpi = agency.kpis.find(k => k.name === kpiName);
+                            const value = kpi ? (kpi[month] || 0) : 0;
+                            row.push(value);
+                        });
+                        
+                        excelData.push(row);
+                    });
+                });
+                
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Análisis Comparativo');
+                
+                const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+                const filename = `Daytona_Analisis_Comparativo_${fecha}.xlsx`;
+                
+                XLSX.writeFile(wb, filename);
+                
+                showStatus('success', `Tabla principal exportada exitosamente: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error exportando tabla principal:', error);
+                showStatus('error', 'Error al exportar la tabla principal');
+            }
+        }
+        
+        function exportSingleTableToExcel() {
+            if (!singleSelectedAgency || singleSelectedMonths.length === 0) {
+                showStatus('error', 'No hay datos individuales para exportar. Genera primero el análisis individual.');
+                return;
+            }
+            
+            try {
+                const agencyData = loadedData.find(agency => agency.agency === singleSelectedAgency);
+                if (!agencyData) {
+                    showStatus('error', 'No se encontraron datos para la agencia seleccionada');
+                    return;
+                }
+                
+                const excelData = [];
+                
+                const header = ['KPI', ...singleSelectedMonths];
+                excelData.push(header);
+                
+                agencyData.kpis.forEach(kpi => {
+                    const row = [kpi.name];
+                    singleSelectedMonths.forEach(month => {
+                        const value = kpi[month] || 0;
+                        row.push(value);
+                    });
+                    excelData.push(row);
+                });
+                
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                XLSX.utils.book_append_sheet(wb, ws, singleSelectedAgency);
+                
+                const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+                const agencyName = singleSelectedAgency.replace(/\s+/g, '_');
+                const filename = `Daytona_${agencyName}_Individual_${fecha}.xlsx`;
+                
+                XLSX.writeFile(wb, filename);
+                
+                showStatus('success', `Análisis individual exportado exitosamente: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error exportando tabla individual:', error);
+                showStatus('error', 'Error al exportar el análisis individual');
+            }
+        }
+        
+        // ==========================================
+        // INICIALIZACIÓN Y EVENTOS
+        // ==========================================
+        
+        // Inicializar reloj
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Eventos para cerrar menús
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const quickActions = document.getElementById('quickActionsMenu');
+            const floatingBtn = document.querySelector('.floating-action-btn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('open') && !mobileMenu.contains(event.target)) {
+                const menuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+                if (!menuButton || !menuButton.contains(event.target)) {
+                    toggleMobileMenu();
+                }
+            }
+            
+            if (quickActions && !quickActions.classList.contains('hidden') && 
+                !quickActions.contains(event.target) && 
+                floatingBtn && !floatingBtn.contains(event.target)) {
+                toggleQuickActions();
+            }
+        });
+        
+        // Inicialización final
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Dashboard completamente cargado');
+            
+            const savedData = sessionStorage.getItem('daytonaDashboardData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    displayResults(data);
+                    showStatus('success', `Datos cargados desde sesión: ${data.length} agencias`);
+                } catch (error) {
+                    console.log('Error cargando sesión:', error);
+                }
+            }
+        });
+    </script>.glass-effect {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
