@@ -376,6 +376,13 @@
     </div>
 
     <script>
+        // Configuración por defecto para auto-carga
+        const DEFAULT_CONFIG = {
+            spreadsheetId: "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ", // Tu spreadsheet por defecto
+            autoLoad: true,
+            showConnectionPanel: false // Ocultar panel de conexión en modo público
+        };
+        
         // Variables globales
         let loadedData = [];
         let selectedAgencies = [];
@@ -383,24 +390,208 @@
         let allKPIs = [];
         let allMonths = [];
         let currentDataSource = 'none';
+        let isPublicMode = true; // Modo público por defecto
         
-        console.log('🚀 Dashboard KPIs Daytona iniciado');
+        console.log('🚀 Dashboard KPIs Daytona iniciado - Modo Público');
         
-        // Actualizar reloj
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = timeString;
+        // Auto-cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Dashboard cargado - Iniciando auto-carga de datos');
+            
+            // Ocultar panel de conexión en modo público
+            if (isPublicMode) {
+                const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
+                const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
+                
+                if (connectionMethods) {
+                    connectionMethods.style.display = 'none';
+                }
+                if (instructions) {
+                    instructions.style.display = 'none';
+                }
+                
+                // Mostrar mensaje de carga automática
+                showStatus('loading', 'Cargando Dashboard...', 'Conectando con datos en tiempo real de Grupo Daytona', [
+                    '🏢 Cargando 9 agencias automotrices',
+                    '📊 Obteniendo KPIs actualizados',
+                    '📅 Procesando datos mensuales'
+                ]);
+            }
+            
+            // Auto-cargar datos después de 1 segundo
+            setTimeout(() => {
+                if (DEFAULT_CONFIG.autoLoad) {
+                    autoLoadDefaultData();
+                }
+            }, 1000);
+            
+            // Resto de la inicialización
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+        
+        // Función para auto-cargar datos por defecto
+        async function autoLoadDefaultData() {
+            try {
+                console.log('🔄 Auto-cargando datos por defecto...');
+                currentDataSource = 'api';
+                
+                // Intentar cargar desde API real primero
+                await connectToRealAPI(DEFAULT_CONFIG.spreadsheetId);
+                
+            } catch (error) {
+                console.warn('⚠️ Error cargando API, usando datos demo:', error);
+                
+                // Si falla la API, cargar demo automáticamente
+                currentDataSource = 'demo';
+                loadDemoSilent();
             }
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        
+        // Versión silenciosa del demo (sin animaciones de carga)
+        function loadDemoSilent() {
+            console.log('🎯 Cargando datos demo silenciosamente...');
+            
+            // Los mismos datos del demo pero sin delays
+            const kpis = [
+                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
+                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos Realizados',
+                'ROI Marketing', 'Inventario Disponible', 'Financiamientos Otorgados', 'Seguros Vendidos',
+                'Post-Venta Servicios', 'Clientes Referidos', 'Llamadas Perdidas', 'Tiempo Promedio Venta',
+                'Margen Utilidad', 'Devoluciones Procesadas', 'Quejas Resueltas', 'Capacitación Equipo',
+                'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención Clientes', 'Tráfico Showroom',
+                'Conversión Digital', 'Social Media Engagement', 'Email Marketing CTR', 'WhatsApp Business',
+                'Costo por Lead', 'Valor Vida Cliente', 'Churn Rate', 'NPS Score', 'Recompras'
+            ];
+            
+            const agencies = [
+                { name: 'Honda Cuajimalpa', base: 220, performance: 1.2 },
+                { name: 'Honda Interlomas', base: 200, performance: 1.1 },
+                { name: 'KIA Interlomas', base: 180, performance: 1.0 },
+                { name: 'KIA Iztapalapa', base: 160, performance: 0.9 },
+                { name: 'MG Cuajimalpa', base: 140, performance: 0.85 },
+                { name: 'MG Interlomas', base: 120, performance: 0.8 },
+                { name: 'MG Iztapalapa', base: 110, performance: 0.75 },
+                { name: 'GWM Iztapalapa', base: 95, performance: 0.7 },
+                { name: 'GWM Morelos', base: 80, performance: 0.65 }
+            ];
+
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+            const data = agencies.map(agency => {
+                const agencyKPIs = kpis.map(kpiName => {
+                    const kpi = { name: kpiName };
+                    months.forEach((month, index) => {
+                        const seasonalFactor = 0.8 + 0.4 * Math.sin((index + 9) * Math.PI / 6);
+                        const randomVariation = 0.8 + Math.random() * 0.4;
+                        
+                        let value = Math.round(agency.base * agency.performance * seasonalFactor * randomVariation);
+                        
+                        if (kpiName.includes('%') || kpiName.includes('Conversión') || kpiName.includes('Satisfacción')) {
+                            value = Math.min(100, Math.max(1, value / 3));
+                        } else if (kpiName.includes('Tiempo')) {
+                            value = Math.max(1, value / 10);
+                        }
+                        
+                        kpi[month] = Math.max(1, Math.round(value));
+                    });
+                    return kpi;
+                });
+
+                return {
+                    agency: agency.name,
+                    kpis: agencyKPIs,
+                    months: months
+                };
+            });
+
+            // Mostrar datos inmediatamente
+            displayResults(data);
+            
+            const dataSourceText = currentDataSource === 'api' ? 'Google Sheets en tiempo real' : 'Datos de demostración';
+            showStatus('success', 'Dashboard Activo', `Mostrando ${dataSourceText}`, [
+                `🏢 ${data.length} agencias automotrices activas`,
+                `📊 ${kpis.length} indicadores de rendimiento`,
+                `📅 ${months.length} períodos de análisis`,
+                `🔄 Datos actualizados automáticamente`
+            ]);
+        }
+        
+        // Función para alternar entre modo público y modo administrador
+        function toggleAdminMode() {
+            isPublicMode = !isPublicMode;
+            
+            const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
+            const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
+            
+            if (isPublicMode) {
+                // Modo público: ocultar controles de conexión
+                if (connectionMethods) connectionMethods.style.display = 'none';
+                if (instructions) instructions.style.display = 'none';
+                console.log('👥 Modo público activado');
+            } else {
+                // Modo admin: mostrar controles de conexión
+                if (connectionMethods) connectionMethods.style.display = 'grid';
+                if (instructions) instructions.style.display = 'block';
+                console.log('⚙️ Modo administrador activado');
+            }
+        }
+        
+        // Agregar botón de admin mode (oculto, se activa con tecla especial)
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Shift + A para alternar modo admin
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                e.preventDefault();
+                toggleAdminMode();
+                showStatus('success', `Modo ${isPublicMode ? 'Público' : 'Administrador'} Activado`, 
+                    `Dashboard en modo ${isPublicMode ? 'público' : 'administrador'}`, []);
+            }
+        });
+        
+        // Función para refrescar datos automáticamente cada 30 minutos
+        function startAutoRefresh() {
+            setInterval(() => {
+                if (currentDataSource === 'api' && DEFAULT_CONFIG.spreadsheetId) {
+                    console.log('🔄 Refrescando datos automáticamente...');
+                    connectToRealAPI(DEFAULT_CONFIG.spreadsheetId);
+                }
+            }, 30 * 60 * 1000); // 30 minutos
+        }
+        
+        // Iniciar auto-refresh
+        setTimeout(startAutoRefresh, 60000); // Después de 1 minuto de carga inicial
+        
+        // Función para mostrar mensaje en el hero cuando está en modo público
+        function updateHeroForPublicMode() {
+            if (isPublicMode) {
+                const heroSection = document.querySelector('.text-center.mb-12');
+                if (heroSection) {
+                    heroSection.innerHTML = `
+                        <h2 class="text-5xl font-bold gradient-text mb-4">
+                            Dashboard KPIs Seminuevos Daytona
+                        </h2>
+                        <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-4">
+                            Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
+                        </p>
+                        <div class="flex items-center justify-center space-x-4 text-sm text-gray-400">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                <span>Datos en tiempo real</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-building text-blue-400"></i>
+                                <span>9 Agencias Activas</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-chart-line text-green-400"></i>
+                                <span>35+ KPIs</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
         
         // FUNCIÓN PRINCIPAL: Conectar API REAL (Restaurada)
         async function connectGoogleSheetsAPI() {
@@ -995,7 +1186,21 @@
             return match ? match[1] : null;
         }
         
-        // Mostrar resultados
+        // Actualizar reloj
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const clockElement = document.getElementById('currentTime');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+        
+        // Mejorar la función displayResults para modo público
         function displayResults(data) {
             loadedData = data;
             selectedAgencies = data.map(agency => agency.agency);
@@ -1015,9 +1220,19 @@
             });
             allKPIs = Array.from(kpiSet);
             
-            // Mostrar sección
+            // Mostrar sección de resultados
             document.getElementById('results').classList.remove('hidden');
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            
+            // En modo público, hacer scroll suave a los resultados
+            if (isPublicMode) {
+                setTimeout(() => {
+                    document.getElementById('results').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    updateHeroForPublicMode();
+                }, 500);
+            }
             
             updateControls();
             updateStats();
@@ -1295,29 +1510,70 @@
             statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         
-        // Inicialización
+        // Inicialización final mejorada
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard Daytona listo');
+            console.log('✅ Dashboard cargado - Iniciando auto-carga de datos');
             
-            // Auto-llenar URLs guardadas
-            const savedApiUrl = localStorage.getItem('daytonaSheetsUrl');
-            const savedCsvUrl = localStorage.getItem('daytonaCsvUrl');
-            
-            if (savedApiUrl) {
-                document.getElementById('sheetsUrl').value = savedApiUrl;
+            // Configurar modo público por defecto
+            if (isPublicMode) {
+                const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
+                const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
+                
+                if (connectionMethods) {
+                    connectionMethods.style.display = 'none';
+                }
+                if (instructions) {
+                    instructions.style.display = 'none';
+                }
+                
+                // Mostrar mensaje de carga automática
+                showStatus('loading', 'Cargando Dashboard...', 'Conectando con datos en tiempo real de Grupo Daytona', [
+                    '🏢 Cargando 9 agencias automotrices',
+                    '📊 Obteniendo KPIs actualizados',
+                    '📅 Procesando datos mensuales'
+                ]);
             }
-            if (savedCsvUrl) {
-                document.getElementById('csvUrl').value = savedCsvUrl;
+            
+            // Inicializar reloj
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // Auto-cargar datos después de 1 segundo
+            setTimeout(() => {
+                if (DEFAULT_CONFIG.autoLoad) {
+                    autoLoadDefaultData();
+                }
+            }, 1000);
+            
+            // Auto-llenar URLs guardadas (solo en modo admin)
+            if (!isPublicMode) {
+                const savedApiUrl = localStorage.getItem('daytonaSheetsUrl');
+                const savedCsvUrl = localStorage.getItem('daytonaCsvUrl');
+                
+                if (savedApiUrl) {
+                    document.getElementById('sheetsUrl').value = savedApiUrl;
+                }
+                if (savedCsvUrl) {
+                    document.getElementById('csvUrl').value = savedCsvUrl;
+                }
+                
+                // Auto-guardar URLs
+                document.getElementById('sheetsUrl').addEventListener('input', function() {
+                    localStorage.setItem('daytonaSheetsUrl', this.value);
+                });
+                
+                document.getElementById('csvUrl').addEventListener('input', function() {
+                    localStorage.setItem('daytonaCsvUrl', this.value);
+                });
             }
             
-            // Auto-guardar URLs
-            document.getElementById('sheetsUrl').addEventListener('input', function() {
-                localStorage.setItem('daytonaSheetsUrl', this.value);
-            });
-            
-            document.getElementById('csvUrl').addEventListener('input', function() {
-                localStorage.setItem('daytonaCsvUrl', this.value);
-            });
+            // Agregar indicador de modo en la esquina (para admin)
+            if (!isPublicMode) {
+                const modeIndicator = document.createElement('div');
+                modeIndicator.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-lg text-xs z-50';
+                modeIndicator.textContent = 'Modo Admin';
+                document.body.appendChild(modeIndicator);
+            }
         });
     </script>
 </body>
