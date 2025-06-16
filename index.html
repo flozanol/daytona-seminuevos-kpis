@@ -613,6 +613,41 @@
         setInterval(updateClock, 1000);
         updateClock();
         
+        // Eventos para botones principales
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Dashboard completamente cargado');
+            
+            // Asignar eventos a los botones principales
+            const loadDemoBtn = document.getElementById('loadDemoBtn');
+            const connectAPIBtn = document.getElementById('connectAPIBtn');
+            
+            if (loadDemoBtn) {
+                loadDemoBtn.addEventListener('click', function() {
+                    console.log('🎯 Botón Cargar Demo clickeado');
+                    loadDemo();
+                });
+            }
+            
+            if (connectAPIBtn) {
+                connectAPIBtn.addEventListener('click', function() {
+                    console.log('🔗 Botón Conectar API clickeado');
+                    connectToAPI();
+                });
+            }
+            
+            // Cargar datos de sesión si existen
+            const savedData = sessionStorage.getItem('daytonaDashboardData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    displayResults(data);
+                    showStatus('success', `Datos cargados desde sesión: ${data.length} agencias`);
+                } catch (error) {
+                    console.log('Error cargando sesión:', error);
+                }
+            }
+        });
+        
         // Eventos para cerrar menús
         document.addEventListener('click', function(event) {
             const mobileMenu = document.getElementById('mobileMenu');
@@ -630,22 +665,6 @@
                 !quickActions.contains(event.target) && 
                 floatingBtn && !floatingBtn.contains(event.target)) {
                 toggleQuickActions();
-            }
-        });
-        
-        // Inicialización final
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard completamente cargado');
-            
-            const savedData = sessionStorage.getItem('daytonaDashboardData');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    displayResults(data);
-                    showStatus('success', `Datos cargados desde sesión: ${data.length} agencias`);
-                } catch (error) {
-                    console.log('Error cargando sesión:', error);
-                }
             }
         });
     </script>.glass-effect {
@@ -953,23 +972,23 @@
                 </div>
                 
                 <div class="space-y-4">
-                    <button onclick="loadDemo(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white">
+                    <button onclick="loadDemo(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
                         <i class="fas fa-play"></i>
                         <span>Cargar Demo</span>
                     </button>
-                    <button onclick="connectToAPI(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white">
+                    <button onclick="connectToAPI(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
                         <i class="fas fa-link"></i>
                         <span>Conectar API</span>
                     </button>
-                    <button onclick="openNewCarsPage(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white">
+                    <button onclick="openNewCarsPage(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
                         <i class="fas fa-car"></i>
                         <span>Dashboard Nuevos</span>
                     </button>
-                    <button onclick="openReportsPage(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white">
+                    <button onclick="openReportsPage(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
                         <i class="fas fa-chart-line"></i>
                         <span>Ver Reportes</span>
                     </button>
-                    <button onclick="exportData(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white">
+                    <button onclick="exportData(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
                         <i class="fas fa-download"></i>
                         <span>Exportar Datos</span>
                     </button>
@@ -1007,11 +1026,11 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
-            <button onclick="loadDemo()" class="btn-primary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+            <button id="loadDemoBtn" class="btn-primary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
                 <i class="fas fa-play mr-3"></i>
                 Cargar Demo
             </button>
-            <button onclick="connectToAPI()" class="btn-secondary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+            <button id="connectAPIBtn" class="btn-secondary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
                 <i class="fas fa-link mr-3 animated-icon"></i>
                 Conectar API
             </button>
