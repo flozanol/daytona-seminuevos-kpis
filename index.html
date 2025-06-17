@@ -6,6 +6,7 @@
     <title>Dashboard KPIs - Grupo Daytona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -66,20 +67,6 @@
             50% { opacity: 0.7; }
         }
         
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: rgba(239, 68, 68, 0.5);
-            border-radius: 3px;
-        }
-        
         .stat-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
             backdrop-filter: blur(20px);
@@ -92,331 +79,270 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .connection-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
             transition: all 0.3s ease;
         }
-        
-        .connection-input:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.6);
         }
-        
-        .method-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+
+        .nav-link {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             transition: all 0.3s ease;
         }
-        
-        .method-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+
+        .nav-link:hover {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .floating-action-btn { bottom: 1rem; right: 1rem; }
         }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- Navigation Bar -->
     <nav class="glass-effect border-b border-white/10 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-10 h-10 rounded-lg object-contain bg-white/10 p-1">
+                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-contain bg-white/10 p-1">
                     <div>
-                        <h1 class="text-xl font-bold text-white">Grupo Daytona</h1>
-                        <p class="text-sm text-gray-300">Dashboard KPIs Seminuevos</p>
+                        <h1 class="text-lg sm:text-xl font-bold text-white">Grupo Daytona</h1>
+                        <p class="text-xs sm:text-sm text-gray-300 hidden sm:block">Dashboard KPIs Seminuevos</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <div class="hidden md:flex items-center space-x-2 text-gray-300">
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button onclick="openNewCarsPage()" class="nav-link flex items-center space-x-2 px-4 py-2 rounded-lg text-white font-medium">
+                        <i class="fas fa-car"></i>
+                        <span>Dashboard Nuevos</span>
+                    </button>
+                    <button onclick="openReportsPage()" class="flex items-center space-x-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reportes</span>
+                    </button>
+                    <div class="flex items-center space-x-2 text-gray-300">
                         <i class="fas fa-clock text-sm"></i>
                         <span class="text-sm" id="currentTime"></span>
                     </div>
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-white text-sm"></i>
+                    <div class="relative">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center cursor-pointer" onclick="toggleUserMenu()">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed top-0 left-0 w-full h-full bg-slate-900/95 backdrop-blur-lg z-50 md:hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold text-white">Menú</h2>
+                    <button onclick="toggleMobileMenu()" class="text-white">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <button onclick="loadDemo(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
+                        <i class="fas fa-play"></i>
+                        <span>Cargar Demo</span>
+                    </button>
+                    <button onclick="connectToAPI(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
+                        <i class="fas fa-link"></i>
+                        <span>Conectar API</span>
+                    </button>
+                    <button onclick="openNewCarsPage(); toggleMobileMenu();" class="w-full flex items-center space-x-3 p-4 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-all">
+                        <i class="fas fa-car"></i>
+                        <span>Dashboard Nuevos</span>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <!-- Hero Section -->
         <div class="text-center mb-12">
-            <h2 class="text-5xl font-bold gradient-text mb-4">
-                Dashboard KPIs Seminuevos Daytona
-            </h2>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
-            </p>
-        </div>
-
-        <!-- Connection Methods -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Method 1: Google Sheets API v4 -->
-            <div class="method-card rounded-2xl p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-plug text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">API Directa</h3>
-                    <p class="text-sm text-gray-300">Conexión directa con Google Sheets API v4</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="url" 
-                        id="sheetsUrl" 
-                        placeholder="https://docs.google.com/spreadsheets/d/ID/edit"
-                        class="w-full px-3 py-2 connection-input text-white text-sm rounded-lg placeholder-gray-400 focus:outline-none"
-                    >
-                    <button onclick="connectGoogleSheetsAPI()" class="w-full btn-secondary px-4 py-3 rounded-lg text-white font-semibold text-sm">
-                        <i class="fas fa-link mr-2"></i>
-                        Conectar API
-                    </button>
-                </div>
-            </div>
-
-            <!-- Method 2: CSV Export -->
-            <div class="method-card rounded-2xl p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-file-csv text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">CSV Export</h3>
-                    <p class="text-sm text-gray-300">Usar exportación CSV de Google Sheets</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="url" 
-                        id="csvUrl" 
-                        placeholder="https://docs.google.com/spreadsheets/d/ID/export?format=csv"
-                        class="w-full px-3 py-2 connection-input text-white text-sm rounded-lg placeholder-gray-400 focus:outline-none"
-                    >
-                    <button onclick="connectCSVMethod()" class="w-full btn-secondary px-4 py-3 rounded-lg text-white font-semibold text-sm">
-                        <i class="fas fa-download mr-2"></i>
-                        Cargar CSV
-                    </button>
-                </div>
-            </div>
-
-            <!-- Method 3: Demo -->
-            <div class="method-card rounded-2xl p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-flask text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Demo</h3>
-                    <p class="text-sm text-gray-300">Datos de demostración para pruebas</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <p class="text-xs text-gray-400 text-center">Genera datos simulados para 9 agencias automotrices</p>
-                    <button onclick="loadDemo()" class="w-full btn-primary px-4 py-3 rounded-lg text-white font-semibold text-sm">
-                        <i class="fas fa-play mr-2"></i>
-                        Cargar Demo
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Instructions -->
-        <div class="glass-effect rounded-2xl p-6 mb-8">
-            <div class="flex items-center mb-4">
-                <i class="fas fa-info-circle text-blue-400 text-xl mr-3"></i>
-                <h3 class="text-lg font-bold text-white">Instrucciones de Uso</h3>
+            <!-- Badge de identificación -->
+            <div class="flex justify-center mb-6">
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                    <i class="fas fa-recycle mr-2"></i>
+                    SEMINUEVOS
+                </span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                <div>
-                    <h4 class="font-semibold text-green-300 mb-2">🔗 API Directa</h4>
-                    <ol class="text-gray-300 space-y-1 list-decimal list-inside">
-                        <li>Haz tu Google Sheets público</li>
-                        <li>Copia la URL completa</li>
-                        <li>Pégala en el campo y conecta</li>
-                    </ol>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-blue-300 mb-2">📄 CSV Export</h4>
-                    <ol class="text-gray-300 space-y-1 list-decimal list-inside">
-                        <li>Ve a Archivo → Descargar → CSV</li>
-                        <li>Modifica la URL: ...d/ID/export?format=csv</li>
-                        <li>Usa esa URL en el campo CSV</li>
-                    </ol>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-purple-300 mb-2">🧪 Demo</h4>
-                    <ol class="text-gray-300 space-y-1 list-decimal list-inside">
-                        <li>No requiere configuración</li>
-                        <li>Genera datos automáticamente</li>
-                        <li>Ideal para pruebas</li>
-                    </ol>
-                </div>
+            <h2 class="hero-title text-3xl sm:text-5xl font-bold gradient-text mb-4">
+                Dashboard KPIs Seminuevos Daytona
+            </h2>
+            <p class="hero-subtitle text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">
+                Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias de seminuevos
+            </p>
+            
+            <!-- Enlace a dashboard de nuevos -->
+            <div class="flex justify-center">
+                <button onclick="openNewCarsPage()" class="inline-flex items-center space-x-2 px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all text-sm">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Ver Dashboard Autos Nuevos</span>
+                </button>
             </div>
         </div>
 
-        <!-- Status Display -->
-        <div id="statusDisplay" class="hidden mb-8">
-            <div class="glass-effect rounded-xl p-6 border-l-4">
-                <div class="flex items-start">
-                    <i id="statusIcon" class="text-2xl mr-4 mt-1"></i>
-                    <div class="flex-1">
-                        <h4 id="statusTitle" class="text-lg font-semibold mb-2"></h4>
-                        <p id="statusMessage" class="text-sm mb-3"></p>
-                        <div id="statusDetails" class="space-y-1 text-xs"></div>
-                    </div>
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-12">
+            <button onclick="loadDemo()" class="btn-primary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+                <i class="fas fa-play mr-3"></i>
+                Cargar Demo
+            </button>
+            <button onclick="connectToAPI()" class="btn-secondary px-6 sm:px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl">
+                <i class="fas fa-link mr-3 animated-icon"></i>
+                Conectar API
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="status" class="hidden mb-8">
+            <div class="glass-effect rounded-xl p-4 border-l-4">
+                <div class="flex items-center">
+                    <i id="statusIcon" class="text-2xl mr-3"></i>
+                    <p id="statusText" class="text-lg font-medium"></p>
                 </div>
             </div>
         </div>
 
         <!-- Results Section -->
         <div id="results" class="hidden">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-chart-bar text-white text-lg"></i>
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                <div class="stat-card rounded-2xl p-4 sm:p-6 text-center">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-white text-lg sm:text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-1" id="totalKPIs">0</h3>
-                    <p class="text-gray-300 text-sm font-medium">KPIs</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2" id="totalKPIs">0</h3>
+                    <p class="text-gray-300 font-medium text-sm sm:text-base">Total KPIs</p>
                 </div>
                 
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-building text-white text-lg"></i>
+                <div class="stat-card rounded-2xl p-4 sm:p-6 text-center">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-building text-white text-lg sm:text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-1" id="totalAgencies">0</h3>
-                    <p class="text-gray-300 text-sm font-medium">Agencias</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2" id="totalAgencies">0</h3>
+                    <p class="text-gray-300 font-medium text-sm sm:text-base">Agencias Activas</p>
                 </div>
                 
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-calendar text-white text-lg"></i>
+                <div class="stat-card rounded-2xl p-4 sm:p-6 text-center sm:col-span-2 lg:col-span-1">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar text-white text-lg sm:text-2xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-1" id="totalPeriods">0</h3>
-                    <p class="text-gray-300 text-sm font-medium">Períodos</p>
-                </div>
-
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-database text-white text-lg"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-1" id="dataSource">--</h3>
-                    <p class="text-gray-300 text-sm font-medium">Fuente</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2" id="totalPeriods">0</h3>
+                    <p class="text-gray-300 font-medium text-sm sm:text-base">Períodos Seleccionados</p>
                 </div>
             </div>
 
-            <!-- Control Panel -->
-            <div class="glass-effect rounded-2xl p-6 mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <i class="fas fa-sliders-h text-purple-400 text-xl mr-3"></i>
-                        <h3 class="text-xl font-bold text-white">Control de Análisis</h3>
+            <!-- Agencies Overview -->
+            <div class="glass-effect rounded-2xl p-4 sm:p-8 mb-8 card-hover">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-store text-white text-lg sm:text-xl"></i>
                     </div>
-                    <div class="flex space-x-2">
-                        <button onclick="selectAllAgencies()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
-                            <i class="fas fa-check-double mr-1"></i>Todas
-                        </button>
-                        <button onclick="exportToCSV()" class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-sm hover:bg-blue-500/30 transition-all">
-                            <i class="fas fa-download mr-1"></i>Exportar
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Agency Selection -->
                     <div>
-                        <label class="text-white font-semibold mb-3 block">
-                            <i class="fas fa-building mr-2 text-blue-400"></i>
-                            <span id="agencyCount">Agencias (0/0)</span>
-                        </label>
-                        <div class="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-lg p-3 scrollbar-thin">
-                            <div id="agencyCheckboxes" class="space-y-2"></div>
-                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-white">Agencias Conectadas</h3>
+                        <p class="text-gray-300 text-sm sm:text-base">Datos cargados desde demo</p>
                     </div>
+                </div>
+                <div id="agenciesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
 
-                    <!-- Month Selection -->
+            <!-- Simple Analysis Table -->
+            <div class="glass-effect rounded-2xl p-4 sm:p-8 card-hover">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-table text-white text-lg sm:text-xl"></i>
+                    </div>
                     <div>
-                        <label class="text-white font-semibold mb-3 block">
-                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
-                            <span id="monthCount">Períodos (0)</span>
-                        </label>
-                        <div class="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-lg p-3 scrollbar-thin">
-                            <div id="monthCheckboxes" class="space-y-2"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center mt-6">
-                    <button onclick="updateAnalysis()" class="btn-primary px-8 py-3 rounded-xl text-white font-semibold">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        Actualizar Análisis
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Data Table -->
-            <div class="glass-effect rounded-2xl p-6 mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <i class="fas fa-table text-indigo-400 text-xl mr-3"></i>
-                        <h3 class="text-xl font-bold text-white">Comparación por Agencias</h3>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="switchTableView('agencies')" id="viewAgenciesBtn" class="px-4 py-2 bg-indigo-500/20 text-indigo-400 rounded-lg text-sm hover:bg-indigo-500/30 transition-all">
-                            <i class="fas fa-building mr-1"></i>Por Agencias
-                        </button>
-                        <button onclick="switchTableView('agency')" id="viewAgencyBtn" class="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg text-sm hover:bg-purple-500/30 transition-all">
-                            <i class="fas fa-chart-line mr-1"></i>Por Agencia
-                        </button>
+                        <h3 class="text-xl sm:text-2xl font-bold text-white">Resumen de KPIs</h3>
+                        <p class="text-gray-300 text-sm sm:text-base">Vista general de indicadores</p>
                     </div>
                 </div>
                 
-                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-lg scrollbar-thin">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr id="tableHeader"></tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-white/10"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Single Agency Analysis Table -->
-            <div class="glass-effect rounded-2xl p-6 mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <i class="fas fa-chart-line text-green-400 text-xl mr-3"></i>
-                        <h3 class="text-xl font-bold text-white">Análisis Mensual por Agencia</h3>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <label class="text-white font-medium">Seleccionar Agencia:</label>
-                        <select id="singleAgencySelect" onchange="updateSingleAgencyTable()" class="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:border-green-400">
-                            <option value="">Selecciona una agencia...</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-lg scrollbar-thin">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr id="singleAgencyTableHeader"></tr>
-                        </thead>
-                        <tbody id="singleAgencyTableBody" class="divide-y divide-white/10"></tbody>
-                    </table>
+                <div id="summaryTable" class="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <p class="text-gray-400 text-center">Los datos aparecerán aquí después de cargar el demo</p>
                 </div>
             </div>
         </div>
+
+        <!-- Floating Action Button -->
+        <button onclick="toggleQuickActions()" class="floating-action-btn w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-plus text-lg sm:text-xl"></i>
+        </button>
+
+        <!-- Quick Actions Menu -->
+        <div id="quickActionsMenu" class="hidden fixed bottom-16 sm:bottom-20 right-4 sm:right-8 z-50 space-y-3">
+            <button onclick="exportData()" class="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg hover:bg-green-600 transition-all text-sm">
+                <i class="fas fa-download"></i>
+                <span class="hidden sm:inline">Exportar</span>
+            </button>
+            <button onclick="shareData()" class="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-all text-sm">
+                <i class="fas fa-share"></i>
+                <span class="hidden sm:inline">Compartir</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center">
+            <div class="glass-effect rounded-2xl p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 text-gray-300">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-shield-alt text-green-400"></i>
+                        <span>Datos Seguros</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-sync text-blue-400"></i>
+                        <span>Tiempo Real</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-chart-line text-red-400"></i>
+                        <span>Analytics Avanzados</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-4">
+                    © 2025 Grupo Daytona - Dashboard KPIs Seminuevos
+                </p>
+            </div>
+        </footer>
     </div>
 
     <script>
-        // Configuración por defecto para auto-carga
-        const DEFAULT_CONFIG = {
-            spreadsheetId: "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ", // Tu spreadsheet por defecto
-            autoLoad: true,
-            showConnectionPanel: false // Ocultar panel de conexión en modo público
-        };
+        console.log("🚀 Dashboard Seminuevos iniciado");
         
         // Variables globales
         let loadedData = [];
@@ -424,1417 +350,231 @@
         let selectedMonths = [];
         let allKPIs = [];
         let allMonths = [];
-        let currentDataSource = 'none';
-        let isPublicMode = true; // Modo público por defecto
         
-        console.log('🚀 Dashboard KPIs Daytona iniciado - Modo Público');
-        
-        // Auto-cargar datos al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard cargado - Iniciando auto-carga de datos');
-            
-            // Ocultar panel de conexión en modo público
-            if (isPublicMode) {
-                const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
-                const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
-                
-                if (connectionMethods) {
-                    connectionMethods.style.display = 'none';
-                }
-                if (instructions) {
-                    instructions.style.display = 'none';
-                }
-                
-                // Mostrar mensaje de carga automática
-                showStatus('loading', 'Cargando Dashboard...', 'Conectando con datos en tiempo real de Grupo Daytona', [
-                    '🏢 Cargando 9 agencias automotrices',
-                    '📊 Obteniendo KPIs actualizados',
-                    '📅 Procesando datos mensuales'
-                ]);
-            }
-            
-            // Auto-cargar datos después de 1 segundo
-            setTimeout(() => {
-                if (DEFAULT_CONFIG.autoLoad) {
-                    autoLoadDefaultData();
-                }
-            }, 1000);
-            
-            // Resto de la inicialización
-            updateClock();
-            setInterval(updateClock, 1000);
-        });
-        
-        // Función para auto-cargar datos por defecto
-        async function autoLoadDefaultData() {
-            try {
-                console.log('🔄 Auto-cargando datos por defecto...');
-                currentDataSource = 'api';
-                
-                // Intentar cargar desde API real primero
-                await connectToRealAPI(DEFAULT_CONFIG.spreadsheetId);
-                
-            } catch (error) {
-                console.warn('⚠️ Error cargando API, usando datos demo:', error);
-                
-                // Si falla la API, cargar demo automáticamente
-                currentDataSource = 'demo';
-                loadDemoSilent();
-            }
-        }
-        
-        // Versión silenciosa del demo (sin animaciones de carga)
-        function loadDemoSilent() {
-            console.log('🎯 Cargando datos demo silenciosamente...');
-            
-            // Los mismos datos del demo pero sin delays
-            const kpis = [
-                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
-                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos Realizados',
-                'ROI Marketing', 'Inventario Disponible', 'Financiamientos Otorgados', 'Seguros Vendidos',
-                'Post-Venta Servicios', 'Clientes Referidos', 'Llamadas Perdidas', 'Tiempo Promedio Venta',
-                'Margen Utilidad', 'Devoluciones Procesadas', 'Quejas Resueltas', 'Capacitación Equipo',
-                'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención Clientes', 'Tráfico Showroom',
-                'Conversión Digital', 'Social Media Engagement', 'Email Marketing CTR', 'WhatsApp Business',
-                'Costo por Lead', 'Valor Vida Cliente', 'Churn Rate', 'NPS Score', 'Recompras'
-            ];
-            
-            const agencies = [
-                { name: 'Honda Cuajimalpa', base: 220, performance: 1.2 },
-                { name: 'Honda Interlomas', base: 200, performance: 1.1 },
-                { name: 'KIA Interlomas', base: 180, performance: 1.0 },
-                { name: 'KIA Iztapalapa', base: 160, performance: 0.9 },
-                { name: 'MG Cuajimalpa', base: 140, performance: 0.85 },
-                { name: 'MG Interlomas', base: 120, performance: 0.8 },
-                { name: 'MG Iztapalapa', base: 110, performance: 0.75 },
-                { name: 'GWM Iztapalapa', base: 95, performance: 0.7 },
-                { name: 'GWM Morelos', base: 80, performance: 0.65 }
-            ];
-
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            const data = agencies.map(agency => {
-                const agencyKPIs = kpis.map(kpiName => {
-                    const kpi = { name: kpiName };
-                    months.forEach((month, index) => {
-                        const seasonalFactor = 0.8 + 0.4 * Math.sin((index + 9) * Math.PI / 6);
-                        const randomVariation = 0.8 + Math.random() * 0.4;
-                        
-                        let value = Math.round(agency.base * agency.performance * seasonalFactor * randomVariation);
-                        
-                        if (kpiName.includes('%') || kpiName.includes('Conversión') || kpiName.includes('Satisfacción')) {
-                            value = Math.min(100, Math.max(1, value / 3));
-                        } else if (kpiName.includes('Tiempo')) {
-                            value = Math.max(1, value / 10);
-                        }
-                        
-                        kpi[month] = Math.max(1, Math.round(value));
-                    });
-                    return kpi;
-                });
-
-                return {
-                    agency: agency.name,
-                    kpis: agencyKPIs,
-                    months: months
-                };
-            });
-
-            // Mostrar datos inmediatamente
-            displayResults(data);
-            
-            const dataSourceText = currentDataSource === 'api' ? 'Google Sheets en tiempo real' : 'Datos de demostración';
-            showStatus('success', 'Dashboard Activo', `Mostrando ${dataSourceText}`, [
-                `🏢 ${data.length} agencias automotrices activas`,
-                `📊 ${kpis.length} indicadores de rendimiento`,
-                `📅 ${months.length} períodos de análisis`,
-                `🔄 Datos actualizados automáticamente`
-            ]);
-        }
-        
-        // Función para alternar entre modo público y modo administrador
-        function toggleAdminMode() {
-            isPublicMode = !isPublicMode;
-            
-            const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
-            const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
-            
-            if (isPublicMode) {
-                // Modo público: ocultar controles de conexión
-                if (connectionMethods) connectionMethods.style.display = 'none';
-                if (instructions) instructions.style.display = 'none';
-                console.log('👥 Modo público activado');
-            } else {
-                // Modo admin: mostrar controles de conexión
-                if (connectionMethods) connectionMethods.style.display = 'grid';
-                if (instructions) instructions.style.display = 'block';
-                console.log('⚙️ Modo administrador activado');
-            }
-        }
-        
-        // Agregar botón de admin mode (oculto, se activa con tecla especial)
-        document.addEventListener('keydown', function(e) {
-            // Ctrl + Shift + A para alternar modo admin
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                toggleAdminMode();
-                showStatus('success', `Modo ${isPublicMode ? 'Público' : 'Administrador'} Activado`, 
-                    `Dashboard en modo ${isPublicMode ? 'público' : 'administrador'}`, []);
-            }
-        });
-        
-        // Función para refrescar datos automáticamente cada 30 minutos
-        function startAutoRefresh() {
-            setInterval(() => {
-                if (currentDataSource === 'api' && DEFAULT_CONFIG.spreadsheetId) {
-                    console.log('🔄 Refrescando datos automáticamente...');
-                    connectToRealAPI(DEFAULT_CONFIG.spreadsheetId);
-                }
-            }, 30 * 60 * 1000); // 30 minutos
-        }
-        
-        // Iniciar auto-refresh
-        setTimeout(startAutoRefresh, 60000); // Después de 1 minuto de carga inicial
-        
-        // Función para mostrar mensaje en el hero cuando está en modo público
-        function updateHeroForPublicMode() {
-            if (isPublicMode) {
-                const heroSection = document.querySelector('.text-center.mb-12');
-                if (heroSection) {
-                    heroSection.innerHTML = `
-                        <h2 class="text-5xl font-bold gradient-text mb-4">
-                            Dashboard KPIs Seminuevos Daytona
-                        </h2>
-                        <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-4">
-                            Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
-                        </p>
-                        <div class="flex items-center justify-center space-x-4 text-sm text-gray-400">
-                            <div class="flex items-center space-x-2">
-                                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                <span>Datos en tiempo real</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <i class="fas fa-building text-blue-400"></i>
-                                <span>9 Agencias Activas</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <i class="fas fa-chart-line text-green-400"></i>
-                                <span>35+ KPIs</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }
-        
-        // FUNCIÓN PRINCIPAL: Conectar API REAL (Restaurada)
-        async function connectGoogleSheetsAPI() {
-            const urlInput = document.getElementById('sheetsUrl');
-            const url = urlInput.value.trim();
-            
-            if (!url) {
-                showStatus('error', 'URL Requerida', 'Ingresa la URL de tu Google Sheets', []);
-                return;
-            }
-            
-            // Extraer SPREADSHEET_ID de la URL
-            const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-            if (!match) {
-                showStatus('error', 'ID No Encontrado', 'No se pudo extraer el ID del documento', []);
-                return;
-            }
-            
-            const spreadsheetId = match[1];
-            console.log('📊 Spreadsheet ID extraído:', spreadsheetId);
-            
-            currentDataSource = 'api';
-            await connectToRealAPI(spreadsheetId);
-        }
-        
-        // FUNCIÓN PRINCIPAL: Conectar API REAL mejorada (Original restaurada)
-        async function connectToRealAPI(spreadsheetId) {
-            const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
-            
-            console.log('🚀 Conectando con Google Sheets REAL...');
-            
-            showStatus('loading', 'Conectando...', 'Estableciendo conexión con Google Sheets API', [
-                'Verificando permisos de acceso',
-                'Obteniendo estructura del documento',
-                'Validando formato de datos'
-            ]);
-            
-            try {
-                // Obtener metadata del spreadsheet REAL
-                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?key=${API_KEY}`;
-                console.log('📡 URL Metadata:', metadataUrl);
-                
-                const metadataResponse = await fetch(metadataUrl);
-                
-                if (!metadataResponse.ok) {
-                    const errorText = await metadataResponse.text();
-                    console.error('❌ Error respuesta API:', errorText);
-                    
-                    let errorMessage = `Error ${metadataResponse.status}: ${metadataResponse.statusText}`;
-                    let suggestions = [];
-                    
-                    if (metadataResponse.status === 403) {
-                        errorMessage = 'Acceso denegado al documento';
-                        suggestions = [
-                            'Verifica que el documento sea público',
-                            'Compártelo con "Cualquier persona con el enlace"',
-                            'Permisos: "Visor" es suficiente'
-                        ];
-                    } else if (metadataResponse.status === 404) {
-                        errorMessage = 'Documento no encontrado';
-                        suggestions = [
-                            'Verifica que la URL sea correcta',
-                            'El documento debe existir y ser accesible',
-                            'Prueba abriendo la URL en tu navegador'
-                        ];
-                    }
-                    
-                    throw new Error(errorMessage);
-                }
-                
-                const metadata = await metadataResponse.json();
-                console.log('📊 Metadata recibida:', metadata);
-                
-                const sheets = metadata.sheets || [];
-                const sheetNames = sheets.map(sheet => sheet.properties.title);
-                console.log('📋 Hojas encontradas:', sheetNames);
-                
-                // Actualizar status con hojas encontradas
-                showStatus('loading', 'Analizando estructura...', `Encontradas ${sheetNames.length} hojas en el documento`, 
-                    sheetNames.map(name => `📄 ${name}`)
-                );
-                
-                // Agencias esperadas (9 agencias originales)
-                const expectedAgencies = [
-                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
-                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
-                ];
-                
-                // Buscar hojas válidas (más flexible)
-                const validSheets = sheetNames.filter(name => {
-                    const normalizedName = name.toLowerCase().trim();
-                    return expectedAgencies.some(expected => {
-                        const normalizedExpected = expected.toLowerCase();
-                        return normalizedName === normalizedExpected || 
-                               normalizedName.includes(normalizedExpected.split(' ')[0]) ||
-                               normalizedExpected.includes(normalizedName);
-                    });
-                });
-                
-                console.log('✅ Hojas válidas encontradas:', validSheets);
-                
-                if (validSheets.length === 0) {
-                    showStatus('error', 'Hojas no encontradas', 'No se encontraron hojas con nombres de agencias reconocidas', [
-                        `Hojas disponibles: ${sheetNames.join(', ')}`,
-                        `Esperadas: ${expectedAgencies.join(', ')}`,
-                        'Verifica que los nombres coincidan exactamente'
-                    ]);
-                    return;
-                }
-                
-                // Procesar cada hoja (lógica original restaurada)
-                const loadedAgencies = [];
-                const errors = [];
-                const successes = [];
-                
-                showStatus('loading', 'Procesando datos...', `Cargando ${validSheets.length} hojas de agencias`, 
-                    validSheets.map(name => `⏳ Procesando ${name}...`)
-                );
-                
-                for (const sheetName of validSheets) {
-                    try {
-                        console.log(`📊 Procesando hoja: ${sheetName}`);
-                        
-                        const range = `${sheetName}!A:Z`;
-                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-                        
-                        console.log(`🔗 URL datos: ${dataUrl}`);
-                        
-                        const dataResponse = await fetch(dataUrl);
-                        if (!dataResponse.ok) {
-                            errors.push(`${sheetName}: Error ${dataResponse.status}`);
-                            continue;
-                        }
-                        
-                        const sheetData = await dataResponse.json();
-                        console.log(`📈 Datos brutos de ${sheetName}:`, sheetData);
-                        
-                        if (!sheetData.values || sheetData.values.length < 2) {
-                            errors.push(`${sheetName}: Sin datos suficientes`);
-                            continue;
-                        }
-                        
-                        // Procesar datos reales (función original restaurada)
-                        const processedData = processRealSheetDataOriginal(sheetData.values, sheetName);
-                        if (processedData && processedData.kpis.length > 0) {
-                            loadedAgencies.push(processedData);
-                            successes.push(`✅ ${sheetName}: ${processedData.kpis.length} KPIs, ${processedData.months.length} períodos`);
-                            console.log(`✅ ${sheetName} procesada correctamente`);
-                        } else {
-                            errors.push(`${sheetName}: Error procesando KPIs`);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`❌ Error procesando ${sheetName}:`, error);
-                        errors.push(`${sheetName}: ${error.message}`);
-                    }
-                }
-                
-                // Mostrar resultados
-                if (loadedAgencies.length > 0) {
-                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
-                    
-                    const totalKPIs = loadedAgencies.reduce((sum, agency) => sum + agency.kpis.length, 0);
-                    
-                    displayResults(loadedAgencies);
-                    showStatus('success', '¡Conexión Exitosa!', `Datos cargados desde tu Google Sheets`, [
-                        `✅ ${loadedAgencies.length} agencias conectadas`,
-                        `📊 ${totalKPIs} KPIs totales cargados`,
-                        `🔄 Datos actualizados en tiempo real`,
-                        ...successes
-                    ]);
-                    
-                } else {
-                    showStatus('error', 'Sin datos válidos', 'No se pudieron cargar datos de ninguna agencia', [
-                        'Verifica que las hojas tengan datos',
-                        'Primera fila debe tener encabezados',
-                        'Debe haber una columna KPI y columnas de meses',
-                        ...errors.slice(0, 3)
-                    ]);
-                }
-                
-            } catch (error) {
-                console.error('❌ Error completo en API:', error);
-                showStatus('error', 'Error de Conexión', error.message, [
-                    'Verifica la URL del Google Sheets',
-                    'Asegúrate de que sea público',
-                    'Intenta cargar el demo para probar'
-                ]);
-            }
-        }
-        
-        // Función para procesar datos reales del Google Sheets (ORIGINAL RESTAURADA)
-        function processRealSheetDataOriginal(values, agencyName) {
-            try {
-                console.log(`🔄 Procesando datos reales de: ${agencyName}`);
-                console.log('📊 Datos recibidos:', values);
-                
-                if (!values || values.length < 2) {
-                    throw new Error('Datos insuficientes en la hoja');
-                }
-                
-                const headers = values[0].map(h => h ? h.toString().trim() : '');
-                const rows = values.slice(1);
-                
-                console.log(`📋 Headers encontrados:`, headers);
-                console.log(`📊 Filas de datos:`, rows.length);
-                
-                // Buscar columna de KPI (más flexible)
-                const kpiColumnIndex = headers.findIndex(header => {
-                    if (!header) return false;
-                    const normalized = header.toLowerCase().trim();
-                    return normalized.includes('kpi') || 
-                           normalized.includes('indicador') ||
-                           normalized.includes('metrica') ||
-                           normalized.includes('métrica') ||
-                           normalized === 'concepto' ||
-                           normalized === 'nombre' ||
-                           normalized === 'descripcion' ||
-                           normalized === 'descripción';
-                });
-                
-                if (kpiColumnIndex === -1) {
-                    console.error('❌ Headers disponibles:', headers);
-                    throw new Error(`No se encontró columna de KPI en ${agencyName}. Headers: ${headers.join(', ')}`);
-                }
-                
-                console.log(`✅ Columna KPI encontrada en índice ${kpiColumnIndex}: "${headers[kpiColumnIndex]}"`);
-                
-                // Buscar columnas de meses (más flexible)
-                const monthNames = [
-                    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-                    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
-                    'jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                    'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
-                    '01', '02', '03', '04', '05', '06',
-                    '07', '08', '09', '10', '11', '12'
-                ];
-                
-                const properMonthNames = [
-                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-                ];
-                
-                const monthColumns = [];
-                headers.forEach((header, index) => {
-                    if (header && header.trim() && index !== kpiColumnIndex) {
-                        const normalizedHeader = header.trim().toLowerCase();
-                        
-                        // Buscar coincidencia con nombres de meses
-                        const monthIndex = monthNames.findIndex(month => 
-                            normalizedHeader === month ||
-                            normalizedHeader.includes(month) ||
-                            month.includes(normalizedHeader)
-                        );
-                        
-                        if (monthIndex !== -1) {
-                            // Mapear al nombre correcto en español
-                            const properMonthIndex = monthIndex % 12;
-                            monthColumns.push({ 
-                                name: properMonthNames[properMonthIndex], 
-                                index: index 
-                            });
-                        }
-                        // También buscar por patrones de fecha
-                        else if (/\d{4}/.test(normalizedHeader) || /\d{1,2}\/\d{1,2}/.test(normalizedHeader)) {
-                            monthColumns.push({ 
-                                name: header.trim(), 
-                                index: index 
-                            });
-                        }
-                    }
-                });
-                
-                console.log(`📅 Columnas de meses encontradas:`, monthColumns);
-                
-                if (monthColumns.length === 0) {
-                    throw new Error(`No se encontraron columnas de meses en ${agencyName}. Headers: ${headers.join(', ')}`);
-                }
-                
-                // Procesar KPIs
-                const kpis = [];
-                rows.forEach((row, rowIndex) => {
-                    if (!row || row.length <= kpiColumnIndex) return;
-                    
-                    const kpiName = row[kpiColumnIndex];
-                    
-                    if (kpiName && kpiName.toString().trim() && kpiName.toString().trim() !== '') {
-                        const cleanKpiName = kpiName.toString().trim();
-                        const kpiData = { name: cleanKpiName };
-                        
-                        monthColumns.forEach(monthCol => {
-                            const rawValue = row[monthCol.index];
-                            let numericValue = 0;
-                            
-                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
-                                // Limpiar el valor (remover comas, símbolos, espacios)
-                                const cleanValue = rawValue.toString()
-                                    .replace(/[$,\s%]/g, '')
-                                    .replace(/[^\d.-]/g, '')
-                                    .trim();
-                                    
-                                const parsed = parseFloat(cleanValue);
-                                numericValue = isNaN(parsed) ? 0 : Math.max(0, parsed);
-                            }
-                            
-                            kpiData[monthCol.name] = numericValue;
-                        });
-                        
-                        // Solo agregar si tiene al menos un valor > 0
-                        const hasData = monthColumns.some(col => kpiData[col.name] > 0);
-                        if (hasData) {
-                            kpis.push(kpiData);
-                            console.log(`✅ KPI procesado: ${cleanKpiName}`);
-                        }
-                    }
-                });
-                
-                console.log(`📊 Total KPIs procesados para ${agencyName}: ${kpis.length}`);
-                
-                if (kpis.length === 0) {
-                    throw new Error(`No se encontraron KPIs válidos en ${agencyName}`);
-                }
-                
-                return {
-                    agency: agencyName,
-                    kpis: kpis,
-                    months: monthColumns.map(col => col.name)
-                };
-                
-            } catch (error) {
-                console.error(`❌ Error procesando ${agencyName}:`, error);
-                throw error;
-            }
-        }
-        
-        // Función: Conectar via CSV
-        async function connectCSVMethod() {
-            const urlInput = document.getElementById('csvUrl');
-            let url = urlInput.value.trim();
-            
-            if (!url) {
-                showStatus('error', 'URL Requerida', 'Ingresa la URL CSV de Google Sheets', []);
-                return;
-            }
-            
-            // Auto-convertir URL normal a CSV
-            if (url.includes('docs.google.com/spreadsheets') && !url.includes('export?format=csv')) {
-                const id = extractSpreadsheetId(url);
-                if (id) {
-                    url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`;
-                    urlInput.value = url;
-                }
-            }
-            
-            currentDataSource = 'csv';
-            showStatus('loading', 'Descargando CSV...', 'Obteniendo datos desde Google Sheets', []);
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                
-                const csvText = await response.text();
-                const parsedData = Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    dynamicTyping: true
-                });
-                
-                if (parsedData.errors.length > 0) {
-                    console.warn('Errores CSV:', parsedData.errors);
-                }
-                
-                const processedData = processCSVData(parsedData.data);
-                displayResults([processedData]);
-                showStatus('success', '¡CSV Cargado!', 'Datos importados correctamente desde CSV', [
-                    `✅ ${processedData.kpis.length} KPIs encontrados`,
-                    `📅 ${processedData.months.length} períodos detectados`
-                ]);
-                
-            } catch (error) {
-                console.error('Error CSV:', error);
-                showStatus('error', 'Error CSV', error.message, [
-                    'Verifica que el documento sea público',
-                    'Asegúrate de usar la URL de exportación CSV',
-                    'Formato: .../export?format=csv'
-                ]);
-            }
-        }
-        
-        // Función: Cargar Demo
-        function loadDemo() {
-            currentDataSource = 'demo';
-            showStatus('loading', 'Generando Demo...', 'Creando datos de demostración', []);
-            
-            // KPIs específicos del sector automotriz
-            const kpis = [
-                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
-                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos Realizados',
-                'ROI Marketing', 'Inventario Disponible', 'Financiamientos Otorgados', 'Seguros Vendidos',
-                'Post-Venta Servicios', 'Clientes Referidos', 'Llamadas Perdidas', 'Tiempo Promedio Venta',
-                'Margen Utilidad', 'Devoluciones Procesadas', 'Quejas Resueltas', 'Capacitación Equipo',
-                'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención Clientes', 'Tráfico Showroom',
-                'Conversión Digital', 'Social Media Engagement', 'Email Marketing CTR', 'WhatsApp Business',
-                'Costo por Lead', 'Valor Vida Cliente', 'Churn Rate', 'NPS Score', 'Recompras'
-            ];
-            
-            const agencies = [
-                { name: 'Honda Cuajimalpa', base: 220, performance: 1.2 },
-                { name: 'Honda Interlomas', base: 200, performance: 1.1 },
-                { name: 'KIA Interlomas', base: 180, performance: 1.0 },
-                { name: 'KIA Iztapalapa', base: 160, performance: 0.9 },
-                { name: 'MG Cuajimalpa', base: 140, performance: 0.85 },
-                { name: 'MG Interlomas', base: 120, performance: 0.8 },
-                { name: 'MG Iztapalapa', base: 110, performance: 0.75 },
-                { name: 'GWM Iztapalapa', base: 95, performance: 0.7 },
-                { name: 'GWM Morelos', base: 80, performance: 0.65 }
-            ];
-
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            const data = agencies.map(agency => {
-                const agencyKPIs = kpis.map(kpiName => {
-                    const kpi = { name: kpiName };
-                    months.forEach((month, index) => {
-                        const seasonalFactor = 0.8 + 0.4 * Math.sin((index + 9) * Math.PI / 6);
-                        const randomVariation = 0.8 + Math.random() * 0.4;
-                        
-                        let value = Math.round(agency.base * agency.performance * seasonalFactor * randomVariation);
-                        
-                        if (kpiName.includes('%') || kpiName.includes('Conversión') || kpiName.includes('Satisfacción')) {
-                            value = Math.min(100, Math.max(1, value / 3));
-                        } else if (kpiName.includes('Tiempo')) {
-                            value = Math.max(1, value / 10);
-                        }
-                        
-                        kpi[month] = Math.max(1, Math.round(value));
-                    });
-                    return kpi;
-                });
-
-                return {
-                    agency: agency.name,
-                    kpis: agencyKPIs,
-                    months: months
-                };
-            });
-
-            setTimeout(() => {
-                displayResults(data);
-                showStatus('success', '¡Demo Cargada!', 'Datos de demostración generados', [
-                    `🏢 ${data.length} agencias automotrices`,
-                    `📊 ${kpis.length} KPIs por agencia`,
-                    `📅 ${months.length} meses de datos`,
-                    '🎯 Datos realistas del sector'
-                ]);
-            }, 1000);
-        }
-        
-        // Conectar a Google API (función original restaurada)
-        async function connectToGoogleAPI(spreadsheetId) {
-            // Esta función ahora llama a connectToRealAPI que es la original
-            await connectToRealAPI(spreadsheetId);
-        }
-        
-        // Mantener las otras funciones de procesamiento como alternativas
-        // pero usar la función original como principal
-        
-        // Procesar formato alternativo (sin columna KPI específica)
-        function processAlternativeFormat(values, sheetName) {
-            try {
-                const headers = values[0].map(h => h ? h.toString().trim() : '');
-                const rows = values.slice(1);
-                
-                // Buscar columnas numéricas (asumiendo que la primera es texto)
-                const monthColumns = [];
-                for (let i = 1; i < headers.length; i++) {
-                    if (headers[i] && headers[i].trim()) {
-                        monthColumns.push({ name: headers[i], index: i });
-                    }
-                }
-                
-                const kpis = [];
-                rows.forEach(row => {
-                    if (!row || row.length < 2) return;
-                    
-                    const kpiName = row[0];
-                    if (!kpiName || !kpiName.toString().trim()) return;
-                    
-                    const kpiData = { name: kpiName.toString().trim() };
-                    let hasData = false;
-                    
-                    monthColumns.forEach(monthCol => {
-                        const rawValue = row[monthCol.index];
-                        let numericValue = 0;
-                        
-                        if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
-                            const cleanValue = rawValue.toString()
-                                .replace(/[$,%\s]/g, '')
-                                .replace(/[^\d.-]/g, '');
-                            
-                            const parsed = parseFloat(cleanValue);
-                            if (!isNaN(parsed)) {
-                                numericValue = Math.max(0, parsed);
-                                hasData = true;
-                            }
-                        }
-                        
-                        kpiData[monthCol.name] = numericValue;
-                    });
-                    
-                    if (hasData) {
-                        kpis.push(kpiData);
-                    }
-                });
-                
-                return {
-                    agency: sheetName,
-                    kpis: kpis,
-                    months: monthColumns.map(col => col.name)
-                };
-                
-            } catch (error) {
-                console.error(`Error formato alternativo ${sheetName}:`, error);
-                return null;
-            }
-        }
-        
-        // Procesar datos CSV
-        function processCSVData(csvData) {
-            if (!csvData || csvData.length === 0) return null;
-            
-            const firstRow = csvData[0];
-            const headers = Object.keys(firstRow);
-            
-            // Buscar columna de KPI
-            const kpiColumn = headers.find(h => {
-                const normalized = h.toLowerCase();
-                return normalized.includes('kpi') || 
-                       normalized.includes('indicador') ||
-                       normalized.includes('concepto') ||
-                       normalized.includes('nombre');
-            }) || headers[0];
-            
-            // Buscar columnas de períodos (todas excepto la de KPI)
-            const monthColumns = headers.filter(h => h !== kpiColumn && h.trim() !== '');
-            
-            const kpis = [];
-            csvData.forEach(row => {
-                const kpiName = row[kpiColumn];
-                if (!kpiName || !kpiName.toString().trim()) return;
-                
-                const kpiData = { name: kpiName.toString().trim() };
-                let hasData = false;
-                
-                monthColumns.forEach(monthCol => {
-                    const rawValue = row[monthCol];
-                    let numericValue = 0;
-                    
-                    if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
-                        const cleanValue = rawValue.toString()
-                            .replace(/[$,%\s]/g, '')
-                            .replace(/[^\d.-]/g, '');
-                        
-                        const parsed = parseFloat(cleanValue);
-                        if (!isNaN(parsed)) {
-                            numericValue = Math.max(0, parsed);
-                            hasData = true;
-                        }
-                    }
-                    
-                    kpiData[monthCol] = numericValue;
-                });
-                
-                if (hasData) {
-                    kpis.push(kpiData);
-                }
-            });
-            
-            return {
-                agency: 'Datos CSV',
-                kpis: kpis,
-                months: monthColumns
-            };
-        }
-        
-        // Extraer ID de spreadsheet
-        function extractSpreadsheetId(url) {
-            const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-            return match ? match[1] : null;
-        }
-        
-        // Actualizar reloj
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = timeString;
-            }
-        }
-        
-        // Mejorar la función displayResults para modo público
-        function displayResults(data) {
-            loadedData = data;
-            selectedAgencies = data.map(agency => agency.agency);
-            
-            // Obtener meses únicos
-            const monthSet = new Set();
-            data.forEach(agency => {
-                agency.months.forEach(month => monthSet.add(month));
-            });
-            allMonths = Array.from(monthSet);
-            selectedMonths = allMonths.slice(0, Math.min(6, allMonths.length));
-            
-            // Obtener KPIs únicos
-            const kpiSet = new Set();
-            data.forEach(agency => {
-                agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
-            });
-            allKPIs = Array.from(kpiSet);
-            
-            // Mostrar sección de resultados
-            document.getElementById('results').classList.remove('hidden');
-            
-            // En modo público, hacer scroll suave a los resultados
-            if (isPublicMode) {
-                setTimeout(() => {
-                    document.getElementById('results').scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    updateHeroForPublicMode();
-                }, 500);
-            }
-            
-            updateControls();
-            updateStats();
-            updateTable();
-            updateSingleAgencyTable();
-        }
-        
-        let currentTableView = 'agencies'; // 'agencies' o 'agency'
-        
-        // Función para cambiar vista de tabla
-        function switchTableView(view) {
-            currentTableView = view;
-            
-            const agenciesBtn = document.getElementById('viewAgenciesBtn');
-            const agencyBtn = document.getElementById('viewAgencyBtn');
-            
-            if (view === 'agencies') {
-                agenciesBtn.className = 'px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm transition-all';
-                agencyBtn.className = 'px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg text-sm hover:bg-purple-500/30 transition-all';
-                updateTable();
-            } else {
-                agenciesBtn.className = 'px-4 py-2 bg-indigo-500/20 text-indigo-400 rounded-lg text-sm hover:bg-indigo-500/30 transition-all';
-                agencyBtn.className = 'px-4 py-2 bg-purple-500 text-white rounded-lg text-sm transition-all';
-                updateSingleAgencyView();
-            }
-        }
-        
-        // Actualizar vista de agencia única
-        function updateSingleAgencyView() {
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            if (!loadedData || loadedData.length === 0) return;
-            
-            // Header para vista de agencia única (KPI vs Meses)
-            headerRow.innerHTML = `
-                <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800 sticky top-0">
-                    <i class="fas fa-chart-bar mr-2"></i>KPI
-                </th>
-                ${selectedMonths.map(month => 
-                    `<th class="px-3 py-3 text-center text-xs font-bold text-white uppercase bg-gray-700 sticky top-0">
-                         <i class="fas fa-calendar mr-1"></i>${month}
-                     </th>`
-                ).join('')}
-                <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase bg-gray-600 sticky top-0">
-                    <i class="fas fa-chart-line mr-1"></i>Promedio
-                </th>
-            `;
-            
-            tableBody.innerHTML = '';
-            
-            // Si hay agencias seleccionadas, mostrar la primera
-            const selectedAgency = selectedAgencies.length > 0 ? selectedAgencies[0] : null;
-            if (!selectedAgency) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td colspan="${selectedMonths.length + 2}" class="px-4 py-8 text-center text-gray-400">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        Selecciona al menos una agencia para ver el análisis mensual
-                    </td>
-                `;
-                tableBody.appendChild(row);
-                return;
-            }
-            
-            const agency = loadedData.find(a => a.agency === selectedAgency);
-            if (!agency) return;
-            
-            // Mostrar KPIs de la agencia seleccionada
-            agency.kpis.forEach((kpi, index) => {
-                const row = document.createElement('tr');
-                row.className = `${index % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15`;
-                
-                const values = selectedMonths.map(month => kpi[month] || 0);
-                const average = values.length > 0 ? (values.reduce((sum, val) => sum + val, 0) / values.length).toFixed(1) : 0;
-                const maxValue = Math.max(...values);
-                
-                let rowHTML = `
-                    <td class="px-4 py-3 text-sm font-semibold text-white">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span>${kpi.name}</span>
-                        </div>
-                    </td>
-                `;
-                
-                values.forEach(value => {
-                    const isHighest = values.length > 1 && value > 0 && value === maxValue;
-                    const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
-                    
-                    rowHTML += `<td class="px-3 py-3 text-center">
-                        <div class="relative">
-                            <div class="w-full bg-gray-700 rounded-full h-1 mb-2">
-                                <div class="h-1 rounded-full bg-gradient-to-r from-blue-500 to-green-500" style="width: ${percentage}%;"></div>
-                            </div>
-                            <span class="text-sm font-semibold ${
-                                isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full' : 'text-gray-300'
-                            }">
-                                ${value.toLocaleString()}
-                                ${isHighest ? ' 🏆' : ''}
-                            </span>
-                        </div>
-                    </td>`;
-                });
-                
-                // Columna de promedio
-                rowHTML += `<td class="px-3 py-3 text-center">
-                    <span class="text-sm font-bold text-yellow-300 bg-yellow-600/20 px-2 py-1 rounded-full">
-                        ${average}
-                    </span>
-                </td>`;
-                
-                row.innerHTML = rowHTML;
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // Actualizar selector de agencia única
-        function updateSingleAgencySelect() {
-            const select = document.getElementById('singleAgencySelect');
-            if (!select) return;
-            
-            select.innerHTML = '<option value="">Selecciona una agencia...</option>';
-            
-            loadedData.forEach(agency => {
-                const option = document.createElement('option');
-                option.value = agency.agency;
-                option.textContent = agency.agency;
-                if (selectedAgencies.includes(agency.agency)) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            });
-        }
-        
-        // Actualizar tabla de agencia única
-        function updateSingleAgencyTable() {
-            const select = document.getElementById('singleAgencySelect');
-            const selectedAgencyName = select.value;
-            
-            if (!selectedAgencyName) {
-                document.getElementById('singleAgencyTableBody').innerHTML = `
-                    <tr><td colspan="100%" class="px-4 py-8 text-center text-gray-400">
-                        <i class="fas fa-arrow-up mr-2"></i>Selecciona una agencia arriba
-                    </td></tr>
-                `;
-                return;
-            }
-            
-            const agency = loadedData.find(a => a.agency === selectedAgencyName);
-            if (!agency) return;
-            
-            const headerRow = document.getElementById('singleAgencyTableHeader');
-            const tableBody = document.getElementById('singleAgencyTableBody');
-            
-            // Header con meses
-            headerRow.innerHTML = `
-                <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800 sticky top-0">
-                    <i class="fas fa-chart-bar mr-2"></i>KPI
-                </th>
-                ${allMonths.map(month => 
-                    `<th class="px-3 py-3 text-center text-xs font-bold text-white uppercase bg-green-700 sticky top-0">
-                         ${month}
-                     </th>`
-                ).join('')}
-                <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase bg-orange-600 sticky top-0">
-                    Total/Promedio
-                </th>
-            `;
-            
-            tableBody.innerHTML = '';
-            
-            // Mostrar todos los KPIs de la agencia seleccionada
-            agency.kpis.forEach((kpi, index) => {
-                const row = document.createElement('tr');
-                row.className = `${index % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15`;
-                
-                const monthValues = allMonths.map(month => kpi[month] || 0);
-                const total = monthValues.reduce((sum, val) => sum + val, 0);
-                const average = monthValues.length > 0 ? (total / monthValues.length).toFixed(1) : 0;
-                const maxValue = Math.max(...monthValues);
-                
-                let rowHTML = `
-                    <td class="px-4 py-3 text-sm font-semibold text-white">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-3 h-3 bg-gradient-to-r from-green-400 to-blue-400 rounded-full"></div>
-                            <span>${kpi.name}</span>
-                        </div>
-                    </td>
-                `;
-                
-                monthValues.forEach((value, monthIndex) => {
-                    const isHighest = monthValues.length > 1 && value > 0 && value === maxValue;
-                    const isLow = value > 0 && value < (maxValue * 0.5);
-                    
-                    rowHTML += `<td class="px-3 py-3 text-center">
-                        <span class="text-sm font-semibold ${
-                            isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full shadow-lg' : 
-                            isLow ? 'text-red-100 bg-red-600/50 px-2 py-1 rounded-full' :
-                            'text-gray-300'
-                        }">
-                            ${value.toLocaleString()}
-                            ${isHighest ? ' 🥇' : ''}
-                        </span>
-                    </td>`;
-                });
-                
-                // Columna total/promedio
-                const displayValue = kpi.name.includes('%') || kpi.name.includes('Tiempo') || kpi.name.includes('Conversión') ? 
-                    average : total.toLocaleString();
-                
-                rowHTML += `<td class="px-3 py-3 text-center">
-                    <span class="text-sm font-bold text-orange-200 bg-orange-600/30 px-3 py-1 rounded-full border border-orange-500/50">
-                        ${displayValue}
-                    </span>
-                </td>`;
-                
-                row.innerHTML = rowHTML;
-                tableBody.appendChild(row);
-            });
-        }
-        
-        // Actualizar checkboxes de agencias
-        function updateAgencyCheckboxes() {
-            const container = document.getElementById('agencyCheckboxes');
-            const count = document.getElementById('agencyCount');
-            
-            if (!container || !count) return;
-            
-            container.innerHTML = '';
-            count.textContent = `Agencias (${selectedAgencies.length}/${loadedData.length})`;
-            
-            loadedData.forEach((agency, index) => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-2 rounded hover:bg-white/5 cursor-pointer text-sm';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedAgencies.includes(agency.agency);
-                checkbox.className = 'w-4 h-4 text-red-500 bg-white/10 border-white/20 rounded focus:ring-red-500';
-                checkbox.onchange = () => toggleAgency(agency.agency);
-                
-                const span = document.createElement('span');
-                span.className = 'text-gray-300 font-medium';
-                span.textContent = agency.agency;
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-        }
-        
-        // Actualizar checkboxes de meses
-        function updateMonthCheckboxes() {
-            const container = document.getElementById('monthCheckboxes');
-            const count = document.getElementById('monthCount');
-            
-            if (!container || !count) return;
-            
-            container.innerHTML = '';
-            count.textContent = `Períodos (${selectedMonths.length}/${allMonths.length})`;
-            
-            allMonths.forEach(month => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-2 rounded hover:bg-white/5 cursor-pointer text-sm';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedMonths.includes(month);
-                checkbox.className = 'w-4 h-4 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500';
-                checkbox.onchange = () => toggleMonth(month);
-                
-                const span = document.createElement('span');
-                span.className = 'text-gray-300 font-medium';
-                span.textContent = month;
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-        }
-        
-        // Toggle functions
-        function toggleAgency(agencyName) {
-            if (selectedAgencies.includes(agencyName)) {
-                selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
-            } else {
-                selectedAgencies.push(agencyName);
-            }
-            updateAgencyCheckboxes();
-            updateStats();
-        }
-        
-        function toggleMonth(month) {
-            if (selectedMonths.includes(month)) {
-                selectedMonths = selectedMonths.filter(m => m !== month);
-            } else {
-                selectedMonths.push(month);
-            }
-            updateMonthCheckboxes();
-            updateStats();
-        }
-        
-        function selectAllAgencies() {
-            selectedAgencies = loadedData.map(agency => agency.agency);
-            updateAgencyCheckboxes();
-            updateStats();
-        }
-        
-        // Actualizar controles
-        function updateControls() {
-            updateAgencyCheckboxes();
-            updateMonthCheckboxes();
-            updateSingleAgencySelect();
-        }
-        
-        // Actualizar función updateAnalysis para incluir la nueva tabla
-        function updateAnalysis() {
-            if (selectedAgencies.length === 0) {
-                showStatus('error', 'Sin Agencias', 'Selecciona al menos una agencia', []);
-                return;
-            }
-            if (selectedMonths.length === 0) {
-                showStatus('error', 'Sin Períodos', 'Selecciona al menos un período', []);
-                return;
-            }
-            
-            if (currentTableView === 'agencies') {
-                updateTable();
-            } else {
-                updateSingleAgencyView();
-            }
-            
-            updateSingleAgencyTable();
-            
-            showStatus('success', 'Análisis Actualizado', 'Vista actualizada correctamente', [
-                `📊 ${selectedAgencies.length} agencias`,
-                `📅 ${selectedMonths.length} períodos`,
-                `🎯 ${allKPIs.length} KPIs disponibles`
-            ]);
-        }
-        
-        // Actualizar estadísticas
-        function updateStats() {
-            document.getElementById('totalKPIs').textContent = allKPIs.length;
-            document.getElementById('totalAgencies').textContent = selectedAgencies.length;
-            document.getElementById('totalPeriods').textContent = selectedMonths.length;
-            
-            const sourceMap = {
-                'api': 'API',
-                'csv': 'CSV', 
-                'demo': 'Demo',
-                'none': '--'
-            };
-            document.getElementById('dataSource').textContent = sourceMap[currentDataSource] || '--';
-        }
-        
-        // Actualizar tabla
-        function updateTable() {
-            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
-            
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            if (!headerRow || !tableBody) return;
-            
-            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
-            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-            
-            // Header
-            headerRow.innerHTML = `
-                <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800 sticky top-0">KPI</th>
-                <th class="px-4 py-3 text-left text-xs font-bold text-white uppercase bg-gray-800 sticky top-0">Período</th>
-                ${filteredData.map((agency, i) => 
-                    `<th class="px-3 py-3 text-center text-xs font-bold text-white uppercase sticky top-0" 
-                         style="background: ${colors[i % colors.length]}80;">
-                         ${agency.agency}
-                     </th>`
-                ).join('')}
-            `;
-            
-            tableBody.innerHTML = '';
-            
-            // Datos
-            allKPIs.forEach(kpiName => {
-                selectedMonths.forEach((month, monthIndex) => {
-                    const row = document.createElement('tr');
-                    row.className = `${monthIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15`;
-                    
-                    const values = filteredData.map(agency => {
-                        const kpi = agency.kpis.find(k => k.name === kpiName);
-                        return kpi ? (kpi[month] || 0) : 0;
-                    });
-                    
-                    const maxValue = Math.max(...values);
-                    const hasValues = values.some(v => v > 0);
-                    
-                    if (!hasValues) return;
-                    
-                    let rowHTML = `
-                        <td class="px-4 py-3 text-sm font-semibold text-white">${kpiName}</td>
-                        <td class="px-4 py-3 text-sm text-gray-300">${month}</td>
-                    `;
-                    
-                    values.forEach((value, index) => {
-                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
-                        
-                        rowHTML += `<td class="px-3 py-3 text-center">
-                            <span class="text-sm font-semibold ${
-                                isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full' : 'text-gray-300'
-                            }">
-                                ${value.toLocaleString()}
-                                ${isHighest ? ' 👑' : ''}
-                            </span>
-                        </td>`;
-                    });
-                    
-                    row.innerHTML = rowHTML;
-                    tableBody.appendChild(row);
-                });
-            });
-        }
-        
-        // Exportar a CSV
-        function exportToCSV() {
-            if (!loadedData || selectedAgencies.length === 0) {
-                showStatus('error', 'Sin Datos', 'No hay datos para exportar', []);
-                return;
-            }
-            
-            let csv = 'Agencia,KPI,' + selectedMonths.join(',') + '\n';
-            
-            selectedAgencies.forEach(agencyName => {
-                const agency = loadedData.find(a => a.agency === agencyName);
-                if (agency) {
-                    agency.kpis.forEach(kpi => {
-                        csv += `"${agencyName}","${kpi.name}",`;
-                        csv += selectedMonths.map(month => kpi[month] || 0).join(',') + '\n';
-                    });
-                }
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `daytona_kpis_${Date.now()}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showStatus('success', 'Exportado', 'CSV descargado exitosamente', []);
-        }
-        
-        // Mostrar estado
-        function showStatus(type, title, message, details = []) {
-            const statusDiv = document.getElementById('statusDisplay');
-            const statusTitle = document.getElementById('statusTitle');
-            const statusMessage = document.getElementById('statusMessage');
+        // Función para mostrar status
+        function showStatus(type, message) {
+            console.log("Status:", type, message);
+            const statusDiv = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
             const statusIcon = document.getElementById('statusIcon');
-            const statusDetails = document.getElementById('statusDetails');
+            
+            if (!statusDiv || !statusText || !statusIcon) return;
             
             const configs = {
-                success: {
-                    bg: 'bg-green-500/20 border-l-green-500 text-green-300',
-                    icon: 'fas fa-check-circle text-green-400',
-                    titleClass: 'text-green-100'
-                },
-                error: {
-                    bg: 'bg-red-500/20 border-l-red-500 text-red-300',
-                    icon: 'fas fa-exclamation-triangle text-red-400',
-                    titleClass: 'text-red-100'
-                },
-                loading: {
-                    bg: 'bg-blue-500/20 border-l-blue-500 text-blue-300',
-                    icon: 'fas fa-spinner fa-spin text-blue-400',
-                    titleClass: 'text-blue-100'
-                }
+                success: { bg: 'bg-green-500/20 border-l-green-500 text-green-300', icon: 'fas fa-check-circle text-green-400' },
+                error: { bg: 'bg-red-500/20 border-l-red-500 text-red-300', icon: 'fas fa-exclamation-circle text-red-400' },
+                loading: { bg: 'bg-blue-500/20 border-l-blue-500 text-blue-300', icon: 'fas fa-spinner fa-spin text-blue-400' }
             };
             
-            const config = configs[type];
-            statusDiv.className = `mb-8 glass-effect rounded-xl p-6 border-l-4 ${config.bg}`;
+            const config = configs[type] || configs.success;
+            statusDiv.className = `mb-8 glass-effect rounded-xl p-4 border-l-4 ${config.bg}`;
             statusIcon.className = config.icon;
-            statusTitle.textContent = title;
-            statusTitle.className = `text-lg font-semibold mb-2 ${config.titleClass}`;
-            statusMessage.textContent = message;
-            
-            if (details.length > 0) {
-                statusDetails.innerHTML = details.map(detail => 
-                    `<div class="flex items-center space-x-2">
-                        <i class="fas fa-chevron-right text-xs"></i>
-                        <span>${detail}</span>
-                    </div>`
-                ).join('');
-                statusDetails.classList.remove('hidden');
-            } else {
-                statusDetails.classList.add('hidden');
-            }
-            
+            statusText.textContent = message;
             statusDiv.classList.remove('hidden');
-            statusDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         
-        // Inicialización final mejorada
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard cargado - Iniciando auto-carga de datos');
+        // FUNCIÓN PRINCIPAL: Cargar Demo
+        function loadDemo() {
+            console.log("🎯 Ejecutando loadDemo()");
+            showStatus('loading', 'Cargando datos de demostración...');
             
-            // Configurar modo público por defecto
-            if (isPublicMode) {
-                const connectionMethods = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-3');
-                const instructions = document.querySelector('.glass-effect.rounded-2xl.p-6.mb-8');
+            try {
+                // Datos simplificados
+                const kpis = [
+                    'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
+                    'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
+                    'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos'
+                ];
                 
-                if (connectionMethods) {
-                    connectionMethods.style.display = 'none';
-                }
-                if (instructions) {
-                    instructions.style.display = 'none';
-                }
+                const agencies = [
+                    { name: 'Honda Cuajimalpa', base: 200 },
+                    { name: 'Honda Interlomas', base: 180 },
+                    { name: 'KIA Interlomas', base: 160 },
+                    { name: 'KIA Iztapalapa', base: 140 },
+                    { name: 'MG Cuajimalpa', base: 120 }
+                ];
+
+                const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+
+                const data = agencies.map(agency => {
+                    const agencyKPIs = kpis.map(kpiName => {
+                        const kpi = { name: kpiName };
+                        months.forEach(month => {
+                            const variation = (Math.random() - 0.5) * 0.4;
+                            kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
+                        });
+                        return kpi;
+                    });
+
+                    return {
+                        agency: agency.name,
+                        kpis: agencyKPIs,
+                        months: months
+                    };
+                });
+
+                loadedData = data;
+                selectedAgencies = data.map(agency => agency.agency);
+                allMonths = months;
+                selectedMonths = months.slice(0, 3);
+                allKPIs = kpis;
                 
-                // Mostrar mensaje de carga automática
-                showStatus('loading', 'Cargando Dashboard...', 'Conectando con datos en tiempo real de Grupo Daytona', [
-                    '🏢 Cargando 9 agencias automotrices',
-                    '📊 Obteniendo KPIs actualizados',
-                    '📅 Procesando datos mensuales'
-                ]);
+                displayResults();
+                showStatus('success', `Demo cargada: ${data.length} agencias, ${kpis.length} KPIs`);
+                
+                alert("🎉 ¡Demo cargada exitosamente!");
+                
+            } catch (error) {
+                console.error("Error en loadDemo:", error);
+                showStatus('error', 'Error cargando demo: ' + error.message);
             }
+        }
+        
+        // FUNCIÓN PRINCIPAL: Conectar API
+        function connectToAPI() {
+            console.log("🔗 Ejecutando connectToAPI()");
+            showStatus('loading', 'Conectando con Google Sheets...');
             
-            // Inicializar reloj
-            updateClock();
-            setInterval(updateClock, 1000);
-            
-            // Auto-cargar datos después de 1 segundo
             setTimeout(() => {
-                if (DEFAULT_CONFIG.autoLoad) {
-                    autoLoadDefaultData();
-                }
+                showStatus('success', 'Conexión simulada exitosa');
+                alert("🎉 Conexión API simulada. Cargando demo...");
+                loadDemo();
             }, 1000);
+        }
+        
+        // Funciones de navegación
+        function openNewCarsPage() {
+            window.open('https://flozanol.github.io/daytona-autos-nuevos-kpis/', '_blank');
+        }
+        
+        function openReportsPage() {
+            alert('🚧 Sección de reportes en desarrollo...');
+        }
+        
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) {
+                menu.classList.toggle('open');
+            }
+        }
+        
+        function toggleUserMenu() {
+            alert('👤 Menú de usuario\n\n• Configuración\n• Notificaciones\n• Ayuda');
+        }
+        
+        function toggleQuickActions() {
+            const menu = document.getElementById('quickActionsMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+        
+        function exportData() {
+            alert('📥 Función de exportación activada');
+        }
+        
+        function shareData() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Dashboard KPIs Seminuevos - Grupo Daytona',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('🔗 URL copiada al portapapeles');
+            }
+        }
+        
+        // Mostrar resultados
+        function displayResults() {
+            console.log("📊 Mostrando resultados");
             
-            // Auto-llenar URLs guardadas (solo en modo admin)
-            if (!isPublicMode) {
-                const savedApiUrl = localStorage.getItem('daytonaSheetsUrl');
-                const savedCsvUrl = localStorage.getItem('daytonaCsvUrl');
-                
-                if (savedApiUrl) {
-                    document.getElementById('sheetsUrl').value = savedApiUrl;
-                }
-                if (savedCsvUrl) {
-                    document.getElementById('csvUrl').value = savedCsvUrl;
-                }
-                
-                // Auto-guardar URLs
-                document.getElementById('sheetsUrl').addEventListener('input', function() {
-                    localStorage.setItem('daytonaSheetsUrl', this.value);
-                });
-                
-                document.getElementById('csvUrl').addEventListener('input', function() {
-                    localStorage.setItem('daytonaCsvUrl', this.value);
-                });
+            // Mostrar sección de resultados
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv) {
+                resultsDiv.classList.remove('hidden');
             }
             
-            // Agregar indicador de modo en la esquina (para admin)
-            if (!isPublicMode) {
-                const modeIndicator = document.createElement('div');
-                modeIndicator.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-lg text-xs z-50';
-                modeIndicator.textContent = 'Modo Admin';
-                document.body.appendChild(modeIndicator);
-            }
-        });
-    </script>
-</body>
-</html>
+            // Actualizar estadísticas
+            updateStats();
+            updateAgenciesList();
+            updateSummaryTable();
+        }
+        
+        function updateStats() {
+            const totalKPIsEl = document.getElementById('totalKPIs');
+            const totalAgenciesEl = document.getElementById('totalAgencies');
+            const totalPeriodsEl = document.getElementById('totalPeriods');
+            
+            if (totalKPIsEl) totalKPIsEl.textContent = allKPIs.length;
+            if (totalAgenciesEl) totalAgenciesEl.textContent = selectedAgencies.length;
+            if (totalPeriodsEl) totalPeriodsEl.textContent = selectedMonths.length;
+        }
+        
+        function updateAgenciesList() {
+            const container = document.getElementById('agenciesList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            loadedData.forEach((agency, index) => {
+                const colors = ['from-red-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500', 'from-yellow-500 to-orange-500', 'from-purple-500 to-indigo-500'];
+                
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all card-hover';
+                
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
+                            <i class="fas fa-store text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-white">${agency.agency}</h4>
+                            <p class="text-sm text-gray-400">${agency.kpis.length} KPIs • ${agency.months.length} meses</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="w-3 h-3 bg-green-400 animate-pulse rounded-full"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function updateSummaryTable() {
+            const container = document.getElementById('summaryTable');
+            if (!container || !loadedData.length) return;
+            
+            let tableHTML = '<div class="overflow-x-auto"><table class="min-w-full text-sm text-white">';
+            tableHTML += '<thead><tr class="border-b border-white/20">';
+            tableHTML += '<th class="text-left py-2 px-4">Agencia</th>';
+            tableHTML += '<th class="text-center py-2 px-4">KPIs</th>';
+            tableHTML += '<th class="text-center py-2 px-4">Promedio</th>';
+            tableHTML += '</tr></thead><tbody>';
+            
+            loadedData.forEach(agency => {
+                const avgValue = Math.round(agency.kpis.reduce((sum, kpi) => {
+                    const monthValues = selectedMonths.map(month => kpi[month] || 0);
+                    return sum + monthValues.reduce((a, b) => a + b, 0) / monthValues.length;
+                }, 0) / agency.kpis.length);
+                
+                tableHTML += `
+                    <tr class="border-b border-white/10 hover:bg-white/5">
+                        <td class="py-3 px-4 font-medium">${agency.agency}</td>
+                        <td class="py-3 px-4 text-center text-blue-400">${agency.kpis.length}</td>
+                        <td class="py-3 px-4 text-center text-green-400">${avgValue.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            container.innerHTML = tableHTML;
+        }
+        
+        // Reloj
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second:
