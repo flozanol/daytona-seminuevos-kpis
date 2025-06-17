@@ -1,571 +1,152 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard KPIs - Grupo Daytona</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #ef4444, #f59e0b);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #10b981, #059669);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
-        }
-        
-        .animated-icon {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: rgba(239, 68, 68, 0.5);
-            border-radius: 3px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-    </style>
-</head>
-<body class="min-h-screen">
-    <!-- Navigation Bar -->
-    <nav class="glass-effect border-b border-white/10 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-10 h-10 rounded-lg object-contain bg-white/10 p-1">
-                    <div>
-                        <h1 class="text-xl font-bold text-white">Grupo Daytona</h1>
-                        <p class="text-sm text-gray-300">Dashboard KPIs Seminuevos</p>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <div class="hidden md:flex items-center space-x-2 text-gray-300">
-                        <i class="fas fa-clock text-sm"></i>
-                        <span class="text-sm" id="currentTime"></span>
-                    </div>
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-white text-sm"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h2 class="text-5xl font-bold gradient-text mb-4">
-                Dashboard KPIs Seminuevos Daytona
-            </h2>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
-            </p>
-        </div>
-
-        <!-- Auto-connection Status -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center space-x-3 glass-effect px-6 py-3 rounded-xl">
-                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span class="text-green-300 font-medium" id="connectionStatus">Conectando automáticamente a Google Sheets...</span>
-            </div>
-        </div>
-
-        <!-- Manual Controls -->
-        <div class="flex justify-center space-x-6 mb-12">
-            <button onclick="forceReconnect()" class="btn-secondary px-6 py-3 rounded-xl text-white font-semibold">
-                <i class="fas fa-sync-alt mr-2"></i>
-                Reconectar API
-            </button>
-            <button onclick="loadDemo()" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
-                <i class="fas fa-play mr-2"></i>
-                Cargar Demo
-            </button>
-        </div>
-
-        <!-- Status Bar -->
-        <div id="status" class="hidden mb-8">
-            <div class="glass-effect rounded-xl p-4 border-l-4">
-                <div class="flex items-center">
-                    <i id="statusIcon" class="text-2xl mr-3"></i>
-                    <p id="statusText" class="text-lg font-medium"></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Section -->
-        <div id="results" class="hidden">
-            <!-- KPI Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-chart-bar text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-white mb-2" id="totalKPIs">0</h3>
-                    <p class="text-gray-300 font-medium">Total KPIs</p>
-                </div>
+console.error('❌ Error completo en API:', error);
+                showStatus('error', `Error API: ${error.message}`);
+                updateConnectionStatus('Error API - Cargando demo como respaldo...');
                 
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-building text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-white mb-2" id="totalAgencies">9</h3>
-                    <p class="text-gray-300 font-medium">Agencias Activas</p>
-                </div>
-                
-                <div class="stat-card rounded-2xl p-6 text-center">
-                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-calendar text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-white mb-2" id="totalPeriods">0</h3>
-                    <p class="text-gray-300 font-medium">Períodos Seleccionados</p>
-                </div>
-            </div>
-
-            <!-- Agencies Overview -->
-            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-store text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Agencias Conectadas</h3>
-                        <p class="text-gray-300">Selecciona las agencias a comparar</p>
-                    </div>
-                </div>
-                <div id="agenciesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-            
-            <!-- Controls Panel -->
-            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-sliders-h text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Configuración del Análisis</h3>
-                        <p class="text-gray-300">Personaliza tu comparación</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Agency Selection -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <label class="text-lg font-semibold text-white flex items-center">
-                                <i class="fas fa-building mr-2 text-blue-400"></i>
-                                <span id="agencyCount">Agencias (0/9)</span>
-                            </label>
-                            <div class="space-x-2">
-                                <button onclick="selectAllAgencies()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
-                                    Todas
-                                </button>
-                                <button onclick="deselectAllAgencies()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
-                                    Ninguna
-                                </button>
-                            </div>
-                        </div>
-                        <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                            <div id="agencyCheckboxes" class="space-y-2"></div>
-                        </div>
-                    </div>
-
-                    <!-- Month Selection -->
-                    <div class="space-y-4">
-                        <label class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
-                            <span id="monthCount">Meses (0)</span>
-                        </label>
-                        <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                            <div id="monthCheckboxes" class="space-y-2"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center space-x-4 mt-8">
-                    <button onclick="updateAnalysis()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        Actualizar Análisis
-                    </button>
-                    <button onclick="refreshData()" class="px-6 py-3 bg-blue-500/20 text-blue-400 rounded-xl font-semibold hover:bg-blue-500/30 transition-all">
-                        <i class="fas fa-refresh mr-2"></i>
-                        Refrescar Datos
-                    </button>
-                </div>
-            </div>
-            
-            <!-- View Toggle Buttons -->
-            <div class="flex justify-center space-x-4 mb-8">
-                <button onclick="switchToAgencyView()" id="agencyViewBtn" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
-                    <i class="fas fa-building mr-2"></i>
-                    Vista por Agencias
-                </button>
-                <button onclick="switchToTrendView()" id="trendViewBtn" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    Vista Tendencias
-                </button>
-            </div>
-
-            <!-- KPI Analysis Table - Agency Comparison -->
-            <div id="agencyComparisonTable" class="glass-effect rounded-2xl p-8 card-hover mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                            <i class="fas fa-table text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold text-white">Comparación entre Agencias</h3>
-                            <p class="text-gray-300">Vista completa de todos los indicadores por agencia</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr id="tableHeader"></tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-white/10"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Trend Analysis Table - Monthly Trends per Agency -->
-            <div id="trendAnalysisTable" class="hidden glass-effect rounded-2xl p-8 card-hover mb-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
-                            <i class="fas fa-chart-line text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold text-white">Análisis de Tendencias por Agencia</h3>
-                            <p class="text-gray-300">Evolución mensual de KPIs para cada agencia</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <label class="text-sm font-medium text-gray-300">Agencia:</label>
-                        <select id="agencySelector" onchange="updateTrendTable()" class="bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Seleccionar agencia</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr id="trendTableHeader"></tr>
-                        </thead>
-                        <tbody id="trendTableBody" class="divide-y divide-white/10"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-16 text-center">
-            <div class="glass-effect rounded-2xl p-6">
-                <div class="flex items-center justify-center space-x-6 text-gray-300">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-shield-alt text-green-400"></i>
-                        <span>Datos Seguros</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-sync text-blue-400"></i>
-                        <span>Tiempo Real</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-chart-line text-red-400"></i>
-                        <span>Analytics Avanzados</span>
-                    </div>
-                </div>
-                <p class="text-gray-400 text-sm mt-4">
-                    © 2025 Grupo Daytona - Dashboard KPIs Seminuevos
-                </p>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        // Variables globales
-        let loadedData = [];
-        let selectedAgencies = [];
-        let selectedMonths = [];
-        let allKPIs = [];
-        let allMonths = [];
-        let currentView = 'agency'; // 'agency' o 'trend'
-        
-        // API Configuration
-        const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
-        const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ";
-        
-        console.log('🚀 Dashboard iniciado');
-        
-        // Actualizar reloj
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            const clockElement = document.getElementById('currentTime');
-            if (clockElement) {
-                clockElement.textContent = timeString;
-            }
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-        
-        // Actualizar estado de conexión
-        function updateConnectionStatus(message, isSuccess = false) {
-            const statusElement = document.getElementById('connectionStatus');
-            if (statusElement) {
-                statusElement.textContent = message;
-                const parent = statusElement.parentElement;
-                if (isSuccess) {
-                    parent.className = parent.className.replace('glass-effect', 'bg-green-500/20 border border-green-500/30');
-                } else {
-                    parent.className = parent.className.replace('bg-green-500/20 border border-green-500/30', 'glass-effect');
-                }
+                // Si falla la API, cargar demo automáticamente como fallback
+                console.log('🔄 Cargando demo como fallback...');
+                setTimeout(() => {
+                    showStatus('loading', 'API no disponible, cargando datos de demostración...');
+                    setTimeout(loadDemo, 1000);
+                }, 2000);
             }
         }
         
-        // FUNCIÓN: Forzar reconexión manual
-        function forceReconnect() {
-            console.log('🔄 Reconectando manualmente...');
-            updateConnectionStatus('Reconectando...');
-            connectToAPI();
-        }
-        
-        // FUNCIÓN PRINCIPAL: Cargar Demo
-        function loadDemo() {
-            console.log('🎯 Cargando demo...');
-            updateConnectionStatus('Cargando datos de demostración...');
-            showStatus('loading', 'Cargando datos de demostración...');
-            
-            // KPIs del sector automotriz
-            const kpis = [
-                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
-                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
-                'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos',
-                'Llamadas Perdidas', 'Tiempo Venta', 'Margen Utilidad', 'Devoluciones', 'Quejas Resueltas',
-                'Capacitación', 'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención',
-                'Tráfico Showroom', 'Conversión Digital', 'Social Media', 'Email Marketing', 'WhatsApp',
-                'Costo por Lead', 'Valor Cliente', 'Churn Rate', 'NPS', 'Recompras'
-            ];
-            
-            // 9 agencias
-            const agencies = [
-                { name: 'Honda Cuajimalpa', base: 200 },
-                { name: 'Honda Interlomas', base: 180 },
-                { name: 'KIA Interlomas', base: 160 },
-                { name: 'KIA Iztapalapa', base: 140 },
-                { name: 'MG Cuajimalpa', base: 120 },
-                { name: 'MG Interlomas', base: 100 },
-                { name: 'MG Iztapalapa', base: 95 },
-                { name: 'GWM Iztapalapa', base: 80 },
-                { name: 'GWM Morelos', base: 60 }
-            ];
-
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            // Generar datos
-            const data = agencies.map(agency => {
-                const agencyKPIs = kpis.map(kpiName => {
-                    const kpi = { name: kpiName };
-                    months.forEach(month => {
-                        const variation = (Math.random() - 0.5) * 0.4;
-                        kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
-                    });
-                    return kpi;
-                });
-
-                return {
-                    agency: agency.name,
-                    kpis: agencyKPIs,
-                    months: months
-                };
-            });
-
-            console.log('✅ Datos generados:', data.length, 'agencias');
-            
-            // Guardar y mostrar
-            sessionStorage.setItem('daytonaDashboardData', JSON.stringify(data));
-            displayResults(data);
-            showStatus('success', `Demo cargada: ${data.length} agencias, ${kpis.length} KPIs`);
-            updateConnectionStatus(`Demo cargada: ${data.length} agencias activas`, true);
-        }
-        
-        // FUNCIÓN PRINCIPAL: Conectar API REAL
-        async function connectToAPI() {
-            console.log('🚀 Conectando con Google Sheets REAL...');
-            updateConnectionStatus('Conectando con Google Sheets API...');
-            showStatus('loading', 'Conectando con Google Sheets API...');
-            
+        // Función para procesar datos reales del Google Sheets
+        function processRealSheetData(values, agencyName) {
             try {
-                // Obtener metadata del spreadsheet REAL
-                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
-                console.log('📡 URL Metadata:', metadataUrl);
+                console.log(`🔄 Procesando datos reales de: ${agencyName}`);
+                console.log('📊 Datos recibidos:', values);
                 
-                const metadataResponse = await fetch(metadataUrl);
-                
-                if (!metadataResponse.ok) {
-                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
+                if (!values || values.length < 2) {
+                    throw new Error('Datos insuficientes en la hoja');
                 }
                 
-                const metadata = await metadataResponse.json();
-                console.log('📊 Metadata recibida:', metadata);
+                const headers = values[0];
+                const rows = values.slice(1);
                 
-                const sheets = metadata.sheets || [];
-                const sheetNames = sheets.map(sheet => sheet.properties.title);
-                console.log('📋 Hojas encontradas:', sheetNames);
+                console.log(`📋 Headers encontrados:`, headers);
+                console.log(`📊 Filas de datos:`, rows.length);
                 
-                // Agencias esperadas (9 agencias)
-                const expectedAgencies = [
-                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
-                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
-                ];
-                
-                // Buscar hojas válidas
-                const validSheets = sheetNames.filter(name => 
-                    expectedAgencies.includes(name) || 
-                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                // Buscar columna de KPI (más flexible)
+                const kpiColumnIndex = headers.findIndex(header => 
+                    header && (
+                        header.toLowerCase().trim().includes('kpi') || 
+                        header.toLowerCase().trim().includes('indicador') ||
+                        header.toLowerCase().trim().includes('metrica') ||
+                        header.toLowerCase().trim().includes('métrica') ||
+                        header.toLowerCase().trim() === 'concepto' ||
+                        header.toLowerCase().trim() === 'nombre'
+                    )
                 );
                 
-                console.log('✅ Hojas válidas encontradas:', validSheets);
-                
-                if (validSheets.length === 0) {
-                    throw new Error(`No se encontraron hojas de agencias.\nHojas disponibles: ${sheetNames.join(', ')}\nEsperadas: ${expectedAgencies.join(', ')}`);
+                if (kpiColumnIndex === -1) {
+                    console.error('❌ Headers disponibles:', headers);
+                    throw new Error(`No se encontró columna de KPI en ${agencyName}. Headers disponibles: ${headers.join(', ')}`);
                 }
                 
-                // Procesar cada hoja
-                const loadedAgencies = [];
-                const errors = [];
-                const successes = [];
+                console.log(`✅ Columna KPI encontrada en índice ${kpiColumnIndex}: "${headers[kpiColumnIndex]}"`);
                 
-                for (const sheetName of validSheets) {
-                    try {
-                        console.log(`📊 Procesando hoja: ${sheetName}`);
-                        
-                        const range = `${sheetName}!A:Z`;
-                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-                        
-                        console.log(`🔗 URL datos: ${dataUrl}`);
-                        
-                        const dataResponse = await fetch(dataUrl);
-                        if (!dataResponse.ok) {
-                            errors.push(`${sheetName}: Error ${dataResponse.status}`);
-                            continue;
+                // Buscar columnas de meses (más flexible)
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                
+                const monthColumns = [];
+                headers.forEach((header, index) => {
+                    if (header && header.trim()) {
+                        const normalizedHeader = header.trim().toLowerCase();
+                        const matchingMonth = monthNames.find(month => 
+                            normalizedHeader === month.toLowerCase() ||
+                            normalizedHeader.includes(month.toLowerCase())
+                        );
+                        if (matchingMonth) {
+                            monthColumns.push({ name: matchingMonth, index: index });
                         }
-                        
-                        const sheetData = await dataResponse.json();
-                        console.log(`📈 Datos brutos de ${sheetName}:`, sheetData);
-                        
-                        if (!sheetData.values || sheetData.values.length < 2) {
-                            errors.push(`${sheetName}: Sin datos suficientes`);
-                            continue;
-                        }
-                        
-                        // Procesar datos reales
-                        const processedData = processRealSheetData(sheetData.values, sheetName);
-                        if (processedData && processedData.kpis.length > 0) {
-                            loadedAgencies.push(processedData);
-                            successes.push(`✅ ${sheetName}: ${processedData.kpis.length} KPIs cargados`);
-                            console.log(`✅ ${sheetName} procesada correctamente`);
-                        } else {
-                            errors.push(`${sheetName}: Error procesando KPIs`);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`❌ Error procesando ${sheetName}:`, error);
-                        errors.push(`${sheetName}: ${error.message}`);
                     }
+                });
+                
+                console.log(`📅 Columnas de meses encontradas:`, monthColumns);
+                
+                if (monthColumns.length === 0) {
+                    throw new Error(`No se encontraron columnas de meses en ${agencyName}. Headers: ${headers.join(', ')}`);
                 }
                 
-                // Mostrar resultados
-                if (loadedAgencies.length > 0) {
-                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                // Procesar KPIs
+                const kpis = [];
+                rows.forEach((row, rowIndex) => {
+                    const kpiName = row[kpiColumnIndex];
                     
-                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
-                    displayResults(loadedAgencies);
-                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
-                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
-                    
-                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
-                } else {
-                    throw new Error(`No se pudieron cargar datos reales.\nErrores: ${errors.join(', ')}`);
+                    if (kpiName && kpiName.toString().trim() && kpiName.toString().trim() !== '') {
+                        const kpiData = { name: kpiName.toString().trim() };
+                        
+                        monthColumns.forEach(monthCol => {
+                            const rawValue = row[monthCol.index];
+                            let numericValue = 0;
+                            
+                            if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+                                // Limpiar el valor (remover comas, símbolos, espacios)
+                                const cleanValue = rawValue.toString()
+                                    .replace(/[,$%\s]/g, '')
+                                    .replace(/[^\d.-]/g, '')
+                                    .trim();
+                                    
+                                numericValue = parseFloat(cleanValue) || 0;
+                            }
+                            
+                            kpiData[monthCol.name] = numericValue;
+                        });
+                        
+                        kpis.push(kpiData);
+                        console.log(`✅ KPI procesado: ${kpiName}`);
+                    }
+                });
+                
+                console.log(`📊 Total KPIs procesados para ${agencyName}: ${kpis.length}`);
+                
+                if (kpis.length === 0) {
+                    throw new Error(`No se encontraron KPIs válidos en ${agencyName}`);
                 }
+                
+                return {
+                    agency: agencyName,
+                    kpis: kpis,
+                    months: monthColumns.map(col => col.name)
+                };
                 
             } catch (error) {
-                console.error('❌ Error completo en API:', error);
-                showStatus('error', `Error API: ${error.message}`);
+                console.error(`❌ Error procesando ${agencyName}:`, error);
+                throw error;
+            }
+        }
+        
+        // Mostrar resultados
+        function displayResults(data) {
+            console.log('📊 Mostrando resultados...');
+            loadedData = data;
+            selectedAgencies = data.map(agency => agency.agency);
+            allMonths = data[0].months;
+            selectedMonths = allMonths.slice(0, 6);
+            
+            // Obtener KPIs únicos
+            const kpiSet = new Set();
+            data.forEach(agency => {
+                agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
+            });
+            allKPIs = Array.from(kpiSet);
+            
+            // Mostrar sección
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv) {
+                resultsDiv.classList.remove('hidden');
+            }
+            
+            // Actualizar componentes
+            updateAgenciesList();
+            updateAgencyCheckboxes();
+            updateMonthCheckboxes();
+            updateAgencySelector();
+            updateStats();
+            updateTable();
+        } `Error API: ${error.message}`);
                 updateConnectionStatus('Error API - Cargando demo como respaldo...');
                 
                 // Si falla la API, cargar demo automáticamente como fallback
@@ -903,6 +484,8 @@
             
             updateTrendTable();
         }
+        
+        // Toggle functions
         function toggleAgency(agencyName) {
             if (selectedAgencies.includes(agencyName)) {
                 selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
@@ -973,7 +556,72 @@
             if (totalPeriodsEl) totalPeriodsEl.textContent = selectedMonths.length;
         }
         
-        // Actualizar tabla de comparación entre agencias de tendencias por agencia
+        // Actualizar tabla de comparación entre agencias
+        function updateTable() {
+            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
+            
+            const headerRow = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            if (!headerRow || !tableBody) return;
+            
+            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
+            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
+            
+            // Header con nombres en blanco
+            headerRow.innerHTML = `
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
+                    KPI
+                </th>
+                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
+                    Período
+                </th>
+                ${filteredData.map((agency, index) => 
+                    `<th class="px-2 py-4 text-center text-xs font-bold text-white uppercase tracking-wider sticky top-0 border-b border-gray-200 z-30" 
+                         style="background: linear-gradient(135deg, ${colors[index % colors.length]}60, ${colors[index % colors.length]}40);">
+                         <div class="flex items-center justify-center">
+                            <span class="text-white font-semibold text-xs leading-tight">${agency.agency}</span>
+                         </div>
+                     </th>`
+                ).join('')}
+            `;
+            
+            tableBody.innerHTML = '';
+            
+            // Mostrar todos los KPIs
+            allKPIs.forEach(kpiName => {
+                selectedMonths.forEach((month, monthIndex) => {
+                    const row = document.createElement('tr');
+                    row.className = `${monthIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition-colors`;
+                    
+                    const values = filteredData.map(agency => {
+                        const kpi = agency.kpis.find(k => k.name === kpiName);
+                        return kpi ? (kpi[month] || 0) : 0;
+                    });
+                    
+                    const maxValue = Math.max(...values);
+                    
+                    let rowHTML = `
+                        <td class="px-3 py-3 text-sm font-semibold text-white">${kpiName}</td>
+                        <td class="px-3 py-3 text-sm font-medium text-gray-300">${month}</td>
+                    `;
+                    
+                    values.forEach((value, index) => {
+                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
+                        rowHTML += `<td class="px-2 py-3 text-center">
+                            <span class="text-xs font-bold ${
+                                isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full shadow-lg' : 'text-gray-300'
+                            }">${value.toLocaleString()}</span>
+                        </td>`;
+                    });
+                    
+                    row.innerHTML = rowHTML;
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+        
+        // Actualizar tabla de tendencias por agencia
         function updateTrendTable() {
             const selectedAgency = document.getElementById('agencySelector').value;
             const headerRow = document.getElementById('trendTableHeader');
@@ -1064,109 +712,6 @@
             });
         }
         
-        // Actualizar selector de agencias para vista de tendencias
-        function updateAgencySelector() {
-            const selector = document.getElementById('agencySelector');
-            if (!selector) return;
-            
-            selector.innerHTML = '<option value="">Seleccionar agencia</option>';
-            
-            loadedData.forEach(agency => {
-                const option = document.createElement('option');
-                option.value = agency.agency;
-                option.textContent = agency.agency;
-                selector.appendChild(option);
-            });
-        }
-        
-        // Cambiar vista
-        function switchToAgencyView() {
-            currentView = 'agency';
-            document.getElementById('agencyComparisonTable').classList.remove('hidden');
-            document.getElementById('trendAnalysisTable').classList.add('hidden');
-            
-            // Actualizar botones
-            document.getElementById('agencyViewBtn').className = 'btn-primary px-6 py-3 rounded-xl text-white font-semibold';
-            document.getElementById('trendViewBtn').className = 'px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all';
-            
-            updateTable();
-        }
-        
-        function switchToTrendView() {
-            currentView = 'trend';
-            document.getElementById('agencyComparisonTable').classList.add('hidden');
-            document.getElementById('trendAnalysisTable').classList.remove('hidden');
-            
-            // Actualizar botones
-            document.getElementById('trendViewBtn').className = 'btn-primary px-6 py-3 rounded-xl text-white font-semibold';
-            document.getElementById('agencyViewBtn').className = 'px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all';
-            
-            updateTrendTable();
-        }
-        function updateTable() {
-            if (!loadedData || selectedAgencies.length === 0 || selectedMonths.length === 0) return;
-            
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            if (!headerRow || !tableBody) return;
-            
-            const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
-            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
-            
-            // Header con nombres en blanco
-            headerRow.innerHTML = `
-                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
-                    KPI
-                </th>
-                <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
-                    Período
-                </th>
-                ${filteredData.map((agency, index) => 
-                    `<th class="px-2 py-4 text-center text-xs font-bold text-white uppercase tracking-wider sticky top-0 border-b border-gray-200 z-30" 
-                         style="background: linear-gradient(135deg, ${colors[index % colors.length]}60, ${colors[index % colors.length]}40);">
-                         <div class="flex items-center justify-center">
-                            <span class="text-white font-semibold text-xs leading-tight">${agency.agency}</span>
-                         </div>
-                     </th>`
-                ).join('')}
-            `;
-            
-            tableBody.innerHTML = '';
-            
-            // Mostrar todos los KPIs
-            allKPIs.forEach(kpiName => {
-                selectedMonths.forEach((month, monthIndex) => {
-                    const row = document.createElement('tr');
-                    row.className = `${monthIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition-colors`;
-                    
-                    const values = filteredData.map(agency => {
-                        const kpi = agency.kpis.find(k => k.name === kpiName);
-                        return kpi ? (kpi[month] || 0) : 0;
-                    });
-                    
-                    const maxValue = Math.max(...values);
-                    
-                    let rowHTML = `
-                        <td class="px-3 py-3 text-sm font-semibold text-white">${kpiName}</td>
-                        <td class="px-3 py-3 text-sm font-medium text-gray-300">${month}</td>
-                    `;
-                    
-                    values.forEach((value, index) => {
-                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
-                        rowHTML += `<td class="px-2 py-3 text-center">
-                            <span class="text-xs font-bold ${
-                                isHighest ? 'text-green-100 bg-green-600 px-2 py-1 rounded-full shadow-lg' : 'text-gray-300'
-                            }">${value.toLocaleString()}</span>
-                        </td>`;
-                    });
-                    
-                    row.innerHTML = rowHTML;
-                    tableBody.appendChild(row);
-                });
-            });
-        }
-        
         // Funciones de estado
         function showStatus(type, message) {
             const statusDiv = document.getElementById('status');
@@ -1223,4 +768,571 @@
         });
     </script>
 </body>
-</html>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard KPIs - Grupo Daytona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .animated-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.5);
+            border-radius: 3px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation Bar -->
+    <nav class="glass-effect border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="https://api.grupodaytona.com/files/images/full-xzLxpZqXUE-1728519042236.png" alt="Grupo Daytona" class="w-10 h-10 rounded-lg object-contain bg-white/10 p-1">
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Grupo Daytona</h1>
+                        <p class="text-sm text-gray-300">Dashboard KPIs Seminuevos</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="hidden md:flex items-center space-x-2 text-gray-300">
+                        <i class="fas fa-clock text-sm"></i>
+                        <span class="text-sm" id="currentTime"></span>
+                    </div>
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-bold gradient-text mb-4">
+                Dashboard KPIs Seminuevos Daytona
+            </h2>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Análisis en tiempo real de indicadores clave de rendimiento para todas las agencias automotrices
+            </p>
+        </div>
+
+        <!-- Auto-connection Status -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center space-x-3 glass-effect px-6 py-3 rounded-xl">
+                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-green-300 font-medium" id="connectionStatus">Conectando automáticamente a Google Sheets...</span>
+            </div>
+        </div>
+
+        <!-- Manual Controls -->
+        <div class="flex justify-center space-x-6 mb-12">
+            <button onclick="forceReconnect()" class="btn-secondary px-6 py-3 rounded-xl text-white font-semibold">
+                <i class="fas fa-sync-alt mr-2"></i>
+                Reconectar API
+            </button>
+            <button onclick="loadDemo()" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
+                <i class="fas fa-play mr-2"></i>
+                Cargar Demo
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="status" class="hidden mb-8">
+            <div class="glass-effect rounded-xl p-4 border-l-4">
+                <div class="flex items-center">
+                    <i id="statusIcon" class="text-2xl mr-3"></i>
+                    <p id="statusText" class="text-lg font-medium"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="hidden">
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalKPIs">0</h3>
+                    <p class="text-gray-300 font-medium">Total KPIs</p>
+                </div>
+                
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-building text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalAgencies">9</h3>
+                    <p class="text-gray-300 font-medium">Agencias Activas</p>
+                </div>
+                
+                <div class="stat-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2" id="totalPeriods">0</h3>
+                    <p class="text-gray-300 font-medium">Períodos Seleccionados</p>
+                </div>
+            </div>
+
+            <!-- Agencies Overview -->
+            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Agencias Conectadas</h3>
+                        <p class="text-gray-300">Selecciona las agencias a comparar</p>
+                    </div>
+                </div>
+                <div id="agenciesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+            
+            <!-- Controls Panel -->
+            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-sliders-h text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Configuración del Análisis</h3>
+                        <p class="text-gray-300">Personaliza tu comparación</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Agency Selection -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="text-lg font-semibold text-white flex items-center">
+                                <i class="fas fa-building mr-2 text-blue-400"></i>
+                                <span id="agencyCount">Agencias (0/9)</span>
+                            </label>
+                            <div class="space-x-2">
+                                <button onclick="selectAllAgencies()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
+                                    Todas
+                                </button>
+                                <button onclick="deselectAllAgencies()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
+                                    Ninguna
+                                </button>
+                            </div>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                            <div id="agencyCheckboxes" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Month Selection -->
+                    <div class="space-y-4">
+                        <label class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
+                            <span id="monthCount">Meses (0)</span>
+                        </label>
+                        <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                            <div id="monthCheckboxes" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4 mt-8">
+                    <button onclick="updateAnalysis()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Actualizar Análisis
+                    </button>
+                    <button onclick="refreshData()" class="px-6 py-3 bg-blue-500/20 text-blue-400 rounded-xl font-semibold hover:bg-blue-500/30 transition-all">
+                        <i class="fas fa-refresh mr-2"></i>
+                        Refrescar Datos
+                    </button>
+                </div>
+            </div>
+
+            <!-- View Toggle Buttons -->
+            <div class="flex justify-center space-x-4 mb-8">
+                <button onclick="switchToAgencyView()" id="agencyViewBtn" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                    <i class="fas fa-building mr-2"></i>
+                    Vista por Agencias
+                </button>
+                <button onclick="switchToTrendView()" id="trendViewBtn" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Vista Tendencias
+                </button>
+            </div>
+
+            <!-- KPI Analysis Table - Agency Comparison -->
+            <div id="agencyComparisonTable" class="glass-effect rounded-2xl p-8 card-hover mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-table text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Comparación entre Agencias</h3>
+                            <p class="text-gray-300">Vista completa de todos los indicadores por agencia</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr id="tableHeader"></tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-white/10"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Trend Analysis Table - Monthly Trends per Agency -->
+            <div id="trendAnalysisTable" class="hidden glass-effect rounded-2xl p-8 card-hover mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Análisis de Tendencias por Agencia</h3>
+                            <p class="text-gray-300">Evolución mensual de KPIs para cada agencia</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <label class="text-sm font-medium text-gray-300">Agencia:</label>
+                        <select id="agencySelector" onchange="updateTrendTable()" class="bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Seleccionar agencia</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr id="trendTableHeader"></tr>
+                        </thead>
+                        <tbody id="trendTableBody" class="divide-y divide-white/10"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center">
+            <div class="glass-effect rounded-2xl p-6">
+                <div class="flex items-center justify-center space-x-6 text-gray-300">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-shield-alt text-green-400"></i>
+                        <span>Datos Seguros</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-sync text-blue-400"></i>
+                        <span>Tiempo Real</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-chart-line text-red-400"></i>
+                        <span>Analytics Avanzados</span>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm mt-4">
+                    © 2025 Grupo Daytona - Dashboard KPIs Seminuevos
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Variables globales
+        let loadedData = [];
+        let selectedAgencies = [];
+        let selectedMonths = [];
+        let allKPIs = [];
+        let allMonths = [];
+        let currentView = 'agency'; // 'agency' o 'trend'
+        
+        // API Configuration
+        const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
+        const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ";
+        
+        console.log('🚀 Dashboard iniciado');
+        
+        // Actualizar reloj
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const clockElement = document.getElementById('currentTime');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Actualizar estado de conexión
+        function updateConnectionStatus(message, isSuccess = false) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                const parent = statusElement.parentElement;
+                if (isSuccess) {
+                    parent.className = parent.className.replace('glass-effect', 'bg-green-500/20 border border-green-500/30');
+                } else {
+                    parent.className = parent.className.replace('bg-green-500/20 border border-green-500/30', 'glass-effect');
+                }
+            }
+        }
+        
+        // FUNCIÓN: Forzar reconexión manual
+        function forceReconnect() {
+            console.log('🔄 Reconectando manualmente...');
+            updateConnectionStatus('Reconectando...');
+            connectToAPI();
+        }
+        
+        // FUNCIÓN PRINCIPAL: Cargar Demo
+        function loadDemo() {
+            console.log('🎯 Cargando demo...');
+            updateConnectionStatus('Cargando datos de demostración...');
+            showStatus('loading', 'Cargando datos de demostración...');
+            
+            // KPIs del sector automotriz
+            const kpis = [
+                'Ventas Totales', 'Leads Generados', 'Conversión %', 'Test Drive', 'Satisfacción Cliente',
+                'Tiempo Respuesta', 'Llamadas Atendidas', 'Cotizaciones Enviadas', 'Seguimientos', 'ROI Marketing',
+                'Inventario', 'Financiamientos', 'Seguros Vendidos', 'Post-Venta', 'Clientes Referidos',
+                'Llamadas Perdidas', 'Tiempo Venta', 'Margen Utilidad', 'Devoluciones', 'Quejas Resueltas',
+                'Capacitación', 'Metas Cumplidas', 'Cross-Selling', 'Up-Selling', 'Retención',
+                'Tráfico Showroom', 'Conversión Digital', 'Social Media', 'Email Marketing', 'WhatsApp',
+                'Costo por Lead', 'Valor Cliente', 'Churn Rate', 'NPS', 'Recompras'
+            ];
+            
+            // 9 agencias
+            const agencies = [
+                { name: 'Honda Cuajimalpa', base: 200 },
+                { name: 'Honda Interlomas', base: 180 },
+                { name: 'KIA Interlomas', base: 160 },
+                { name: 'KIA Iztapalapa', base: 140 },
+                { name: 'MG Cuajimalpa', base: 120 },
+                { name: 'MG Interlomas', base: 100 },
+                { name: 'MG Iztapalapa', base: 95 },
+                { name: 'GWM Iztapalapa', base: 80 },
+                { name: 'GWM Morelos', base: 60 }
+            ];
+
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+            // Generar datos
+            const data = agencies.map(agency => {
+                const agencyKPIs = kpis.map(kpiName => {
+                    const kpi = { name: kpiName };
+                    months.forEach(month => {
+                        const variation = (Math.random() - 0.5) * 0.4;
+                        kpi[month] = Math.max(1, Math.round(agency.base * (1 + variation)));
+                    });
+                    return kpi;
+                });
+
+                return {
+                    agency: agency.name,
+                    kpis: agencyKPIs,
+                    months: months
+                };
+            });
+
+            console.log('✅ Datos generados:', data.length, 'agencias');
+            
+            // Guardar y mostrar
+            sessionStorage.setItem('daytonaDashboardData', JSON.stringify(data));
+            displayResults(data);
+            showStatus('success', `Demo cargada: ${data.length} agencias, ${kpis.length} KPIs`);
+            updateConnectionStatus(`Demo cargada: ${data.length} agencias activas`, true);
+        }
+        
+        // FUNCIÓN PRINCIPAL: Conectar API REAL
+        async function connectToAPI() {
+            console.log('🚀 Conectando con Google Sheets REAL...');
+            updateConnectionStatus('Conectando con Google Sheets API...');
+            showStatus('loading', 'Conectando con Google Sheets API...');
+            
+            try {
+                // Obtener metadata del spreadsheet REAL
+                const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
+                console.log('📡 URL Metadata:', metadataUrl);
+                
+                const metadataResponse = await fetch(metadataUrl);
+                
+                if (!metadataResponse.ok) {
+                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
+                }
+                
+                const metadata = await metadataResponse.json();
+                console.log('📊 Metadata recibida:', metadata);
+                
+                const sheets = metadata.sheets || [];
+                const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('📋 Hojas encontradas:', sheetNames);
+                
+                // Agencias esperadas (9 agencias)
+                const expectedAgencies = [
+                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
+                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
+                ];
+                
+                // Buscar hojas válidas
+                const validSheets = sheetNames.filter(name => 
+                    expectedAgencies.includes(name) || 
+                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                );
+                
+                console.log('✅ Hojas válidas encontradas:', validSheets);
+                
+                if (validSheets.length === 0) {
+                    throw new Error(`No se encontraron hojas de agencias.\nHojas disponibles: ${sheetNames.join(', ')}\nEsperadas: ${expectedAgencies.join(', ')}`);
+                }
+                
+                // Procesar cada hoja
+                const loadedAgencies = [];
+                const errors = [];
+                const successes = [];
+                
+                for (const sheetName of validSheets) {
+                    try {
+                        console.log(`📊 Procesando hoja: ${sheetName}`);
+                        
+                        const range = `${sheetName}!A:Z`;
+                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+                        
+                        console.log(`🔗 URL datos: ${dataUrl}`);
+                        
+                        const dataResponse = await fetch(dataUrl);
+                        if (!dataResponse.ok) {
+                            errors.push(`${sheetName}: Error ${dataResponse.status}`);
+                            continue;
+                        }
+                        
+                        const sheetData = await dataResponse.json();
+                        console.log(`📈 Datos brutos de ${sheetName}:`, sheetData);
+                        
+                        if (!sheetData.values || sheetData.values.length < 2) {
+                            errors.push(`${sheetName}: Sin datos suficientes`);
+                            continue;
+                        }
+                        
+                        // Procesar datos reales
+                        const processedData = processRealSheetData(sheetData.values, sheetName);
+                        if (processedData && processedData.kpis.length > 0) {
+                            loadedAgencies.push(processedData);
+                            successes.push(`✅ ${sheetName}: ${processedData.kpis.length} KPIs cargados`);
+                            console.log(`✅ ${sheetName} procesada correctamente`);
+                        } else {
+                            errors.push(`${sheetName}: Error procesando KPIs`);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`❌ Error procesando ${sheetName}:`, error);
+                        errors.push(`${sheetName}: ${error.message}`);
+                    }
+                }
+                
+                // Mostrar resultados
+                if (loadedAgencies.length > 0) {
+                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                    
+                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
+                    displayResults(loadedAgencies);
+                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
+                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
+                    
+                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
+                } else {
+                    throw new Error(`No se pudieron cargar datos reales.\nErrores: ${errors.join(', ')}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error completo en API:', error);
+                showStatus('error',
