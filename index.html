@@ -205,11 +205,11 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-bold text-white">Configuración del Análisis</h3>
-                        <p class="text-gray-300">Personaliza tu comparación</p>
+                        <p class="text-gray-300">Personaliza tu comparación - cada tabla es independiente</p>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-1 gap-8">
                     <!-- Agency Selection -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
@@ -230,17 +230,6 @@
                             <div id="agencyCheckboxes" class="space-y-2"></div>
                         </div>
                     </div>
-
-                    <!-- Month Selection -->
-                    <div class="space-y-4">
-                        <label class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
-                            <span id="monthCount">Meses (0)</span>
-                        </label>
-                        <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                            <div id="monthCheckboxes" class="space-y-2"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="flex justify-center space-x-4 mt-8">
@@ -255,18 +244,6 @@
                 </div>
             </div>
 
-            <!-- View Toggle Buttons -->
-            <div class="flex justify-center space-x-4 mb-8">
-                <button onclick="showAgencyView()" id="agencyViewBtn" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
-                    <i class="fas fa-building mr-2"></i>
-                    Comparar Agencias
-                </button>
-                <button onclick="showTrendView()" id="trendViewBtn" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    Tendencias Agencia
-                </button>
-            </div>
-
             <!-- TABLA 1: Comparación entre Agencias -->
             <div id="agencyComparisonTable" class="glass-effect rounded-2xl p-8 card-hover mb-8">
                 <div class="flex items-center justify-between mb-6">
@@ -275,9 +252,36 @@
                             <i class="fas fa-table text-white text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-white">Comparación entre Agencias</h3>
+                            <h3 class="text-2xl font-bold text-white">1. Comparación entre Agencias</h3>
                             <p class="text-gray-300">Compara KPIs entre diferentes agencias</p>
                         </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            <span id="table1MonthsInfo">Meses: 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Month Selection for Table 1 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
+                            <span id="table1MonthCount">Meses para Comparación (0)</span>
+                        </label>
+                        <div class="space-x-2">
+                            <button onclick="selectAllTable1Months()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
+                                Todos
+                            </button>
+                            <button onclick="deselectAllTable1Months()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
+                                Ninguno
+                            </button>
+                        </div>
+                    </div>
+                    <div class="max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                        <div id="table1MonthCheckboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
                     </div>
                 </div>
                 
@@ -292,14 +296,14 @@
             </div>
 
             <!-- TABLA 2: Tendencias por Agencia -->
-            <div id="trendAnalysisTable" class="hidden glass-effect rounded-2xl p-8 card-hover mb-8">
+            <div id="trendAnalysisTable" class="glass-effect rounded-2xl p-8 card-hover mb-8">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
                             <i class="fas fa-chart-line text-white text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-white">Tendencias de una Agencia</h3>
+                            <h3 class="text-2xl font-bold text-white">2. Tendencias de una Agencia</h3>
                             <p class="text-gray-300">Evolución mensual de KPIs con promedio y tendencias</p>
                         </div>
                     </div>
@@ -312,8 +316,29 @@
                         </div>
                         <div class="text-sm text-gray-400">
                             <i class="fas fa-info-circle mr-1"></i>
-                            <span id="selectedMonthsInfo">Meses: 0</span>
+                            <span id="table2MonthsInfo">Meses: 0</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Month Selection for Table 2 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-calendar-alt mr-2 text-blue-400"></i>
+                            <span id="table2MonthCount">Meses para Tendencias (0)</span>
+                        </label>
+                        <div class="space-x-2">
+                            <button onclick="selectAllTable2Months()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
+                                Todos
+                            </button>
+                            <button onclick="deselectAllTable2Months()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
+                                Ninguno
+                            </button>
+                        </div>
+                    </div>
+                    <div class="max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                        <div id="table2MonthCheckboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
                     </div>
                 </div>
                 
@@ -376,7 +401,8 @@
         // Variables globales
         let loadedData = [];
         let selectedAgencies = [];
-        let selectedMonths = [];
+        let table1SelectedMonths = []; // Meses para tabla 1 (comparación)
+        let table2SelectedMonths = []; // Meses para tabla 2 (tendencias)
         let allKPIs = [];
         let allMonths = [];
         
@@ -667,7 +693,8 @@
             loadedData = data;
             selectedAgencies = data.map(agency => agency.agency);
             allMonths = data[0].months;
-            selectedMonths = allMonths.slice(0, 6);
+            table1SelectedMonths = allMonths.slice(0, 3); // Tabla 1: primeros 3 meses por defecto
+            table2SelectedMonths = allMonths.slice(0, 6); // Tabla 2: primeros 6 meses por defecto
             
             // Obtener KPIs únicos
             const kpiSet = new Set();
@@ -685,10 +712,12 @@
             // Actualizar componentes
             updateAgenciesList();
             updateAgencyCheckboxes();
-            updateMonthCheckboxes();
+            updateTable1MonthCheckboxes();
+            updateTable2MonthCheckboxes();
             updateAgencySelector();
             updateStats();
             updateTable();
+            updateTrendTable();
         }
         
         // Actualizar lista de agencias con fotos reales
@@ -791,34 +820,62 @@
             });
         }
         
-        // Actualizar checkboxes de meses
-        function updateMonthCheckboxes() {
-            const container = document.getElementById('monthCheckboxes');
-            const count = document.getElementById('monthCount');
+        // Actualizar checkboxes de meses para TABLA 1 (Comparación)
+        function updateTable1MonthCheckboxes() {
+            const container = document.getElementById('table1MonthCheckboxes');
+            const count = document.getElementById('table1MonthCount');
+            const info = document.getElementById('table1MonthsInfo');
             
             if (!container || !count) return;
             
             container.innerHTML = '';
-            count.textContent = `Meses (${selectedMonths.length})`;
-            
-            // Actualizar info en tabla de tendencias
-            const monthsInfo = document.getElementById('selectedMonthsInfo');
-            if (monthsInfo) {
-                monthsInfo.textContent = `Meses: ${selectedMonths.length} seleccionados`;
-            }
+            count.textContent = `Meses para Comparación (${table1SelectedMonths.length})`;
+            if (info) info.textContent = `Meses: ${table1SelectedMonths.length} seleccionados`;
             
             allMonths.forEach(month => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                label.className = 'flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = selectedMonths.includes(month);
-                checkbox.className = 'w-4 h-4 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2';
-                checkbox.onchange = () => toggleMonth(month);
+                checkbox.checked = table1SelectedMonths.includes(month);
+                checkbox.className = 'w-3 h-3 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-1';
+                checkbox.onchange = () => toggleTable1Month(month);
                 
                 const span = document.createElement('span');
-                span.className = 'text-gray-300 text-sm font-medium';
+                span.className = 'text-gray-300 text-xs font-medium';
+                span.textContent = month;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+        }
+        
+        // Actualizar checkboxes de meses para TABLA 2 (Tendencias)
+        function updateTable2MonthCheckboxes() {
+            const container = document.getElementById('table2MonthCheckboxes');
+            const count = document.getElementById('table2MonthCount');
+            const info = document.getElementById('table2MonthsInfo');
+            
+            if (!container || !count) return;
+            
+            container.innerHTML = '';
+            count.textContent = `Meses para Tendencias (${table2SelectedMonths.length})`;
+            if (info) info.textContent = `Meses: ${table2SelectedMonths.length} seleccionados`;
+            
+            allMonths.forEach(month => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = table2SelectedMonths.includes(month);
+                checkbox.className = 'w-3 h-3 text-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-500 focus:ring-1';
+                checkbox.onchange = () => toggleTable2Month(month);
+                
+                const span = document.createElement('span');
+                span.className = 'text-gray-300 text-xs font-medium';
                 span.textContent = month;
                 
                 label.appendChild(checkbox);
@@ -842,25 +899,57 @@
             });
         }
         
-        // Funciones para cambiar vista
-        function showAgencyView() {
-            document.getElementById('agencyComparisonTable').classList.remove('hidden');
-            document.getElementById('trendAnalysisTable').classList.add('hidden');
-            
-            // Actualizar botones
-            document.getElementById('agencyViewBtn').className = 'btn-primary px-6 py-3 rounded-xl text-white font-semibold';
-            document.getElementById('trendViewBtn').className = 'px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all';
-            
+        // Toggle functions para meses independientes
+        function toggleTable1Month(month) {
+            if (table1SelectedMonths.includes(month)) {
+                table1SelectedMonths = table1SelectedMonths.filter(m => m !== month);
+            } else {
+                table1SelectedMonths.push(month);
+            }
+            updateTable1MonthCheckboxes();
+            updateStats();
             updateTable();
         }
         
-        function showTrendView() {
-            document.getElementById('agencyComparisonTable').classList.add('hidden');
-            document.getElementById('trendAnalysisTable').classList.remove('hidden');
-            
-            // Actualizar botones
-            document.getElementById('trendViewBtn').className = 'btn-primary px-6 py-3 rounded-xl text-white font-semibold';
-            document.getElementById('agencyViewBtn').className = 'px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all';
+        function toggleTable2Month(month) {
+            if (table2SelectedMonths.includes(month)) {
+                table2SelectedMonths = table2SelectedMonths.filter(m => m !== month);
+            } else {
+                table2SelectedMonths.push(month);
+            }
+            updateTable2MonthCheckboxes();
+            updateStats();
+            updateTrendTable();
+        }
+        
+        // Funciones para seleccionar todos/ninguno
+        function selectAllTable1Months() {
+            table1SelectedMonths = [...allMonths];
+            updateTable1MonthCheckboxes();
+            updateStats();
+            updateTable();
+        }
+        
+        function deselectAllTable1Months() {
+            table1SelectedMonths = [];
+            updateTable1MonthCheckboxes();
+            updateStats();
+            updateTable();
+        }
+        
+        function selectAllTable2Months() {
+            table2SelectedMonths = [...allMonths];
+            updateTable2MonthCheckboxes();
+            updateStats();
+            updateTrendTable();
+        }
+        
+        function deselectAllTable2Months() {
+            table2SelectedMonths = [];
+            updateTable2MonthCheckboxes();
+            updateStats();
+            updateTrendTable();
+        }gray-500/30 transition-all';
             
             updateTrendTable();
         }
