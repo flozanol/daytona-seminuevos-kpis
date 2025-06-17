@@ -577,4 +577,23 @@
             const timeString = now.toLocaleTimeString('es-ES', { 
                 hour: '2-digit', 
                 minute: '2-digit', 
-                second:
+                second: '2-digit'
+            });
+            const clockElement = document.getElementById('currentTime');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+        
+        // Inicialización
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("✅ DOM cargado - Dashboard inicializado");
+        });
+        
+        console.log("📜 Script cargado completamente");
+    </script>
+</body>
+</html>
