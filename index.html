@@ -101,10 +101,6 @@
                         <i class="fas fa-clock text-sm"></i>
                         <span class="text-sm" id="currentTime"></span>
                     </div>
-                    <a href="#" class="hidden md:flex items-center space-x-2 px-3 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-sm hover:bg-blue-500/30 transition-all">
-                        <i class="fas fa-car text-sm"></i>
-                        <span>Dashboard Nuevos</span>
-                    </a>
                     <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                         <i class="fas fa-user text-white text-sm"></i>
                     </div>
@@ -171,7 +167,7 @@
                         <i class="fas fa-building text-white text-2xl"></i>
                     </div>
                     <h3 class="text-3xl font-bold text-white mb-2" id="totalAgencies">9</h3>
-                    <p class="text-gray-300 font-medium">Agencias Activas</p>
+                    <p class="text-gray-300 font-medium">Agencias Disponibles</p>
                 </div>
                 
                 <div class="stat-card rounded-2xl p-6 text-center">
@@ -179,65 +175,7 @@
                         <i class="fas fa-calendar text-white text-2xl"></i>
                     </div>
                     <h3 class="text-3xl font-bold text-white mb-2" id="totalPeriods">0</h3>
-                    <p class="text-gray-300 font-medium">Períodos Seleccionados</p>
-                </div>
-            </div>
-
-            <!-- Agencies Overview -->
-            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-store text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Agencias Conectadas</h3>
-                        <p class="text-gray-300">Selecciona las agencias a analizar</p>
-                    </div>
-                </div>
-                <div id="agenciesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-            
-            <!-- Controls Panel -->
-            <div class="glass-effect rounded-2xl p-8 mb-8 card-hover">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
-                        <i class="fas fa-sliders-h text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Configuración del Análisis</h3>
-                        <p class="text-gray-300">Selecciona agencias para ambas tablas</p>
-                    </div>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <label class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-building mr-2 text-blue-400"></i>
-                            <span id="agencyCount">Agencias (0/9)</span>
-                        </label>
-                        <div class="space-x-2">
-                            <button onclick="selectAllAgencies()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
-                                Todas
-                            </button>
-                            <button onclick="deselectAllAgencies()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
-                                Ninguna
-                            </button>
-                        </div>
-                    </div>
-                    <div class="max-h-64 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                        <div id="agencyCheckboxes" class="space-y-2"></div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center space-x-4 mt-8">
-                    <button onclick="updateAnalysis()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        Actualizar Análisis
-                    </button>
-                    <button onclick="refreshData()" class="px-6 py-3 bg-blue-500/20 text-blue-400 rounded-xl font-semibold hover:bg-blue-500/30 transition-all">
-                        <i class="fas fa-refresh mr-2"></i>
-                        Refrescar Datos
-                    </button>
+                    <p class="text-gray-300 font-medium">Meses Disponibles</p>
                 </div>
             </div>
 
@@ -246,42 +184,63 @@
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
                         <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                            <i class="fas fa-table text-white text-xl"></i>
+                            <i class="fas fa-balance-scale text-white text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-white">1. Comparación entre Agencias</h3>
+                            <h3 class="text-2xl font-bold text-white">Comparación entre Agencias</h3>
                             <p class="text-gray-300">Compara KPIs entre diferentes agencias</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Month Selection for Table 1 -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <label class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
-                            <span id="table1MonthCount">Meses para Comparación (0)</span>
-                        </label>
-                        <div class="space-x-2">
-                            <button onclick="selectAllTable1Months()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
-                                Todos
-                            </button>
-                            <button onclick="deselectAllTable1Months()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
-                                Ninguno
-                            </button>
+                <!-- Controles para Tabla 1 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+                    <!-- Selección de Agencias para Tabla 1 -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="text-lg font-semibold text-white flex items-center">
+                                <i class="fas fa-building mr-2 text-blue-400"></i>
+                                <span id="agencyCount1">Agencias (0/9)</span>
+                            </label>
+                            <div class="space-x-2">
+                                <button onclick="selectAllAgencies(1)" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
+                                    Todas
+                                </button>
+                                <button onclick="deselectAllAgencies(1)" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
+                                    Ninguna
+                                </button>
+                            </div>
+                        </div>
+                        <div class="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                            <div id="agencyCheckboxes1" class="space-y-2"></div>
                         </div>
                     </div>
-                    <div class="max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                        <div id="table1MonthCheckboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+
+                    <!-- Selección de Meses para Tabla 1 -->
+                    <div class="space-y-4">
+                        <label class="text-lg font-semibold text-white flex items-center">
+                            <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
+                            <span id="monthCount1">Meses (0)</span>
+                        </label>
+                        <div class="max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                            <div id="monthCheckboxes1" class="space-y-2"></div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="flex justify-center mb-6">
+                    <button onclick="updateTable1()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Actualizar Comparación
+                    </button>
                 </div>
                 
                 <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr id="tableHeader"></tr>
+                            <tr id="tableHeader1"></tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-white/10"></tbody>
+                        <tbody id="tableBody1" class="divide-y divide-white/10"></tbody>
                     </table>
                 </div>
             </div>
@@ -294,47 +253,60 @@
                             <i class="fas fa-chart-line text-white text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-white">2. Tendencias de una Agencia</h3>
+                            <h3 class="text-2xl font-bold text-white">Tendencias de una Agencia</h3>
                             <p class="text-gray-300">Evolución mensual de KPIs con promedio y tendencias</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-300">Agencia:</label>
-                            <select id="agencySelector" onchange="updateTrendTable()" class="bg-white/10 border border-white/20 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 min-w-48">
-                                <option value="">Seleccionar agencia</option>
-                            </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Month Selection for Table 2 -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
+                <!-- Controles para Tabla 2 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Selección de Agencia para Tabla 2 -->
+                    <div class="space-y-4">
                         <label class="text-lg font-semibold text-white flex items-center">
-                            <i class="fas fa-calendar-alt mr-2 text-blue-400"></i>
-                            <span id="table2MonthCount">Meses para Tendencias (0)</span>
+                            <i class="fas fa-building mr-2 text-blue-400"></i>
+                            Agencia a Analizar
                         </label>
-                        <div class="space-x-2">
-                            <button onclick="selectAllTable2Months()" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
-                                Todos
-                            </button>
-                            <button onclick="deselectAllTable2Months()" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
-                                Ninguno
-                            </button>
+                        <select id="agencySelector2" onchange="updateTable2()" class="w-full bg-white/10 border border-white/20 text-white rounded-lg px-3 py-3 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Seleccionar agencia</option>
+                        </select>
+                    </div>
+
+                    <!-- Selección de Meses para Tabla 2 -->
+                    <div class="space-y-4 lg:col-span-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-lg font-semibold text-white flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
+                                <span id="monthCount2">Meses (0)</span>
+                            </label>
+                            <div class="space-x-2">
+                                <button onclick="selectAllMonths(2)" class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30 transition-all">
+                                    Todos
+                                </button>
+                                <button onclick="deselectAllMonths(2)" class="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all">
+                                    Ninguno
+                                </button>
+                            </div>
+                        </div>
+                        <div class="max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
+                            <div id="monthCheckboxes2" class="grid grid-cols-3 gap-2"></div>
                         </div>
                     </div>
-                    <div class="max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-4 scrollbar-thin">
-                        <div id="table2MonthCheckboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-                    </div>
+                </div>
+
+                <div class="flex justify-center mb-6">
+                    <button onclick="updateTable2()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        Actualizar Tendencias
+                    </button>
                 </div>
                 
                 <div class="overflow-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
                     <table class="min-w-full text-sm">
                         <thead>
-                            <tr id="trendTableHeader"></tr>
+                            <tr id="tableHeader2"></tr>
                         </thead>
-                        <tbody id="trendTableBody" class="divide-y divide-white/10"></tbody>
+                        <tbody id="tableBody2" class="divide-y divide-white/10"></tbody>
                     </table>
                 </div>
                 
@@ -385,13 +357,18 @@
     </div>
 
     <script>
-        // Variables globales
+        // Variables globales para cada tabla
         let loadedData = [];
-        let selectedAgencies = [];
-        let table1SelectedMonths = [];
-        let table2SelectedMonths = [];
         let allKPIs = [];
         let allMonths = [];
+        
+        // Variables independientes para Tabla 1 (Comparación entre Agencias)
+        let selectedAgencies1 = [];
+        let selectedMonths1 = [];
+        
+        // Variables independientes para Tabla 2 (Tendencias de Agencia)
+        let selectedAgency2 = '';
+        let selectedMonths2 = [];
         
         // API Configuration
         const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
@@ -493,35 +470,48 @@
             showStatus('loading', 'Conectando con Google Sheets API...');
             
             try {
+                // Obtener metadata del spreadsheet REAL
                 const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
+                console.log('📡 URL Metadata:', metadataUrl);
+                
                 const metadataResponse = await fetch(metadataUrl);
                 
                 if (!metadataResponse.ok) {
-                    throw new Error(`Error API: ${metadataResponse.status}`);
+                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
                 }
                 
                 const metadata = await metadataResponse.json();
+                console.log('📊 Metadata recibida:', metadata);
+                
                 const sheets = metadata.sheets || [];
                 const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('📋 Hojas encontradas:', sheetNames);
                 
+                // Agencias esperadas (9 agencias)
                 const expectedAgencies = [
                     'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
                     'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
                 ];
                 
+                // Buscar hojas válidas
                 const validSheets = sheetNames.filter(name => 
                     expectedAgencies.includes(name) || 
                     expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
                 );
                 
+                console.log('✅ Hojas válidas encontradas:', validSheets);
+                
                 if (validSheets.length === 0) {
                     throw new Error(`No se encontraron hojas de agencias.`);
                 }
                 
+                // Procesar cada hoja
                 const loadedAgencies = [];
                 
                 for (const sheetName of validSheets) {
                     try {
+                        console.log(`📊 Procesando hoja: ${sheetName}`);
+                        
                         const range = `${sheetName}!A:Z`;
                         const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
                         
@@ -532,37 +522,47 @@
                         
                         if (!sheetData.values || sheetData.values.length < 2) continue;
                         
+                        // Procesar datos reales
                         const processedData = processRealSheetData(sheetData.values, sheetName);
                         if (processedData && processedData.kpis.length > 0) {
                             loadedAgencies.push(processedData);
+                            console.log(`✅ ${sheetName} procesada correctamente`);
                         }
                         
                     } catch (error) {
-                        console.error(`Error procesando ${sheetName}:`, error);
+                        console.error(`❌ Error procesando ${sheetName}:`, error);
                     }
                 }
                 
+                // Mostrar resultados
                 if (loadedAgencies.length > 0) {
+                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                    
                     sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
                     displayResults(loadedAgencies);
-                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias`);
+                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
                     updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
+                    
+                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
                 } else {
                     throw new Error(`No se pudieron cargar datos reales.`);
                 }
                 
             } catch (error) {
-                console.error('Error en API:', error);
+                console.error('❌ Error completo en API:', error);
                 showStatus('error', `Error API: ${error.message}`);
-                updateConnectionStatus('Error API - Cargando demo...');
+                updateConnectionStatus('Error API - Cargando demo como respaldo...');
                 
+                // Si falla la API, cargar demo automáticamente como fallback
+                console.log('🔄 Cargando demo como fallback...');
                 setTimeout(() => {
-                    loadDemo();
+                    showStatus('loading', 'API no disponible, cargando datos de demostración...');
+                    setTimeout(loadDemo, 1000);
                 }, 2000);
             }
         }
         
-        // Procesar datos reales del Google Sheets
+        // Función para procesar datos reales del Google Sheets
         function processRealSheetData(values, agencyName) {
             try {
                 if (!values || values.length < 2) {
@@ -572,6 +572,7 @@
                 const headers = values[0];
                 const rows = values.slice(1);
                 
+                // Buscar columna de KPI
                 const kpiColumnIndex = headers.findIndex(header => 
                     header && (
                         header.toLowerCase().trim().includes('kpi') || 
@@ -584,6 +585,7 @@
                     throw new Error(`No se encontró columna de KPI en ${agencyName}`);
                 }
                 
+                // Buscar columnas de meses
                 const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
                                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
                 
@@ -605,6 +607,7 @@
                     throw new Error(`No se encontraron columnas de meses en ${agencyName}`);
                 }
                 
+                // Procesar KPIs
                 const kpis = [];
                 rows.forEach((row, rowIndex) => {
                     const kpiName = row[kpiColumnIndex];
@@ -643,7 +646,7 @@
                 };
                 
             } catch (error) {
-                console.error(`Error procesando ${agencyName}:`, error);
+                console.error(`❌ Error procesando ${agencyName}:`, error);
                 throw error;
             }
         }
@@ -652,115 +655,58 @@
         function displayResults(data) {
             console.log('📊 Mostrando resultados...');
             loadedData = data;
-            selectedAgencies = data.map(agency => agency.agency);
             allMonths = data[0].months;
-            table1SelectedMonths = allMonths.slice(0, 3);
-            table2SelectedMonths = allMonths.slice(0, 6);
             
+            // Obtener KPIs únicos
             const kpiSet = new Set();
             data.forEach(agency => {
                 agency.kpis.forEach(kpi => kpiSet.add(kpi.name));
             });
             allKPIs = Array.from(kpiSet);
             
+            // Inicializar selecciones por defecto
+            selectedAgencies1 = data.slice(0, 3).map(agency => agency.agency); // Primeras 3 agencias
+            selectedMonths1 = allMonths.slice(0, 6); // Primeros 6 meses
+            selectedAgency2 = data[0].agency; // Primera agencia
+            selectedMonths2 = allMonths.slice(0, 6); // Primeros 6 meses
+            
+            // Mostrar sección
             const resultsDiv = document.getElementById('results');
             if (resultsDiv) {
                 resultsDiv.classList.remove('hidden');
             }
             
-            updateAgenciesList();
-            updateAgencyCheckboxes();
-            updateTable1MonthCheckboxes();
-            updateTable2MonthCheckboxes();
-            updateAgencySelector();
+            // Actualizar componentes
+            updateAgencyCheckboxes1();
+            updateMonthCheckboxes1();
+            updateAgencySelector2();
+            updateMonthCheckboxes2();
             updateStats();
-            updateTable();
-            updateTrendTable();
+            updateTable1();
+            updateTable2();
         }
         
-        // Actualizar lista de agencias con fotos reales
-        function updateAgenciesList() {
-            const container = document.getElementById('agenciesList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            const agencyImages = {
-                'Honda Cuajimalpa': 'https://api.grupodaytona.com/files/images/large-2OaclDxDuh-1694547654222.jpg',
-                'Honda Interlomas': 'https://api.grupodaytona.com/files/images/large-Cg0SVNUkZp-1695076129864.jpg',
-                'KIA Interlomas': 'https://api.grupodaytona.com/files/images/full-SVRzg-mH5a-1694311813102.jpg',
-                'KIA Iztapalapa': 'https://api.grupodaytona.com/files/images/full-NYSe9ky8Es-1694496101625.jpg',
-                'MG Cuajimalpa': 'https://api.grupodaytona.com/files/images/full-BuCGnVgNRs-1694497075960.jpg',
-                'MG Interlomas': 'https://api.grupodaytona.com/files/images/large-LkGvLDc6m3-1696379783532.png',
-                'MG Iztapalapa': 'https://api.grupodaytona.com/files/images/full-Li4Y-eqSkt-1694454220488.png',
-                'GWM Iztapalapa': 'https://api.grupodaytona.com/files/images/large-O491MhYAB8-1723762761679.jpg',
-                'GWM Morelos': 'https://api.grupodaytona.com/files/images/large-N1FaJzm1rW-1701102100287.jpg'
-            };
-            
-            const colors = [
-                'from-red-500 to-pink-500',
-                'from-blue-500 to-cyan-500', 
-                'from-green-500 to-emerald-500',
-                'from-yellow-500 to-orange-500',
-                'from-purple-500 to-indigo-500',
-                'from-indigo-500 to-blue-500',
-                'from-pink-500 to-rose-500',
-                'from-teal-500 to-cyan-500',
-                'from-orange-500 to-red-500'
-            ];
-            
-            loadedData.forEach((agency, index) => {
-                const div = document.createElement('div');
-                div.className = 'bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all card-hover cursor-pointer';
-                div.onclick = () => toggleAgency(agency.agency);
-                
-                const agencyPhoto = agencyImages[agency.agency] || '';
-                
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="relative">
-                            ${agencyPhoto ? 
-                                `<img src="${agencyPhoto}" alt="${agency.agency}" class="w-12 h-12 rounded-lg object-cover shadow-lg">
-                                 <div class="absolute inset-0 w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg opacity-20"></div>` :
-                                `<div class="w-12 h-12 bg-gradient-to-r ${colors[index % colors.length]} rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-store text-white"></i>
-                                 </div>`
-                            }
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-semibold text-white">${agency.agency}</h4>
-                            <p class="text-sm text-gray-400">${agency.kpis.length} KPIs • ${agency.months.length} meses</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="w-3 h-3 ${selectedAgencies.includes(agency.agency) ? 'bg-green-400 animate-pulse' : 'bg-gray-400'} rounded-full"></div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        // Actualizar checkboxes de agencias
-        function updateAgencyCheckboxes() {
-            const container = document.getElementById('agencyCheckboxes');
-            const count = document.getElementById('agencyCount');
+        // TABLA 1 - Checkboxes de agencias
+        function updateAgencyCheckboxes1() {
+            const container = document.getElementById('agencyCheckboxes1');
+            const count = document.getElementById('agencyCount1');
             
             if (!container || !count) return;
             
             container.innerHTML = '';
-            count.textContent = `Agencias (${selectedAgencies.length}/${loadedData.length})`;
+            count.textContent = `Agencias (${selectedAgencies1.length}/${loadedData.length})`;
             
             const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
             
             loadedData.forEach((agency, index) => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = selectedAgencies.includes(agency.agency);
+                checkbox.checked = selectedAgencies1.includes(agency.agency);
                 checkbox.className = 'w-4 h-4 text-red-500 bg-white/10 border-white/20 rounded focus:ring-red-500 focus:ring-2';
-                checkbox.onchange = () => toggleAgency(agency.agency);
+                checkbox.onchange = () => toggleAgency1(agency.agency);
                 
                 const imageDiv = document.createElement('div');
                 imageDiv.className = 'w-3 h-3 rounded-full';
@@ -777,28 +723,28 @@
             });
         }
         
-        // Actualizar checkboxes de meses para TABLA 1
-        function updateTable1MonthCheckboxes() {
-            const container = document.getElementById('table1MonthCheckboxes');
-            const count = document.getElementById('table1MonthCount');
+        // TABLA 1 - Checkboxes de meses
+        function updateMonthCheckboxes1() {
+            const container = document.getElementById('monthCheckboxes1');
+            const count = document.getElementById('monthCount1');
             
             if (!container || !count) return;
             
             container.innerHTML = '';
-            count.textContent = `Meses para Comparación (${table1SelectedMonths.length})`;
+            count.textContent = `Meses (${selectedMonths1.length})`;
             
             allMonths.forEach(month => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
+                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = table1SelectedMonths.includes(month);
-                checkbox.className = 'w-3 h-3 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-1';
-                checkbox.onchange = () => toggleTable1Month(month);
+                checkbox.checked = selectedMonths1.includes(month);
+                checkbox.className = 'w-4 h-4 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2';
+                checkbox.onchange = () => toggleMonth1(month);
                 
                 const span = document.createElement('span');
-                span.className = 'text-gray-300 text-xs font-medium';
+                span.className = 'text-gray-300 text-sm font-medium';
                 span.textContent = month;
                 
                 label.appendChild(checkbox);
@@ -807,39 +753,9 @@
             });
         }
         
-        // Actualizar checkboxes de meses para TABLA 2
-        function updateTable2MonthCheckboxes() {
-            const container = document.getElementById('table2MonthCheckboxes');
-            const count = document.getElementById('table2MonthCount');
-            
-            if (!container || !count) return;
-            
-            container.innerHTML = '';
-            count.textContent = `Meses para Tendencias (${table2SelectedMonths.length})`;
-            
-            allMonths.forEach(month => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = table2SelectedMonths.includes(month);
-                checkbox.className = 'w-3 h-3 text-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-500 focus:ring-1';
-                checkbox.onchange = () => toggleTable2Month(month);
-                
-                const span = document.createElement('span');
-                span.className = 'text-gray-300 text-xs font-medium';
-                span.textContent = month;
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-        }
-        
-        // Actualizar selector de agencias
-        function updateAgencySelector() {
-            const selector = document.getElementById('agencySelector');
+        // TABLA 2 - Selector de agencia
+        function updateAgencySelector2() {
+            const selector = document.getElementById('agencySelector2');
             if (!selector) return;
             
             selector.innerHTML = '<option value="">Seleccionar agencia</option>';
@@ -848,100 +764,96 @@
                 const option = document.createElement('option');
                 option.value = agency.agency;
                 option.textContent = agency.agency;
+                option.selected = selectedAgency2 === agency.agency;
                 selector.appendChild(option);
             });
         }
         
-        // FUNCIONES DE BOTONES
-        function toggleTable1Month(month) {
-            if (table1SelectedMonths.includes(month)) {
-                table1SelectedMonths = table1SelectedMonths.filter(m => m !== month);
+        // TABLA 2 - Checkboxes de meses
+        function updateMonthCheckboxes2() {
+            const container = document.getElementById('monthCheckboxes2');
+            const count = document.getElementById('monthCount2');
+            
+            if (!container || !count) return;
+            
+            container.innerHTML = '';
+            count.textContent = `Meses (${selectedMonths2.length})`;
+            
+            allMonths.forEach(month => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-2 p-2 rounded hover:bg-white/5 cursor-pointer transition-all text-sm';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedMonths2.includes(month);
+                checkbox.className = 'w-3 h-3 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-1';
+                checkbox.onchange = () => toggleMonth2(month);
+                
+                const span = document.createElement('span');
+                span.className = 'text-gray-300 text-xs font-medium';
+                span.textContent = month;
+                
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+        }
+        
+        // Toggle functions para Tabla 1
+        function toggleAgency1(agencyName) {
+            if (selectedAgencies1.includes(agencyName)) {
+                selectedAgencies1 = selectedAgencies1.filter(name => name !== agencyName);
             } else {
-                table1SelectedMonths.push(month);
+                selectedAgencies1.push(agencyName);
             }
-            updateTable1MonthCheckboxes();
-            updateStats();
-            updateTable();
+            updateAgencyCheckboxes1();
         }
         
-        function toggleTable2Month(month) {
-            if (table2SelectedMonths.includes(month)) {
-                table2SelectedMonths = table2SelectedMonths.filter(m => m !== month);
+        function toggleMonth1(month) {
+            if (selectedMonths1.includes(month)) {
+                selectedMonths1 = selectedMonths1.filter(m => m !== month);
             } else {
-                table2SelectedMonths.push(month);
+                selectedMonths1.push(month);
             }
-            updateTable2MonthCheckboxes();
-            updateStats();
-            updateTrendTable();
+            updateMonthCheckboxes1();
         }
         
-        function selectAllTable1Months() {
-            table1SelectedMonths = [...allMonths];
-            updateTable1MonthCheckboxes();
-            updateStats();
-            updateTable();
+        function selectAllAgencies(table) {
+            if (table === 1) {
+                selectedAgencies1 = loadedData.map(agency => agency.agency);
+                updateAgencyCheckboxes1();
+            }
         }
         
-        function deselectAllTable1Months() {
-            table1SelectedMonths = [];
-            updateTable1MonthCheckboxes();
-            updateStats();
-            updateTable();
+        function deselectAllAgencies(table) {
+            if (table === 1) {
+                selectedAgencies1 = [];
+                updateAgencyCheckboxes1();
+            }
         }
         
-        function selectAllTable2Months() {
-            table2SelectedMonths = [...allMonths];
-            updateTable2MonthCheckboxes();
-            updateStats();
-            updateTrendTable();
-        }
-        
-        function deselectAllTable2Months() {
-            table2SelectedMonths = [];
-            updateTable2MonthCheckboxes();
-            updateStats();
-            updateTrendTable();
-        }
-        
-        function toggleAgency(agencyName) {
-            if (selectedAgencies.includes(agencyName)) {
-                selectedAgencies = selectedAgencies.filter(name => name !== agencyName);
+        // Toggle functions para Tabla 2
+        function toggleMonth2(month) {
+            if (selectedMonths2.includes(month)) {
+                selectedMonths2 = selectedMonths2.filter(m => m !== month);
             } else {
-                selectedAgencies.push(agencyName);
+                selectedMonths2.push(month);
             }
-            updateAgencyCheckboxes();
-            updateAgenciesList();
-            updateStats();
+            updateMonthCheckboxes2();
         }
         
-        function selectAllAgencies() {
-            selectedAgencies = loadedData.map(agency => agency.agency);
-            updateAgencyCheckboxes();
-            updateAgenciesList();
-            updateStats();
-        }
-        
-        function deselectAllAgencies() {
-            selectedAgencies = [];
-            updateAgencyCheckboxes();
-            updateAgenciesList();
-            updateStats();
-        }
-        
-        function updateAnalysis() {
-            if (selectedAgencies.length === 0) {
-                showStatus('error', 'Selecciona al menos una agencia');
-                return;
+        function selectAllMonths(table) {
+            if (table === 2) {
+                selectedMonths2 = [...allMonths];
+                updateMonthCheckboxes2();
             }
-            updateTable();
-            updateTrendTable();
-            showStatus('success', `Análisis actualizado: ${selectedAgencies.length} agencias`);
         }
         
-        function refreshData() {
-            sessionStorage.removeItem('daytonaDashboardData');
-            showStatus('loading', 'Refrescando datos...');
-            setTimeout(connectToAPI, 500);
+        function deselectAllMonths(table) {
+            if (table === 2) {
+                selectedMonths2 = [];
+                updateMonthCheckboxes2();
+            }
         }
         
         // Actualizar estadísticas
@@ -951,30 +863,39 @@
             const totalPeriodsEl = document.getElementById('totalPeriods');
             
             if (totalKPIsEl) totalKPIsEl.textContent = allKPIs.length;
-            if (totalAgenciesEl) totalAgenciesEl.textContent = selectedAgencies.length;
-            if (totalPeriodsEl) totalPeriodsEl.textContent = Math.max(table1SelectedMonths.length, table2SelectedMonths.length);
+            if (totalAgenciesEl) totalAgenciesEl.textContent = loadedData.length;
+            if (totalPeriodsEl) totalPeriodsEl.textContent = allMonths.length;
         }
         
-        // TABLA 1: Actualizar tabla de comparación
-        function updateTable() {
-            if (!loadedData || selectedAgencies.length === 0 || table1SelectedMonths.length === 0) {
-                const headerRow = document.getElementById('tableHeader');
-                const tableBody = document.getElementById('tableBody');
-                if (headerRow && tableBody) {
-                    headerRow.innerHTML = '<th class="px-3 py-4 text-center text-gray-400 bg-gray-800" colspan="100%">Selecciona agencias y meses para comparar</th>';
-                    tableBody.innerHTML = '';
+        // TABLA 1: Actualizar tabla de comparación entre agencias
+        function updateTable1() {
+            if (!loadedData || selectedAgencies1.length === 0 || selectedMonths1.length === 0) {
+                const headerRow = document.getElementById('tableHeader1');
+                const tableBody = document.getElementById('tableBody1');
+                
+                if (headerRow) {
+                    headerRow.innerHTML = `
+                        <th class="px-3 py-4 text-center text-gray-400 bg-gray-800" colspan="100%">
+                            <div class="flex items-center justify-center space-x-2">
+                                <i class="fas fa-info-circle text-lg"></i>
+                                <span>Selecciona al menos una agencia y un mes para ver la comparación</span>
+                            </div>
+                        </th>
+                    `;
                 }
+                if (tableBody) tableBody.innerHTML = '';
                 return;
             }
             
-            const headerRow = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
+            const headerRow = document.getElementById('tableHeader1');
+            const tableBody = document.getElementById('tableBody1');
             
             if (!headerRow || !tableBody) return;
             
             const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6', '#f97316'];
-            const filteredData = loadedData.filter(agency => selectedAgencies.includes(agency.agency));
+            const filteredData = loadedData.filter(agency => selectedAgencies1.includes(agency.agency));
             
+            // Header con nombres en blanco
             headerRow.innerHTML = `
                 <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
                     KPI
@@ -994,8 +915,9 @@
             
             tableBody.innerHTML = '';
             
+            // Mostrar todos los KPIs
             allKPIs.forEach(kpiName => {
-                table1SelectedMonths.forEach((month, monthIndex) => {
+                selectedMonths1.forEach((month, monthIndex) => {
                     const row = document.createElement('tr');
                     row.className = `${monthIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition-colors`;
                     
@@ -1026,33 +948,22 @@
             });
         }
         
-        // TABLA 2: Actualizar tabla de tendencias
-        function updateTrendTable() {
-            const selectedAgency = document.getElementById('agencySelector').value;
-            const headerRow = document.getElementById('trendTableHeader');
-            const tableBody = document.getElementById('trendTableBody');
+        // TABLA 2: Actualizar tabla de tendencias por agencia
+        function updateTable2() {
+            const selectedAgency = document.getElementById('agencySelector2').value;
+            selectedAgency2 = selectedAgency;
+            
+            const headerRow = document.getElementById('tableHeader2');
+            const tableBody = document.getElementById('tableBody2');
             
             if (!headerRow || !tableBody) return;
             
-            if (!selectedAgency) {
+            if (!selectedAgency || selectedMonths2.length === 0) {
                 headerRow.innerHTML = `
                     <th class="px-3 py-4 text-center text-gray-400 bg-gray-800" colspan="100%">
                         <div class="flex items-center justify-center space-x-2">
-                            <i class="fas fa-arrow-up text-lg"></i>
-                            <span>Selecciona una agencia arriba para ver su evolución mensual</span>
-                        </div>
-                    </th>
-                `;
-                tableBody.innerHTML = '';
-                return;
-            }
-            
-            if (table2SelectedMonths.length === 0) {
-                headerRow.innerHTML = `
-                    <th class="px-3 py-4 text-center text-gray-400 bg-gray-800" colspan="100%">
-                        <div class="flex items-center justify-center space-x-2">
-                            <i class="fas fa-calendar text-lg"></i>
-                            <span>Selecciona meses arriba para ver tendencias</span>
+                            <i class="fas fa-info-circle text-lg"></i>
+                            <span>Selecciona una agencia y al menos un mes para ver las tendencias</span>
                         </div>
                     </th>
                 `;
@@ -1063,11 +974,12 @@
             const agencyData = loadedData.find(agency => agency.agency === selectedAgency);
             if (!agencyData) return;
             
+            // Header con meses seleccionados + columna de promedio
             headerRow.innerHTML = `
                 <th class="px-3 py-4 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-800 sticky top-0 border-b border-gray-200 z-30">
                     KPI
                 </th>
-                ${table2SelectedMonths.map(month => 
+                ${selectedMonths2.map(month => 
                     `<th class="px-3 py-4 text-center text-xs font-bold text-white uppercase tracking-wider bg-blue-600/60 sticky top-0 border-b border-gray-200 z-30">
                         ${month}
                     </th>`
@@ -1082,17 +994,21 @@
             
             tableBody.innerHTML = '';
             
+            // Procesar cada KPI
             agencyData.kpis.forEach((kpi, kpiIndex) => {
                 const row = document.createElement('tr');
                 row.className = `${kpiIndex % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition-colors`;
                 
-                const monthlyValues = table2SelectedMonths.map(month => kpi[month] || 0);
+                // Obtener valores para meses seleccionados
+                const monthlyValues = selectedMonths2.map(month => kpi[month] || 0);
                 const firstValue = monthlyValues[0];
                 const lastValue = monthlyValues[monthlyValues.length - 1];
                 
+                // Calcular promedio
                 const validValues = monthlyValues.filter(val => val > 0);
                 const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length) : 0;
                 
+                // Calcular tendencia
                 let trendIcon = '';
                 let trendClass = '';
                 let trendText = '';
@@ -1113,10 +1029,12 @@
                     trendText = '0%';
                 }
                 
+                // Encontrar el valor máximo para highlighting
                 const maxValue = Math.max(...monthlyValues);
                 
                 let rowHTML = `<td class="px-3 py-3 text-sm font-semibold text-white">${kpi.name}</td>`;
                 
+                // Columnas de meses
                 monthlyValues.forEach(value => {
                     const isHighest = value > 0 && value === maxValue && monthlyValues.filter(v => v === maxValue).length === 1;
                     rowHTML += `<td class="px-3 py-3 text-center">
@@ -1126,12 +1044,14 @@
                     </td>`;
                 });
                 
+                // Columna de promedio
                 rowHTML += `<td class="px-3 py-3 text-center">
                     <span class="text-sm font-bold text-purple-300 bg-purple-500/20 px-2 py-1 rounded-lg">
                         ${average.toFixed(0)}
                     </span>
                 </td>`;
                 
+                // Columna de tendencia
                 rowHTML += `<td class="px-3 py-3 text-center">
                     <span class="inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-bold ${trendClass}">
                         ${trendIcon}
@@ -1174,23 +1094,27 @@
             statusDiv.classList.remove('hidden');
         }
         
-        // Inicialización
+        // Inicialización con conexión automática
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard cargado');
+            console.log('✅ Dashboard completamente cargado');
             
+            // Cargar datos de sesión si existen (como fallback inmediato)
             const savedData = sessionStorage.getItem('daytonaDashboardData');
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
+                    console.log('📱 Datos encontrados en sesión, mostrando...');
                     displayResults(data);
-                    showStatus('success', `Datos cargados: ${data.length} agencias`);
+                    showStatus('success', `Datos cargados desde sesión: ${data.length} agencias`);
                     updateConnectionStatus(`Datos en sesión: ${data.length} agencias`, true);
                 } catch (error) {
-                    console.log('Error cargando sesión:', error);
+                    console.log('❌ Error cargando sesión:', error);
                 }
             }
             
+            // Intentar conexión automática a la API después de un momento
             setTimeout(() => {
+                console.log('🚀 Iniciando conexión automática a Google Sheets...');
                 connectToAPI();
             }, 1000);
         });
