@@ -97,6 +97,11 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-3">
+                    <a href="https://daytonanuevos.github.io/daytona-nuevos-kpis/" target="_blank" 
+                       class="hidden md:flex items-center space-x-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all">
+                        <i class="fas fa-external-link-alt text-sm"></i>
+                        <span class="text-sm font-medium">Dashboard Nuevos</span>
+                    </a>
                     <div class="hidden md:flex items-center space-x-2 text-gray-300">
                         <i class="fas fa-clock text-sm"></i>
                         <span class="text-sm" id="currentTime"></span>
@@ -191,6 +196,10 @@
                             <p class="text-gray-300">Compara KPIs entre diferentes agencias</p>
                         </div>
                     </div>
+                    <button onclick="exportTable1()" class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all flex items-center space-x-2">
+                        <i class="fas fa-download text-sm"></i>
+                        <span class="text-sm font-medium">Exportar Excel</span>
+                    </button>
                 </div>
 
                 <!-- Controles para Tabla 1 -->
@@ -257,6 +266,10 @@
                             <p class="text-gray-300">Evolución mensual de KPIs con promedio y tendencias</p>
                         </div>
                     </div>
+                    <button onclick="exportTable2()" class="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all flex items-center space-x-2">
+                        <i class="fas fa-download text-sm"></i>
+                        <span class="text-sm font-medium">Exportar Análisis</span>
+                    </button>
                 </div>
 
                 <!-- Controles para Tabla 2 -->
@@ -472,88 +485,6 @@
             try {
                 // Obtener metadata del spreadsheet REAL
                 const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
-                console.log('📡 URL Metadata:', metadataUrl);
-                
-                const metadataResponse = await fetch(metadataUrl);
-                
-                if (!metadataResponse.ok) {
-                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
-                }
-                
-                const metadata = await metadataResponse.json();
-                console.log('📊 Metadata recibida:', metadata);
-                
-                const sheets = metadata.sheets || [];
-                const sheetNames = sheets.map(sheet => sheet.properties.title);
-                console.log('📋 Hojas encontradas:', sheetNames);
-                
-                // Agencias esperadas (9 agencias)
-                const expectedAgencies = [
-                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
-                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
-                ];
-                
-                // Buscar hojas válidas
-                const validSheets = sheetNames.filter(name => 
-                    expectedAgencies.includes(name) || 
-                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
-                );
-                
-                console.log('✅ Hojas válidas encontradas:', validSheets);
-                
-                if (validSheets.length === 0) {
-                    throw new Error(`No se encontraron hojas de agencias.`);
-                }
-                
-                // Procesar cada hoja
-                const loadedAgencies = [];
-                
-                for (const sheetName of validSheets) {
-                    try {
-                        console.log(`📊 Procesando hoja: ${sheetName}`);
-                        
-                        const range = `${sheetName}!A:Z`;
-                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-                        
-                        const dataResponse = await fetch(dataUrl);
-                        if (!dataResponse.ok) continue;
-                        
-                        const sheetData = await dataResponse.json();
-                        
-                        if (!sheetData.values || sheetData.values.length < 2) continue;
-                        
-                        // Procesar datos reales
-                        const processedData = processRealSheetData(sheetData.values, sheetName);
-                        if (processedData && processedData.kpis.length > 0) {
-                            loadedAgencies.push(processedData);
-                            console.log(`✅ ${sheetName} procesada correctamente`);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`❌ Error procesando ${sheetName}:`, error);
-                    }
-                }
-                
-                // Mostrar resultados
-                if (loadedAgencies.length > 0) {
-                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
-                    
-                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
-                    displayResults(loadedAgencies);
-                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
-                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
-                    
-                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
-                } else {
-                    throw new Error(`No se pudieron cargar datos reales.`);
-                }
-                
-            } catch (error) {
-                console.error('❌ Error completo en API:', error);
-                showStatus('error', `Error API: ${error.message}`);
-                updateConnectionStatus('Error API - Cargando demo como respaldo...');
-                
-                // Si falla la API, cargar demo automáticamente como fallback
                 console.log('🔄 Cargando demo como fallback...');
                 setTimeout(() => {
                     showStatus('loading', 'API no disponible, cargando datos de demostración...');
@@ -1064,6 +995,113 @@
             });
         }
         
+        // FUNCIÓN NUEVA: Exportar Tabla 1
+        function exportTable1() {
+            if (!loadedData || selectedAgencies1.length === 0 || selectedMonths1.length === 0) {
+                alert('No hay datos para exportar. Asegúrate de tener agencias y meses seleccionados en la Tabla 1.');
+                return;
+            }
+            
+            console.log('📊 Exportando Tabla 1...');
+            
+            const exportData = [];
+            const filteredData = loadedData.filter(agency => selectedAgencies1.includes(agency.agency));
+            
+            // Header row
+            const headerRow = ['KPI', 'Período', ...filteredData.map(agency => agency.agency)];
+            exportData.push(headerRow);
+            
+            // Data rows
+            allKPIs.forEach(kpiName => {
+                selectedMonths1.forEach(month => {
+                    const row = [kpiName, month];
+                    
+                    filteredData.forEach(agency => {
+                        const kpi = agency.kpis.find(k => k.name === kpiName);
+                        const value = kpi ? (kpi[month] || 0) : 0;
+                        row.push(value);
+                    });
+                    
+                    exportData.push(row);
+                });
+            });
+            
+            downloadCSV(exportData, 'Daytona_Comparacion_Agencias');
+            
+            setTimeout(() => {
+                alert(`✅ Tabla de Comparación exportada!\n\n📊 ${exportData.length - 1} filas de datos\n🏢 ${selectedAgencies1.length} agencias\n📅 ${selectedMonths1.length} meses`);
+            }, 500);
+        }
+        
+        // FUNCIÓN NUEVA: Exportar Tabla 2
+        function exportTable2() {
+            if (!selectedAgency2 || selectedMonths2.length === 0) {
+                alert('Selecciona una agencia y meses para exportar el análisis de tendencias.');
+                return;
+            }
+            
+            console.log('📊 Exportando Tabla 2...');
+            
+            const agencyData = loadedData.find(agency => agency.agency === selectedAgency2);
+            if (!agencyData) return;
+            
+            const exportData = [];
+            
+            // Header row
+            const headerRow = ['KPI', ...selectedMonths2, 'Promedio', 'Tendencia'];
+            exportData.push(headerRow);
+            
+            // Data rows
+            agencyData.kpis.forEach(kpi => {
+                const monthlyValues = selectedMonths2.map(month => kpi[month] || 0);
+                const validValues = monthlyValues.filter(val => val > 0);
+                const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(0) : 0;
+                
+                // Calcular tendencia
+                const firstValue = monthlyValues[0];
+                const lastValue = monthlyValues[monthlyValues.length - 1];
+                let trendText = 'Estable';
+                
+                if (lastValue > firstValue && firstValue > 0) {
+                    const increase = ((lastValue - firstValue) / firstValue * 100).toFixed(1);
+                    trendText = `Creciente +${increase}%`;
+                } else if (lastValue < firstValue && firstValue > 0) {
+                    const decrease = ((firstValue - lastValue) / firstValue * 100).toFixed(1);
+                    trendText = `Decreciente -${decrease}%`;
+                }
+                
+                const row = [kpi.name, ...monthlyValues, average, trendText];
+                exportData.push(row);
+            });
+            
+            const agencyName = selectedAgency2.replace(/\s+/g, '_');
+            downloadCSV(exportData, `Daytona_${agencyName}_Tendencias`);
+            
+            setTimeout(() => {
+                alert(`✅ Análisis de Tendencias exportado!\n\n🏢 Agencia: ${selectedAgency2}\n📊 ${exportData.length - 1} KPIs\n📅 ${selectedMonths2.length} meses\n📈 Con promedios y tendencias`);
+            }, 500);
+        }
+        
+        // FUNCIÓN AUXILIAR: Descargar CSV
+        function downloadCSV(data, filename) {
+            const csvContent = data.map(row => 
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+            
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            
+            const currentDate = new Date().toISOString().split('T')[0];
+            link.setAttribute('download', `${filename}_${currentDate}.csv`);
+            
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
         // Funciones de estado
         function showStatus(type, message) {
             const statusDiv = document.getElementById('status');
@@ -1120,4 +1158,86 @@
         });
     </script>
 </body>
-</html>
+</html>.log('📡 URL Metadata:', metadataUrl);
+                
+                const metadataResponse = await fetch(metadataUrl);
+                
+                if (!metadataResponse.ok) {
+                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
+                }
+                
+                const metadata = await metadataResponse.json();
+                console.log('📊 Metadata recibida:', metadata);
+                
+                const sheets = metadata.sheets || [];
+                const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('📋 Hojas encontradas:', sheetNames);
+                
+                // Agencias esperadas (9 agencias)
+                const expectedAgencies = [
+                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
+                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
+                ];
+                
+                // Buscar hojas válidas
+                const validSheets = sheetNames.filter(name => 
+                    expectedAgencies.includes(name) || 
+                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                );
+                
+                console.log('✅ Hojas válidas encontradas:', validSheets);
+                
+                if (validSheets.length === 0) {
+                    throw new Error(`No se encontraron hojas de agencias.`);
+                }
+                
+                // Procesar cada hoja
+                const loadedAgencies = [];
+                
+                for (const sheetName of validSheets) {
+                    try {
+                        console.log(`📊 Procesando hoja: ${sheetName}`);
+                        
+                        const range = `${sheetName}!A:Z`;
+                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+                        
+                        const dataResponse = await fetch(dataUrl);
+                        if (!dataResponse.ok) continue;
+                        
+                        const sheetData = await dataResponse.json();
+                        
+                        if (!sheetData.values || sheetData.values.length < 2) continue;
+                        
+                        // Procesar datos reales
+                        const processedData = processRealSheetData(sheetData.values, sheetName);
+                        if (processedData && processedData.kpis.length > 0) {
+                            loadedAgencies.push(processedData);
+                            console.log(`✅ ${sheetName} procesada correctamente`);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`❌ Error procesando ${sheetName}:`, error);
+                    }
+                }
+                
+                // Mostrar resultados
+                if (loadedAgencies.length > 0) {
+                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                    
+                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
+                    displayResults(loadedAgencies);
+                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
+                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
+                    
+                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
+                } else {
+                    throw new Error(`No se pudieron cargar datos reales.`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error completo en API:', error);
+                showStatus('error', `Error API: ${error.message}`);
+                updateConnectionStatus('Error API - Cargando demo como respaldo...');
+                
+                // Si falla la API, cargar demo automáticamente como fallback
+                console
