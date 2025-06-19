@@ -485,6 +485,88 @@
             try {
                 // Obtener metadata del spreadsheet REAL
                 const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
+                console.log('📡 URL Metadata:', metadataUrl);
+                
+                const metadataResponse = await fetch(metadataUrl);
+                
+                if (!metadataResponse.ok) {
+                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
+                }
+                
+                const metadata = await metadataResponse.json();
+                console.log('📊 Metadata recibida:', metadata);
+                
+                const sheets = metadata.sheets || [];
+                const sheetNames = sheets.map(sheet => sheet.properties.title);
+                console.log('📋 Hojas encontradas:', sheetNames);
+                
+                // Agencias esperadas (9 agencias)
+                const expectedAgencies = [
+                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
+                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
+                ];
+                
+                // Buscar hojas válidas
+                const validSheets = sheetNames.filter(name => 
+                    expectedAgencies.includes(name) || 
+                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
+                );
+                
+                console.log('✅ Hojas válidas encontradas:', validSheets);
+                
+                if (validSheets.length === 0) {
+                    throw new Error(`No se encontraron hojas de agencias.`);
+                }
+                
+                // Procesar cada hoja
+                const loadedAgencies = [];
+                
+                for (const sheetName of validSheets) {
+                    try {
+                        console.log(`📊 Procesando hoja: ${sheetName}`);
+                        
+                        const range = `${sheetName}!A:Z`;
+                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+                        
+                        const dataResponse = await fetch(dataUrl);
+                        if (!dataResponse.ok) continue;
+                        
+                        const sheetData = await dataResponse.json();
+                        
+                        if (!sheetData.values || sheetData.values.length < 2) continue;
+                        
+                        // Procesar datos reales
+                        const processedData = processRealSheetData(sheetData.values, sheetName);
+                        if (processedData && processedData.kpis.length > 0) {
+                            loadedAgencies.push(processedData);
+                            console.log(`✅ ${sheetName} procesada correctamente`);
+                        }
+                        
+                    } catch (error) {
+                        console.error(`❌ Error procesando ${sheetName}:`, error);
+                    }
+                }
+                
+                // Mostrar resultados
+                if (loadedAgencies.length > 0) {
+                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
+                    
+                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
+                    displayResults(loadedAgencies);
+                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
+                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
+                    
+                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
+                } else {
+                    throw new Error(`No se pudieron cargar datos reales.`);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error completo en API:', error);
+                showStatus('error', `Error API: ${error.message}`);
+                updateConnectionStatus('Error API - Cargando demo como respaldo...');
+                
+                // Si falla la API, cargar demo automáticamente como fallback
                 console.log('🔄 Cargando demo como fallback...');
                 setTimeout(() => {
                     showStatus('loading', 'API no disponible, cargando datos de demostración...');
@@ -1158,86 +1240,4 @@
         });
     </script>
 </body>
-</html>.log('📡 URL Metadata:', metadataUrl);
-                
-                const metadataResponse = await fetch(metadataUrl);
-                
-                if (!metadataResponse.ok) {
-                    throw new Error(`Error API: ${metadataResponse.status} - ${metadataResponse.statusText}`);
-                }
-                
-                const metadata = await metadataResponse.json();
-                console.log('📊 Metadata recibida:', metadata);
-                
-                const sheets = metadata.sheets || [];
-                const sheetNames = sheets.map(sheet => sheet.properties.title);
-                console.log('📋 Hojas encontradas:', sheetNames);
-                
-                // Agencias esperadas (9 agencias)
-                const expectedAgencies = [
-                    'Honda Cuajimalpa', 'Honda Interlomas', 'KIA Interlomas', 'KIA Iztapalapa', 
-                    'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'GWM Iztapalapa', 'GWM Morelos'
-                ];
-                
-                // Buscar hojas válidas
-                const validSheets = sheetNames.filter(name => 
-                    expectedAgencies.includes(name) || 
-                    expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
-                );
-                
-                console.log('✅ Hojas válidas encontradas:', validSheets);
-                
-                if (validSheets.length === 0) {
-                    throw new Error(`No se encontraron hojas de agencias.`);
-                }
-                
-                // Procesar cada hoja
-                const loadedAgencies = [];
-                
-                for (const sheetName of validSheets) {
-                    try {
-                        console.log(`📊 Procesando hoja: ${sheetName}`);
-                        
-                        const range = `${sheetName}!A:Z`;
-                        const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-                        
-                        const dataResponse = await fetch(dataUrl);
-                        if (!dataResponse.ok) continue;
-                        
-                        const sheetData = await dataResponse.json();
-                        
-                        if (!sheetData.values || sheetData.values.length < 2) continue;
-                        
-                        // Procesar datos reales
-                        const processedData = processRealSheetData(sheetData.values, sheetName);
-                        if (processedData && processedData.kpis.length > 0) {
-                            loadedAgencies.push(processedData);
-                            console.log(`✅ ${sheetName} procesada correctamente`);
-                        }
-                        
-                    } catch (error) {
-                        console.error(`❌ Error procesando ${sheetName}:`, error);
-                    }
-                }
-                
-                // Mostrar resultados
-                if (loadedAgencies.length > 0) {
-                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
-                    
-                    sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
-                    displayResults(loadedAgencies);
-                    showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
-                    updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
-                    
-                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
-                } else {
-                    throw new Error(`No se pudieron cargar datos reales.`);
-                }
-                
-            } catch (error) {
-                console.error('❌ Error completo en API:', error);
-                showStatus('error', `Error API: ${error.message}`);
-                updateConnectionStatus('Error API - Cargando demo como respaldo...');
-                
-                // Si falla la API, cargar demo automáticamente como fallback
-                console
+</html>
