@@ -1039,7 +1039,7 @@
             
             const filteredData = loadedData.filter(agency => selectedAgencies1.includes(agency.agency));
             
-            // Header con nombres de agencias
+            // Header con nombres de agencias + columna de promedio
             headerRow.innerHTML = `
                 <th class="table-header-cell" style="text-align: left; width: 200px;">KPI</th>
                 <th class="table-header-cell" style="text-align: left; width: 120px;">Período</th>
@@ -1050,6 +1050,12 @@
                          </div>
                      </th>`
                 ).join('')}
+                <th class="table-header-cell" style="background: linear-gradient(135deg, rgba(147, 51, 234, 0.8), rgba(147, 51, 234, 0.6)); min-width: 100px;">
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-calculator mr-1"></i>
+                        <span>Promedio</span>
+                    </div>
+                </th>
             `;
             
             tableBody.innerHTML = '';
@@ -1064,6 +1070,10 @@
                         const kpi = agency.kpis.find(k => k.name === kpiName);
                         return kpi ? (kpi[month] || 0) : 0;
                     });
+                    
+                    // Calcular promedio
+                    const validValues = values.filter(val => val > 0);
+                    const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length) : 0;
                     
                     const maxValue = Math.max(...values);
                     
@@ -1080,6 +1090,13 @@
                             }">${value.toLocaleString()}</span>
                         </td>`;
                     });
+                    
+                    // Columna de promedio
+                    rowHTML += `<td class="table-cell">
+                        <span class="average-cell">
+                            ${average > 0 ? average.toFixed(0) : '0'}
+                        </span>
+                    </td>`;
                     
                     row.innerHTML = rowHTML;
                     tableBody.appendChild(row);
@@ -1211,8 +1228,8 @@
             const exportData = [];
             const filteredData = loadedData.filter(agency => selectedAgencies1.includes(agency.agency));
             
-            // Header row
-            const headerRow = ['KPI', 'Período', ...filteredData.map(agency => agency.agency)];
+            // Header row con columna de promedio
+            const headerRow = ['KPI', 'Período', ...filteredData.map(agency => agency.agency), 'Promedio'];
             exportData.push(headerRow);
             
             // Data rows
@@ -1220,11 +1237,18 @@
                 selectedMonths1.forEach(month => {
                     const row = [kpiName, month];
                     
+                    const values = [];
                     filteredData.forEach(agency => {
                         const kpi = agency.kpis.find(k => k.name === kpiName);
                         const value = kpi ? (kpi[month] || 0) : 0;
+                        values.push(value);
                         row.push(value);
                     });
+                    
+                    // Calcular y agregar promedio
+                    const validValues = values.filter(val => val > 0);
+                    const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(0) : 0;
+                    row.push(average);
                     
                     exportData.push(row);
                 });
@@ -1233,7 +1257,7 @@
             downloadExcel(exportData, 'Daytona_Comparacion_Agencias');
             
             setTimeout(() => {
-                alert(`✅ Tabla de Comparación exportada!\n\n📊 ${exportData.length - 1} filas de datos\n🏢 ${selectedAgencies1.length} agencias\n📅 ${selectedMonths1.length} meses`);
+                alert(`✅ Tabla de Comparación exportada!\n\n📊 ${exportData.length - 1} filas de datos\n🏢 ${selectedAgencies1.length} agencias\n📅 ${selectedMonths1.length} meses\n📈 Incluye columna de promedio`);
             }, 500);
         }
         
