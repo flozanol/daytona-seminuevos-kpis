@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard KPIs - Grupo Daytona</title>
+    <title>Dashboard KPIs Seminuevos - Grupo Daytona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
@@ -57,9 +58,10 @@
             transform: translateY(-1px);
             box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
         }
-        
+
         .scrollbar-thin::-webkit-scrollbar {
             width: 6px;
+            height: 6px;
         }
         
         .scrollbar-thin::-webkit-scrollbar-track {
@@ -71,7 +73,7 @@
             background: rgba(239, 68, 68, 0.5);
             border-radius: 3px;
         }
-        
+
         .stat-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
             backdrop-filter: blur(20px);
@@ -84,140 +86,104 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Estilos mejorados para tablas */
-        .table-container {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            overflow: hidden;
+        /* === Estilos de Tabla Unificados === */
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: auto;
         }
-
-        .table-header-cell {
-            background: linear-gradient(135deg, rgba(31, 41, 55, 0.9), rgba(55, 65, 81, 0.8));
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 1rem 0.75rem;
+        
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 10px;
             text-align: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
             position: sticky;
             top: 0;
             z-index: 20;
         }
 
-        .table-cell {
-            padding: 0.875rem 0.75rem;
-            text-align: center;
-            font-size: 0.875rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
+        td {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.75rem; /* text-xs equivalent */
         }
-
-        .table-row {
-            transition: all 0.2s ease;
-        }
-
-        .table-row:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .table-row:nth-child(even) {
+        
+        tr:nth-child(even) {
             background: rgba(255, 255, 255, 0.02);
         }
-
-        .table-row:nth-child(odd) {
-            background: rgba(255, 255, 255, 0.04);
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .kpi-name {
-            color: #ffffff;
-            font-weight: 600;
-            text-align: left;
-            padding-left: 1rem;
-        }
-
-        .period-name {
-            color: #d1d5db;
-            font-weight: 500;
-            text-align: left;
-            padding-left: 1rem;
-        }
-
-        .value-cell {
-            color: #e5e7eb;
-            font-weight: 600;
-        }
-
+        /* Colores del Promedio y Resaltado */
         .highest-value {
-            background: linear-gradient(135deg, #059669, #10b981);
-            color: #ffffff;
-            border-radius: 8px;
-            padding: 0.375rem 0.75rem;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            font-weight: 700;
-        }
-
-        .agency-header {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(245, 158, 11, 0.6));
-            color: #ffffff;
-            font-weight: 700;
-        }
-
-        .month-header {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(16, 185, 129, 0.6));
-            color: #ffffff;
-            font-weight: 700;
-        }
-
-        .average-cell {
-            background: rgba(147, 51, 234, 0.2);
-            color: #c084fc;
-            border-radius: 6px;
-            padding: 0.375rem 0.5rem;
-            font-weight: 700;
-        }
-
-        .trend-up {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
+            background: rgba(34, 197, 94, 0.2) !important;
+            color: #22c55e !important;
             font-weight: 600;
-            font-size: 0.75rem;
+            border: 1px solid rgba(34, 197, 94, 0.3) !important;
         }
 
-        .trend-down {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
+        /* Clases para la tendencia */
+        .tendencia-roja {
+            color: #ef4444 !important; /* Rojo */
             font-weight: 600;
-            font-size: 0.75rem;
         }
 
-        .trend-stable {
-            background: rgba(107, 114, 128, 0.2);
-            color: #9ca3af;
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
+        .tendencia-amarilla {
+            color: #f59e0b !important; /* Naranja/Amarillo */
             font-weight: 600;
-            font-size: 0.75rem;
         }
 
-        .max-value-highlight {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #000000;
-            border-radius: 8px;
-            padding: 0.375rem 0.5rem;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+        .tendencia-verde {
+            color: #22c55e !important; /* Verde */
+            font-weight: 600;
+        }
+        
+        /* === Estilos para la primera columna (KPI) fija - TABLA 1 (Comparación) === */
+        #table-comparison #tableBody1 td:first-child,
+        #table-comparison #tableHeader1 th:first-child {
+            position: sticky;
+            left: 0;
+            background: rgba(15, 23, 42, 0.9); /* Fondo oscuro para visibilidad */
+            z-index: 15;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            /* Asegura que el KPI Name se vea bien */
+            font-weight: 600; 
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        #table-comparison #tableHeader1 th:first-child {
+            z-index: 25;
+        }
+        
+        /* === Estilos para la primera columna (KPI) fija - TABLA 2 (Tendencias) === */
+        #table-trends #tableBody2 td:first-child,
+        #table-trends #tableHeader2 th:first-child {
+            position: sticky;
+            left: 0;
+            background: rgba(15, 23, 42, 0.9); 
+            z-index: 15;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            /* Asegura que el KPI Name se vea bien */
+            font-weight: 600; 
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        #table-trends #tableHeader2 th:first-child {
+            z-index: 25;
         }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Navigation Bar -->
     <nav class="glass-effect border-b border-white/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
@@ -230,7 +196,7 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <a href="https://flozanol.github.io/daytona-autos-nuevos-kpis/" target="_blank" 
-                       class="hidden md:flex items-center space-x-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all">
+                        class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                         <i class="fas fa-external-link-alt text-sm"></i>
                         <span class="text-sm font-medium">Dashboard Nuevos</span>
                     </a>
@@ -247,49 +213,57 @@
     </nav>
 
     <div class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Hero Section -->
         <div class="text-center mb-12">
+            <div class="flex items-center justify-center mb-4">
+                <div class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-full text-white text-sm font-semibold mr-4">
+                    <i class="fas fa-car-side text-sm mr-2"></i>
+                    AUTOS SEMINUEVOS
+                </div>
+                <div class="text-gray-400 text-sm">
+                    <a href="https://flozanol.github.io/daytona-autos-nuevos-kpis/" 
+                        target="_blank" 
+                        class="hover:text-blue-400 transition-colors flex items-center">
+                        <i class="fas fa-exchange-alt mr-1"></i>
+                        Ver Dashboard Nuevos
+                    </a>
+                </div>
+            </div>
             <h2 class="text-5xl font-bold gradient-text mb-4">
-                Dashboard Seminuevos Daytona
+                Dashboard KPIs Seminuevos Daytona
             </h2>
             <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Análisis de KPIs
+                Análisis en tiempo real de indicadores clave de rendimiento para autos seminuevos
             </p>
         </div>
 
-        <!-- Auto-connection Status -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center space-x-3 glass-effect px-6 py-3 rounded-xl">
-                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <span class="text-green-300 font-medium" id="connectionStatus">Conectando automáticamente a Google Sheets...</span>
+            <div class="inline-flex items-center space-x-3 glass-effect px-6 py-3 rounded-xl border-l-4 border-blue-500/50">
+                <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                <span class="text-blue-300 font-medium" id="connectionStatus">Conectando automáticamente a Google Sheets...</span>
             </div>
         </div>
 
-        <!-- Manual Controls -->
         <div class="flex justify-center space-x-6 mb-12">
-            <button onclick="forceReconnect()" class="btn-secondary px-6 py-3 rounded-xl text-white font-semibold">
+            <button onclick="forceReconnect()" class="btn-secondary px-6 py-3 rounded-xl text-white font-semibold shadow-2xl">
                 <i class="fas fa-sync-alt mr-2"></i>
                 Reconectar API
             </button>
-            <button onclick="loadDemo()" class="px-6 py-3 bg-gray-500/20 text-gray-400 rounded-xl font-semibold hover:bg-gray-500/30 transition-all">
+            <button onclick="loadDemo()" class="btn-primary px-6 py-3 rounded-xl text-white font-semibold shadow-2xl">
                 <i class="fas fa-play mr-2"></i>
                 Cargar Demo
             </button>
         </div>
 
-        <!-- Status Bar -->
         <div id="status" class="hidden mb-8">
             <div class="glass-effect rounded-xl p-4 border-l-4">
                 <div class="flex items-center">
                     <i id="statusIcon" class="text-2xl mr-3"></i>
-                    <p id="statusText" class="text-lg font-medium"></p>
+                    <p id="statusText" class="text-lg font-medium text-white"></p>
                 </div>
             </div>
         </div>
 
-        <!-- Results Section -->
         <div id="results" class="hidden">
-            <!-- KPI Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="stat-card rounded-2xl p-6 text-center">
                     <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -316,7 +290,6 @@
                 </div>
             </div>
 
-            <!-- TABLA 1: Comparación entre Agencias -->
             <div class="glass-effect rounded-2xl p-8 card-hover mb-8">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
@@ -334,9 +307,7 @@
                     </button>
                 </div>
 
-                <!-- Controles para Tabla 1 -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
-                    <!-- Selección de Agencias para Tabla 1 -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <label class="text-lg font-semibold text-white flex items-center">
@@ -357,7 +328,6 @@
                         </div>
                     </div>
 
-                    <!-- Selección de Meses para Tabla 1 -->
                     <div class="space-y-4">
                         <label class="text-lg font-semibold text-white flex items-center">
                             <i class="fas fa-calendar-alt mr-2 text-green-400"></i>
@@ -376,8 +346,8 @@
                     </button>
                 </div>
                 
-                <div class="table-container max-h-96 overflow-auto scrollbar-thin">
-                    <table class="min-w-full">
+                <div class="overflow-x-auto overflow-y-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
+                    <table id="table-comparison" class="min-w-full">
                         <thead>
                             <tr id="tableHeader1"></tr>
                         </thead>
@@ -386,7 +356,6 @@
                 </div>
             </div>
 
-            <!-- TABLA 2: Tendencias por Agencia -->
             <div class="glass-effect rounded-2xl p-8 card-hover mb-8">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
@@ -404,9 +373,7 @@
                     </button>
                 </div>
 
-                <!-- Controles para Tabla 2 -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <!-- Selección de Agencia para Tabla 2 -->
                     <div class="space-y-4">
                         <label class="text-lg font-semibold text-white flex items-center">
                             <i class="fas fa-building mr-2 text-blue-400"></i>
@@ -417,7 +384,6 @@
                         </select>
                     </div>
 
-                    <!-- Selección de Meses para Tabla 2 -->
                     <div class="space-y-4 lg:col-span-2">
                         <div class="flex items-center justify-between">
                             <label class="text-lg font-semibold text-white flex items-center">
@@ -446,8 +412,8 @@
                     </button>
                 </div>
                 
-                <div class="table-container max-h-96 overflow-auto scrollbar-thin">
-                    <table class="min-w-full">
+                <div class="overflow-x-auto overflow-y-auto max-h-96 bg-white/5 border border-white/10 rounded-xl scrollbar-thin">
+                    <table id="table-trends" class="min-w-full">
                         <thead>
                             <tr id="tableHeader2"></tr>
                         </thead>
@@ -455,29 +421,31 @@
                     </table>
                 </div>
                 
-                <!-- Leyenda -->
                 <div class="mt-4 flex flex-wrap items-center justify-center space-x-6 text-xs text-gray-400">
                     <div class="flex items-center space-x-1">
-                        <div class="w-3 h-3 bg-yellow-600 rounded-full"></div>
-                        <span>Valor más alto</span>
+                        <div class="w-3 h-3 bg-green-400/50 rounded-full"></div>
+                        <span class="text-green-400 font-semibold">Valor más alto (Verde)</span>
                     </div>
                     <div class="flex items-center space-x-1">
-                        <div class="w-3 h-3 bg-purple-500/60 rounded"></div>
-                        <span>Promedio</span>
+                        <div class="w-3 h-3 bg-blue-800/50 rounded"></div>
+                        <span class="text-blue-300 font-semibold">Promedio (Azul oscuro)</span>
                     </div>
                     <div class="flex items-center space-x-1">
                         <i class="fas fa-arrow-up text-green-400"></i>
-                        <span>Crecimiento</span>
+                        <span class="text-green-400 font-semibold">Crecimiento (Verde)</span>
                     </div>
                     <div class="flex items-center space-x-1">
                         <i class="fas fa-arrow-down text-red-400"></i>
-                        <span>Decrecimiento</span>
+                        <span class="text-red-400 font-semibold">Decrecimiento (Rojo)</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <i class="fas fa-equals text-yellow-400"></i>
+                        <span class="text-yellow-400 font-semibold">Estable (Amarillo)</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="mt-16 text-center">
             <div class="glass-effect rounded-2xl p-6">
                 <div class="flex items-center justify-center space-x-6 text-gray-300">
@@ -517,9 +485,12 @@
         
         // API Configuration
         const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
-        const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ";
+        const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ"; // ID de seminuevos
         
-        console.log('🚀 Dashboard iniciado');
+        // Orden cronológico de meses para ordenar datos
+        const chronologicalMonthOrder = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        
+        console.log('🚀 Dashboard Seminuevos iniciado');
         
         // Actualizar reloj
         function updateClock() {
@@ -540,8 +511,22 @@
         // Actualizar estado de conexión
         function updateConnectionStatus(message, isSuccess = false) {
             const statusElement = document.getElementById('connectionStatus');
+            const statusBox = statusElement.closest('.inline-flex');
+            
             if (statusElement) {
                 statusElement.textContent = message;
+                // Ajustar colores del indicador
+                if (isSuccess) {
+                    statusBox.classList.remove('border-blue-500/50', 'border-red-500/50');
+                    statusBox.classList.add('border-green-500/50');
+                    statusBox.querySelector('.w-3.h-3').classList.remove('bg-blue-400', 'bg-red-400', 'animate-pulse');
+                    statusBox.querySelector('.w-3.h-3').classList.add('bg-green-400');
+                } else {
+                    statusBox.classList.remove('border-green-500/50', 'border-red-500/50');
+                    statusBox.classList.add('border-blue-500/50');
+                    statusBox.querySelector('.w-3.h-3').classList.remove('bg-green-400', 'bg-red-400');
+                    statusBox.querySelector('.w-3.h-3').classList.add('bg-blue-400', 'animate-pulse');
+                }
             }
         }
         
@@ -578,8 +563,7 @@
                 { name: 'GWM Morelos', base: 60 }
             ];
 
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const months = chronologicalMonthOrder;
 
             // Generar datos
             const data = agencies.map(agency => {
@@ -617,7 +601,6 @@
             try {
                 // Obtener metadata del spreadsheet REAL
                 const metadataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
-                console.log('📡 URL Metadata:', metadataUrl);
                 
                 const metadataResponse = await fetch(metadataUrl);
                 
@@ -626,11 +609,9 @@
                 }
                 
                 const metadata = await metadataResponse.json();
-                console.log('📊 Metadata recibida:', metadata);
                 
                 const sheets = metadata.sheets || [];
                 const sheetNames = sheets.map(sheet => sheet.properties.title);
-                console.log('📋 Hojas encontradas:', sheetNames);
                 
                 // Agencias esperadas (9 agencias)
                 const expectedAgencies = [
@@ -644,7 +625,6 @@
                     expectedAgencies.some(agency => name.toLowerCase().includes(agency.toLowerCase().split(' ')[0]))
                 );
                 
-                console.log('✅ Hojas válidas encontradas:', validSheets);
                 
                 if (validSheets.length === 0) {
                     throw new Error(`No se encontraron hojas de agencias.`);
@@ -655,8 +635,6 @@
                 
                 for (const sheetName of validSheets) {
                     try {
-                        console.log(`📊 Procesando hoja: ${sheetName}`);
-                        
                         const range = `${sheetName}!A:Z`;
                         const dataUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
                         
@@ -671,7 +649,6 @@
                         const processedData = processRealSheetData(sheetData.values, sheetName);
                         if (processedData && processedData.kpis.length > 0) {
                             loadedAgencies.push(processedData);
-                            console.log(`✅ ${sheetName} procesada correctamente`);
                         }
                         
                     } catch (error) {
@@ -681,14 +658,12 @@
                 
                 // Mostrar resultados
                 if (loadedAgencies.length > 0) {
-                    console.log('🎉 Datos reales cargados exitosamente:', loadedAgencies);
                     
                     sessionStorage.setItem('daytonaDashboardData', JSON.stringify(loadedAgencies));
                     displayResults(loadedAgencies);
                     showStatus('success', `Datos REALES cargados: ${loadedAgencies.length} agencias desde Google Sheets`);
                     updateConnectionStatus(`API conectada: ${loadedAgencies.length} agencias reales`, true);
                     
-                    console.log(`🎉 ¡CONEXIÓN API EXITOSA! ${loadedAgencies.length} agencias conectadas con datos REALES`);
                 } else {
                     throw new Error(`No se pudieron cargar datos reales.`);
                 }
@@ -699,7 +674,6 @@
                 updateConnectionStatus('Error API - Cargando demo como respaldo...');
                 
                 // Si falla la API, cargar demo automáticamente como fallback
-                console.log('🔄 Cargando demo como fallback...');
                 setTimeout(() => {
                     showStatus('loading', 'API no disponible, cargando datos de demostración...');
                     setTimeout(loadDemo, 1000);
@@ -718,38 +692,56 @@
                 const rows = values.slice(1);
                 
                 // Buscar columna de KPI
-                const kpiColumnIndex = headers.findIndex(header => 
+                // Buscar índice de la primera columna que contenga "KPI", "indicador" o "concepto" (o la primera si no se encuentra)
+                let kpiColumnIndex = headers.findIndex(header => 
                     header && (
                         header.toLowerCase().trim().includes('kpi') || 
                         header.toLowerCase().trim().includes('indicador') ||
                         header.toLowerCase().trim() === 'concepto'
                     )
                 );
-                
+
                 if (kpiColumnIndex === -1) {
-                    throw new Error(`No se encontró columna de KPI en ${agencyName}`);
+                    kpiColumnIndex = 0; // Por defecto, la primera columna
                 }
                 
                 // Buscar columnas de meses
-                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-                
                 const monthColumns = [];
                 headers.forEach((header, index) => {
-                    if (header && header.trim()) {
+                    if (header && header.trim() && index !== kpiColumnIndex) {
                         const normalizedHeader = header.trim().toLowerCase();
-                        const matchingMonth = monthNames.find(month => 
-                            normalizedHeader === month.toLowerCase() ||
+                        const matchingMonth = chronologicalMonthOrder.find(month => 
                             normalizedHeader.includes(month.toLowerCase())
                         );
-                        if (matchingMonth) {
-                            monthColumns.push({ name: matchingMonth, index: index });
+                        // Permitir encabezados de columna que no sean meses cronológicos (ej. 'Utilidad', 'Promedio')
+                        if (matchingMonth || !isNaN(parseFloat(header)) || (header.trim().length < 20)) {
+                             // Si es un mes cronológico, usarlo
+                            if (matchingMonth) {
+                                monthColumns.push({ name: matchingMonth, index: index });
+                            } else {
+                                // Si es otro encabezado, usar el encabezado original limpio
+                                monthColumns.push({ name: header.trim(), index: index });
+                            }
                         }
                     }
                 });
-                
+
+                // Ordenar los meses cronológicos y dejar los demás al final en su orden de aparición
+                monthColumns.sort((a, b) => {
+                    const indexA = chronologicalMonthOrder.indexOf(a.name);
+                    const indexB = chronologicalMonthOrder.indexOf(b.name);
+
+                    if (indexA > -1 && indexB > -1) {
+                        return indexA - indexB; // Ambos son meses cronológicos
+                    }
+                    if (indexA > -1) return -1; // A es cronológico, va primero
+                    if (indexB > -1) return 1; // B es cronológico, va primero
+
+                    return a.index - b.index; // Ambos no son cronológicos, ordenar por índice de columna
+                });
+
                 if (monthColumns.length === 0) {
-                    throw new Error(`No se encontraron columnas de meses en ${agencyName}`);
+                    throw new Error(`No se encontraron columnas de datos en ${agencyName}`);
                 }
                 
                 // Procesar KPIs
@@ -766,8 +758,10 @@
                             
                             if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
                                 const cleanValue = rawValue.toString()
-                                    .replace(/[,$%\s]/g, '')
-                                    .replace(/[^\d.-]/g, '')
+                                    .replace(/[\s\$,€£¥₹]/g, '')
+                                    .replace(/,/g, '.') // Reemplazar coma por punto para el parseo en JS (si el archivo usa coma decimal)
+                                    .replace(/[()]/g, '')
+                                    .replace(/[^\d.\-]/g, '') // Dejar solo dígitos, punto y signo negativo
                                     .trim();
                                     
                                 numericValue = parseFloat(cleanValue) || 0;
@@ -800,7 +794,19 @@
         function displayResults(data) {
             console.log('📊 Mostrando resultados...');
             loadedData = data;
-            allMonths = data[0].months;
+            
+            // Recoger todos los meses y ordenarlos cronológicamente (si aplica)
+            const uniqueMonths = new Set();
+            data.forEach(agency => agency.months.forEach(month => uniqueMonths.add(month)));
+            allMonths = Array.from(uniqueMonths).sort((a, b) => {
+                const indexA = chronologicalMonthOrder.indexOf(a);
+                const indexB = chronologicalMonthOrder.indexOf(b);
+
+                if (indexA > -1 && indexB > -1) {
+                    return indexA - indexB;
+                }
+                return 0; // Mantener orden para meses no cronológicos
+            });
             
             // Obtener KPIs únicos
             const kpiSet = new Set();
@@ -809,11 +815,11 @@
             });
             allKPIs = Array.from(kpiSet);
             
-            // Inicializar selecciones por defecto
+            // Inicializar selecciones por defecto (usando los datos reales/demo)
             selectedAgencies1 = data.slice(0, 3).map(agency => agency.agency); // Primeras 3 agencias
-            selectedMonths1 = allMonths.slice(0, 6); // Primeros 6 meses
-            selectedAgency2 = data[0].agency; // Primera agencia
-            selectedMonths2 = allMonths.slice(0, 6); // Primeros 6 meses
+            selectedMonths1 = allMonths.slice(0, Math.min(6, allMonths.length)); // Primeros 6 meses o menos
+            selectedAgency2 = data.length > 0 ? data[0].agency : ''; // Primera agencia
+            selectedMonths2 = allMonths.slice(0, Math.min(6, allMonths.length)); // Primeros 6 meses o menos
             
             // Mostrar sección
             const resultsDiv = document.getElementById('results');
@@ -845,20 +851,20 @@
             
             loadedData.forEach((agency, index) => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = selectedAgencies1.includes(agency.agency);
                 checkbox.className = 'w-4 h-4 text-red-500 bg-white/10 border-white/20 rounded focus:ring-red-500 focus:ring-2';
-                checkbox.onchange = () => toggleAgency1(agency.agency);
+                checkbox.onchange = () => { toggleAgency1(agency.agency); updateTable1(); };
                 
                 const imageDiv = document.createElement('div');
                 imageDiv.className = 'w-3 h-3 rounded-full';
                 imageDiv.style.backgroundColor = colors[index % colors.length];
                 
                 const span = document.createElement('span');
-                span.className = 'text-gray-300 text-sm font-medium';
+                span.className = 'text-gray-300 font-medium';
                 span.textContent = agency.agency;
                 
                 label.appendChild(checkbox);
@@ -880,16 +886,16 @@
             
             allMonths.forEach(month => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all';
+                label.className = 'flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all text-sm';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = selectedMonths1.includes(month);
                 checkbox.className = 'w-4 h-4 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-2';
-                checkbox.onchange = () => toggleMonth1(month);
+                checkbox.onchange = () => { toggleMonth1(month); updateTable1(); };
                 
                 const span = document.createElement('span');
-                span.className = 'text-gray-300 text-sm font-medium';
+                span.className = 'text-gray-300 font-medium';
                 span.textContent = month;
                 
                 label.appendChild(checkbox);
@@ -926,16 +932,16 @@
             
             allMonths.forEach(month => {
                 const label = document.createElement('label');
-                label.className = 'flex items-center space-x-2 p-2 rounded hover:bg-white/5 cursor-pointer transition-all text-sm';
+                label.className = 'flex items-center space-x-2 p-2 rounded hover:bg-white/5 cursor-pointer transition-all text-xs';
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = selectedMonths2.includes(month);
                 checkbox.className = 'w-3 h-3 text-green-500 bg-white/10 border-white/20 rounded focus:ring-green-500 focus:ring-1';
-                checkbox.onchange = () => toggleMonth2(month);
+                checkbox.onchange = () => { toggleMonth2(month); updateTable2(); };
                 
                 const span = document.createElement('span');
-                span.className = 'text-gray-300 text-xs font-medium';
+                span.className = 'text-gray-300 font-medium';
                 span.textContent = month;
                 
                 label.appendChild(checkbox);
@@ -951,7 +957,6 @@
             } else {
                 selectedAgencies1.push(agencyName);
             }
-            updateAgencyCheckboxes1();
         }
         
         function toggleMonth1(month) {
@@ -960,13 +965,13 @@
             } else {
                 selectedMonths1.push(month);
             }
-            updateMonthCheckboxes1();
         }
         
         function selectAllAgencies(table) {
             if (table === 1) {
                 selectedAgencies1 = loadedData.map(agency => agency.agency);
                 updateAgencyCheckboxes1();
+                updateTable1();
             }
         }
         
@@ -974,6 +979,7 @@
             if (table === 1) {
                 selectedAgencies1 = [];
                 updateAgencyCheckboxes1();
+                updateTable1();
             }
         }
         
@@ -984,13 +990,13 @@
             } else {
                 selectedMonths2.push(month);
             }
-            updateMonthCheckboxes2();
         }
         
         function selectAllMonths(table) {
             if (table === 2) {
                 selectedMonths2 = [...allMonths];
                 updateMonthCheckboxes2();
+                updateTable2();
             }
         }
         
@@ -998,6 +1004,7 @@
             if (table === 2) {
                 selectedMonths2 = [];
                 updateMonthCheckboxes2();
+                updateTable2();
             }
         }
         
@@ -1020,8 +1027,8 @@
                 
                 if (headerRow) {
                     headerRow.innerHTML = `
-                        <th class="table-header-cell" colspan="100%">
-                            <div class="flex items-center justify-center space-x-2">
+                        <th class="table-header-cell" style="background: rgba(255, 255, 255, 0.1);" colspan="100%">
+                            <div class="flex items-center justify-center space-x-2 text-gray-400 font-medium">
                                 <i class="fas fa-info-circle text-lg"></i>
                                 <span>Selecciona al menos una agencia y un mes para ver la comparación</span>
                             </div>
@@ -1041,16 +1048,16 @@
             
             // Header con nombres de agencias + columna de promedio
             headerRow.innerHTML = `
-                <th class="table-header-cell" style="text-align: left; width: 200px;">KPI</th>
-                <th class="table-header-cell" style="text-align: left; width: 120px;">Período</th>
+                <th class="table-header-cell" style="width: 200px;">KPI</th>
+                <th class="table-header-cell" style="width: 120px;">Período</th>
                 ${filteredData.map((agency, index) => 
-                    `<th class="table-header-cell agency-header" style="min-width: 120px;">
-                         <div class="flex items-center justify-center">
+                    `<th class="table-header-cell" style="min-width: 120px; background: rgba(255, 255, 255, 0.1);">
+                        <div class="flex items-center justify-center">
                             <span class="text-white font-semibold text-xs leading-tight">${agency.agency}</span>
-                         </div>
-                     </th>`
+                        </div>
+                    </th>`
                 ).join('')}
-                <th class="table-header-cell" style="background: linear-gradient(135deg, rgba(147, 51, 234, 0.8), rgba(147, 51, 234, 0.6)); min-width: 100px;">
+                <th class="table-header-cell" style="background: rgba(59, 130, 246, 0.5); min-width: 100px;">
                     <div class="flex items-center justify-center">
                         <i class="fas fa-calculator mr-1"></i>
                         <span>Promedio</span>
@@ -1078,23 +1085,24 @@
                     const maxValue = Math.max(...values);
                     
                     let rowHTML = `
-                        <td class="table-cell kpi-name">${kpiName}</td>
-                        <td class="table-cell period-name">${month}</td>
+                        <td class="table-cell font-medium text-left">${kpiName}</td>
+                        <td class="table-cell">${month}</td>
                     `;
                     
                     values.forEach((value, index) => {
-                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue;
+                        const isHighest = filteredData.length > 1 && value > 0 && value === maxValue && values.filter(v => v === maxValue).length === 1;
+                        // Usar la clase unificada 'highest-value'
                         rowHTML += `<td class="table-cell">
-                            <span class="value-cell ${
-                                isHighest ? 'highest-value' : ''
-                            }">${value.toLocaleString()}</span>
+                            <span class="${
+                                isHighest ? 'highest-value' : 'value-cell'
+                            }">${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>
                         </td>`;
                     });
                     
-                    // Columna de promedio
-                    rowHTML += `<td class="table-cell">
-                        <span class="average-cell">
-                            ${average > 0 ? average.toFixed(0) : '0'}
+                    // Columna de promedio (Usando el estilo de Autos Nuevos)
+                    rowHTML += `<td class="table-cell bg-blue-800/50">
+                        <span class="font-bold text-white">
+                            ${average > 0 ? average.toFixed(0) : 'N/A'}
                         </span>
                     </td>`;
                     
@@ -1116,8 +1124,8 @@
             
             if (!selectedAgency || selectedMonths2.length === 0) {
                 headerRow.innerHTML = `
-                    <th class="table-header-cell" colspan="100%">
-                        <div class="flex items-center justify-center space-x-2">
+                    <th class="table-header-cell" style="background: rgba(255, 255, 255, 0.1);" colspan="100%">
+                        <div class="flex items-center justify-center space-x-2 text-gray-400 font-medium">
                             <i class="fas fa-info-circle text-lg"></i>
                             <span>Selecciona una agencia y al menos un mes para ver las tendencias</span>
                         </div>
@@ -1130,16 +1138,21 @@
             const agencyData = loadedData.find(agency => agency.agency === selectedAgency);
             if (!agencyData) return;
             
+            // Ordenar meses cronológicamente para el análisis de tendencia
+            const sortedMonths = [...selectedMonths2].sort((a, b) => {
+                return chronologicalMonthOrder.indexOf(a) - chronologicalMonthOrder.indexOf(b);
+            });
+
             // Header con meses seleccionados + columna de promedio
             headerRow.innerHTML = `
-                <th class="table-header-cell" style="text-align: left; width: 200px;">KPI</th>
-                ${selectedMonths2.map(month => 
-                    `<th class="table-header-cell month-header" style="min-width: 100px;">${month}</th>`
+                <th class="table-header-cell" style="width: 200px;">KPI</th>
+                ${sortedMonths.map(month => 
+                    `<th class="table-header-cell" style="min-width: 100px; background: rgba(255, 255, 255, 0.1);">${month}</th>`
                 ).join('')}
-                <th class="table-header-cell" style="background: linear-gradient(135deg, rgba(147, 51, 234, 0.8), rgba(147, 51, 234, 0.6)); min-width: 100px;">
+                <th class="table-header-cell" style="background: rgba(59, 130, 246, 0.5); min-width: 100px;">
                     Promedio
                 </th>
-                <th class="table-header-cell" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(16, 185, 129, 0.6)); min-width: 120px;">
+                <th class="table-header-cell" style="background: rgba(16, 185, 129, 0.5); min-width: 120px;">
                     Tendencia
                 </th>
             `;
@@ -1151,8 +1164,8 @@
                 const row = document.createElement('tr');
                 row.className = 'table-row';
                 
-                // Obtener valores para meses seleccionados
-                const monthlyValues = selectedMonths2.map(month => kpi[month] || 0);
+                // Obtener valores para meses seleccionados (en orden cronológico)
+                const monthlyValues = sortedMonths.map(month => kpi[month] || 0);
                 const firstValue = monthlyValues[0];
                 const lastValue = monthlyValues[monthlyValues.length - 1];
                 
@@ -1162,52 +1175,57 @@
                 
                 // Calcular tendencia
                 let trendIcon = '';
-                let trendClass = '';
-                let trendText = '';
+                let trendClass = 'tendencia-amarilla'; // Default: neutral/estable
+                let trendText = '0%';
+                const THRESHOLD = 5;
                 
                 if (lastValue > firstValue && firstValue > 0) {
+                    const change = ((lastValue - firstValue) / firstValue * 100);
                     trendIcon = '<i class="fas fa-arrow-up"></i>';
-                    trendClass = 'trend-up';
-                    const increase = ((lastValue - firstValue) / firstValue * 100).toFixed(1);
-                    trendText = `+${increase}%`;
+                    trendText = `+${change.toFixed(1)}%`;
+
+                    if (change > THRESHOLD) {
+                        trendClass = 'tendencia-verde';
+                    } else {
+                        trendClass = 'tendencia-amarilla';
+                    }
                 } else if (lastValue < firstValue && firstValue > 0) {
+                    const change = ((firstValue - lastValue) / firstValue * 100);
                     trendIcon = '<i class="fas fa-arrow-down"></i>';
-                    trendClass = 'trend-down';
-                    const decrease = ((firstValue - lastValue) / firstValue * 100).toFixed(1);
-                    trendText = `-${decrease}%`;
+                    trendText = `-${change.toFixed(1)}%`;
+                    trendClass = 'tendencia-roja';
                 } else {
                     trendIcon = '<i class="fas fa-equals"></i>';
-                    trendClass = 'trend-stable';
                     trendText = '0%';
                 }
                 
                 // Encontrar el valor máximo para highlighting
                 const maxValue = Math.max(...monthlyValues);
                 
-                let rowHTML = `<td class="table-cell kpi-name">${kpi.name}</td>`;
+                let rowHTML = `<td class="table-cell font-medium text-left">${kpi.name}</td>`;
                 
                 // Columnas de meses
                 monthlyValues.forEach(value => {
                     const isHighest = value > 0 && value === maxValue && monthlyValues.filter(v => v === maxValue).length === 1;
                     rowHTML += `<td class="table-cell">
-                        <span class="value-cell ${
-                            isHighest ? 'max-value-highlight' : ''
-                        }">${value.toLocaleString()}</span>
+                        <span class="${
+                            isHighest ? 'highest-value' : 'value-cell'
+                        }">${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>
                     </td>`;
                 });
                 
                 // Columna de promedio
-                rowHTML += `<td class="table-cell">
-                    <span class="average-cell">
+                rowHTML += `<td class="table-cell bg-blue-800/50">
+                    <span class="font-bold text-white">
                         ${average.toFixed(0)}
                     </span>
                 </td>`;
                 
                 // Columna de tendencia
                 rowHTML += `<td class="table-cell">
-                    <span class="${trendClass}">
+                    <span class="${trendClass} flex items-center justify-center space-x-1">
                         ${trendIcon}
-                        <span>${trendText}</span>
+                        <span class="ml-1 text-xs">${trendText}</span>
                     </span>
                 </td>`;
                 
@@ -1247,17 +1265,17 @@
                     
                     // Calcular y agregar promedio
                     const validValues = values.filter(val => val > 0);
-                    const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(0) : 0;
-                    row.push(average);
+                    const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length) : 0;
+                    row.push(average.toFixed(2));
                     
                     exportData.push(row);
                 });
             });
             
-            downloadExcel(exportData, 'Daytona_Comparacion_Agencias');
+            downloadExcel(exportData, 'Daytona_Seminuevos_Comparacion_Agencias');
             
             setTimeout(() => {
-                alert(`✅ Tabla de Comparación exportada!\n\n📊 ${exportData.length - 1} filas de datos\n🏢 ${selectedAgencies1.length} agencias\n📅 ${selectedMonths1.length} meses\n📈 Incluye columna de promedio`);
+                showStatus('success', `Tabla de Comparación exportada. ${exportData.length - 1} filas.`);
             }, 500);
         }
         
@@ -1275,15 +1293,20 @@
             
             const exportData = [];
             
+            // Ordenar meses cronológicamente para la exportación
+            const sortedMonths = [...selectedMonths2].sort((a, b) => {
+                return chronologicalMonthOrder.indexOf(a) - chronologicalMonthOrder.indexOf(b);
+            });
+
             // Header row
-            const headerRow = ['KPI', ...selectedMonths2, 'Promedio', 'Tendencia'];
+            const headerRow = ['KPI', ...sortedMonths, 'Promedio', 'Tendencia'];
             exportData.push(headerRow);
             
             // Data rows
             agencyData.kpis.forEach(kpi => {
-                const monthlyValues = selectedMonths2.map(month => kpi[month] || 0);
+                const monthlyValues = sortedMonths.map(month => kpi[month] || 0);
                 const validValues = monthlyValues.filter(val => val > 0);
-                const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(0) : 0;
+                const average = validValues.length > 0 ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length) : 0;
                 
                 // Calcular tendencia
                 const firstValue = monthlyValues[0];
@@ -1298,15 +1321,15 @@
                     trendText = `Decreciente -${decrease}%`;
                 }
                 
-                const row = [kpi.name, ...monthlyValues, average, trendText];
+                const row = [kpi.name, ...monthlyValues, average.toFixed(2), trendText];
                 exportData.push(row);
             });
             
             const agencyName = selectedAgency2.replace(/\s+/g, '_');
-            downloadExcel(exportData, `Daytona_${agencyName}_Tendencias`);
+            downloadExcel(exportData, `Daytona_Seminuevos_${agencyName}_Tendencias`);
             
             setTimeout(() => {
-                alert(`✅ Análisis de Tendencias exportado!\n\n🏢 Agencia: ${selectedAgency2}\n📊 ${exportData.length - 1} KPIs\n📅 ${selectedMonths2.length} meses\n📈 Con promedios y tendencias`);
+                showStatus('success', `Análisis de Tendencias exportado de ${selectedAgency2}.`);
             }, 500);
         }
         
@@ -1358,14 +1381,12 @@
         
         // Inicialización con conexión automática
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ Dashboard completamente cargado');
             
             // Cargar datos de sesión si existen (como fallback inmediato)
             const savedData = sessionStorage.getItem('daytonaDashboardData');
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
-                    console.log('📱 Datos encontrados en sesión, mostrando...');
                     displayResults(data);
                     showStatus('success', `Datos cargados desde sesión: ${data.length} agencias`);
                     updateConnectionStatus(`Datos en sesión: ${data.length} agencias`, true);
@@ -1376,7 +1397,6 @@
             
             // Intentar conexión automática a la API después de un momento
             setTimeout(() => {
-                console.log('🚀 Iniciando conexión automática a Google Sheets...');
                 connectToAPI();
             }, 1000);
         });
