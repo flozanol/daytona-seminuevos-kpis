@@ -29,7 +29,7 @@
         
         body { font-family: 'Roboto', sans-serif; background-color: #f3f4f6; color: #1f2937; }
 
-        /* Tarjetas y Botones (Rojo Daytona) */
+        /* Tarjetas y Botones */
         .card-daytona { 
             background: white; border-radius: 0.75rem; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -46,12 +46,10 @@
         td:first-child, th:first-child { position: sticky; left: 0; z-index: 25; text-align: left; font-weight: 700; background-color: #f9fafb; border-right: 2px solid #e5e7eb; }
         th:first-child { background-color: #fd0019; color: white; } 
 
-        /* HIGHLIGHTS: Lógica de color */
+        /* HIGHLIGHTS */
         .highest-highlight { 
-            background-color: #dcfce7 !important; /* Verde Claro */
-            color: #166534 !important; /* Verde Oscuro */
-            font-weight: 800 !important;
-            border: 1px solid #86efac !important;
+            background-color: #dcfce7 !important; color: #166534 !important; 
+            font-weight: 800 !important; border: 1px solid #86efac !important;
         }
 
         .loader { border-top-color: #fd0019; -webkit-animation: spinner 1.5s linear infinite; animation: spinner 1.5s linear infinite; }
@@ -140,7 +138,7 @@
                 <div class="space-y-6">
                     <div class="card-daytona p-6"><h4 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider text-center">Variación Mensual (Grupo)</h4><div id="waterfallChart" style="height: 350px; width: 100%;"></div></div>
                     <div class="card-daytona p-6 overflow-hidden">
-                        <div class="flex justify-between items-center mb-4"><h4 class="text-sm font-bold text-gray-700">Matriz de KPIs</h4><button onclick="exportTable('globalTable', 'Daytona_Seminuevos_Global')" class="text-xs bg-green-50 text-green-700 px-3 py-1.5 rounded border border-green-200 font-bold hover:bg-green-100 transition-colors"><i class="fas fa-file-excel mr-1"></i> Excel</button></div>
+                        <div class="flex justify-between items-center mb-4"><h4 class="text-sm font-bold text-gray-700">Matriz de KPIs (Promedios Inteligentes)</h4><button onclick="exportTable('globalTable', 'Daytona_Seminuevos_Global')" class="text-xs bg-green-50 text-green-700 px-3 py-1.5 rounded border border-green-200 font-bold hover:bg-green-100 transition-colors"><i class="fas fa-file-excel mr-1"></i> Excel</button></div>
                         <div class="overflow-auto scrollbar-thin"><table id="globalTable"><thead id="globalThead"></thead><tbody id="globalTbody"></tbody></table></div>
                     </div>
                 </div>
@@ -177,20 +175,39 @@
     </div>
 
 <script>
-// --- CONFIGURACIÓN SEMINUEVOS ---
+// --- CONFIGURACIÓN ---
 const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck"; 
 const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ"; 
-
-// --- NOMBRE EXACTO DEL KPI PRINCIPAL ---
 const KPI_TARGET = 'Unidades Facturadas'; 
-
 const MONTHS_ORDER = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-// --- KPIS INVERSOS SEMINUEVOS ---
+// --- LISTAS DE LÓGICA DE NEGOCIO ---
+
+// 1. INVERSOS: Menos es Mejor (Color verde al mínimo)
 const INVERSE_KPIS = [
-    'Antigüedad Promedio', 'Antigüedad', 'Antiguedad', 'Antigûedad',
-    'Autos con más de 60 días', 'Inventario Total Unidades',
-    'Valor Total del Inventario', 'Gasto Financiero'
+    'Antigüedad', 'Antiguedad', 'Antigûedad',
+    'Autos con más de 60', 
+    'Inventario Total', 
+    'Valor Total del Inventario', 
+    'Gasto Financiero'
+];
+
+// 2. PROMEDIOS TEMPORALES: Se promedian los meses, no se suman.
+// Cualquier KPI que contenga estas palabras activará el promedio.
+const AVERAGE_KPIS = [
+    'Utilidad por auto', 'Margen', 'ROI', 'Antigüedad', 'Antiguedad', 
+    'Autos con más de 60', 'Acondicionamiento', 'Inventario', 
+    'Valor Total', 'Efectivdad', 'Cierre', 'Gasto', 'Absorción', 
+    'Asesores', 'Comisión', 'Penetración', 'Aprobación', 
+    'Monto promedio', 'Ingresos Totales F&I', '%', '$'
+];
+
+// 3. SUMA DE GRUPO: KPIs que son promedio mensual, pero se SUMAN entre agencias (Stock/Volumen)
+// Si NO está aquí pero SÍ está en AVERAGE_KPIS, se promediará entre agencias (Ratios).
+const GROUP_SUM_KPIS = [
+    'Inventario Total', 'Autos con más de 60', 
+    'Gasto Financiero', 'Ingresos Totales F&I', 
+    'Valor Total', 'Asesores'
 ];
 
 // --- ESTADO ---
@@ -211,8 +228,8 @@ async function connectToAPI() {
     try {
         const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`);
         
-        if (metaRes.status === 429) throw new Error("ERROR 429: Espera un momento (Google saturado).");
-        if (metaRes.status === 403) throw new Error("ERROR 403: Permisos. Revisa 'Compartir' en Sheets.");
+        if (metaRes.status === 429) throw new Error("ERROR 429: Demasiadas solicitudes. Esperando...");
+        if (metaRes.status === 403) throw new Error("ERROR 403: Permisos denegados. Revisa el archivo.");
         if (!metaRes.ok) throw new Error(`Error de conexión (${metaRes.status}).`);
 
         const meta = await metaRes.json();
@@ -229,9 +246,8 @@ async function connectToAPI() {
             }
         }
         if(rawData.length === 0) throw new Error("Datos vacíos");
-        
         initDashboard();
-        uiStatus('success', `Conectado: ${rawData.length} agencias.`);
+        uiStatus('success', `Conectado: ${rawData.length} agencias de Seminuevos.`);
     } catch (e) {
         console.error(e);
         uiStatus('error', 'ERROR: ' + e.message);
@@ -308,7 +324,6 @@ function calculateTopStats() {
     activeAgencies.forEach(ag => {
         agencyTotals[ag] = 0;
         const d = rawData.find(data => data.agency === ag);
-        // USAMOS EXACTAMENTE EL NOMBRE PROPORCIONADO
         const k = d?.kpis.find(kpi => kpi.name === KPI_TARGET);
         if (k) { activeMonths.forEach(m => { const val = k[m] || 0; totalSales += val; agencyTotals[ag] += val; monthTotals[m] = (monthTotals[m] || 0) + val; }); }
     });
@@ -322,6 +337,7 @@ function calculateTopStats() {
     document.getElementById('cardAvg').innerText = fmt(avg);
 }
 
+// --- RENDERIZADO CON INTELIGENCIA FINANCIERA ---
 function renderTable1_Global() {
     const thead = document.getElementById('globalThead'); const tbody = document.getElementById('globalTbody'); thead.innerHTML = ''; tbody.innerHTML = '';
     let htmlHead = `<tr><th>KPI</th>`; activeAgencies.forEach(a => htmlHead += `<th>${a}</th>`); htmlHead += `<th style="background-color:#1f2937;">Total</th><th style="background-color:#1f2937;">Prom.</th><th>Tend.</th></tr>`; thead.innerHTML = htmlHead;
@@ -329,22 +345,59 @@ function renderTable1_Global() {
     
     allKpis.forEach(kpiName => {
         const isInverse = INVERSE_KPIS.some(inv => kpiName.includes(inv));
+        // Checar si es KPI de Promedio
+        const isAverageKPI = AVERAGE_KPIS.some(avg => kpiName.includes(avg));
+        // Checar si se debe sumar en grupo (Inventario) o promediar (Porcentaje)
+        const isGroupSum = GROUP_SUM_KPIS.some(gs => kpiName.includes(gs));
+
         let tr = document.createElement('tr'); tr.innerHTML = `<td class="font-medium text-gray-900">${kpiName}</td>`;
         let rowTotal = 0; let validAgencies = 0; let startVal = 0, endVal = 0; const valsForHighlight = [];
         
         activeAgencies.forEach((ag) => {
             const data = rawData.find(d => d.agency === ag); const kpiObj = data?.kpis.find(k => k.name === kpiName);
-            let sum = 0; if (kpiObj) { activeMonths.forEach(m => sum += (kpiObj[m] || 0)); startVal += (kpiObj[activeMonths[0]] || 0); endVal += (kpiObj[activeMonths[activeMonths.length-1]] || 0); }
-            rowTotal += sum; validAgencies++; valsForHighlight.push(sum); tr.innerHTML += `<td>${fmt(sum)}</td>`;
+            let sum = 0; let count = 0;
+            if (kpiObj) { 
+                activeMonths.forEach(m => { 
+                    const v = (kpiObj[m] || 0); 
+                    sum += v; 
+                    if(v !== 0) count++; // Contamos meses con dato
+                }); 
+                startVal += (kpiObj[activeMonths[0]] || 0); 
+                endVal += (kpiObj[activeMonths[activeMonths.length-1]] || 0); 
+            }
+            
+            // LÓGICA DE CELDA: ¿Suma o Promedio?
+            let cellValue = sum;
+            if (isAverageKPI && count > 0) {
+                cellValue = sum / count;
+            } else if (isAverageKPI && count === 0) {
+                cellValue = 0;
+            }
+
+            rowTotal += cellValue; 
+            if(cellValue !== 0) validAgencies++; 
+            valsForHighlight.push(cellValue); 
+            tr.innerHTML += `<td>${fmt(cellValue)}</td>`;
         });
         
+        // LÓGICA DE TOTAL DE GRUPO
+        let groupTotal = rowTotal;
+        if (isAverageKPI && !isGroupSum && validAgencies > 0) {
+            // Si es promedio (ej %) y NO es suma de grupo (ej Inventario), entonces promediamos el grupo
+            groupTotal = rowTotal / validAgencies;
+        }
+
         const bestVal = isInverse ? Math.min(...valsForHighlight) : Math.max(...valsForHighlight);
         Array.from(tr.children).slice(1).forEach((td, i) => {
             const val = parseFloat(td.innerText.replace(/,/g,''));
             if (val === bestVal && (isInverse || bestVal > 0)) td.classList.add('highest-highlight'); 
         });
 
-        const avg = validAgencies ? rowTotal / validAgencies : 0; tr.innerHTML += `<td class="font-bold bg-gray-100 text-gray-900">${fmt(rowTotal)}</td>`; tr.innerHTML += `<td class="font-bold bg-gray-100">${fmt(avg)}</td>`;
+        // Columna Total
+        tr.innerHTML += `<td class="font-bold bg-gray-100 text-gray-900">${fmt(groupTotal)}</td>`; 
+        // Columna Promedio (siempre es promedio del grupo)
+        tr.innerHTML += `<td class="font-bold bg-gray-100">${fmt(validAgencies > 0 ? rowTotal / validAgencies : 0)}</td>`;
+        
         const trend = startVal > 0 ? ((endVal - startVal) / startVal) * 100 : 0; 
         const isGood = isInverse ? trend < 0 : trend > 0;
         const trendClass = isGood ? 'text-green-600' : (trend === 0 ? 'text-gray-400' : 'text-daytona-red');
