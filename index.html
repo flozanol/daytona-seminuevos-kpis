@@ -96,8 +96,12 @@
 
         <div id="dashboardContent" class="hidden space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card-daytona p-6 flex flex-col justify-between">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase">Ventas Acumuladas</p><h3 class="text-3xl font-black text-gray-800 mt-1" id="cardTotalSales">0</h3></div>
+                <div class="card-daytona p-6 flex flex-col justify-between" title="KPI Detectado Automáticamente">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase">Ventas Acumuladas</p>
+                        <h3 class="text-3xl font-black text-gray-800 mt-1" id="cardTotalSales">0</h3>
+                        <p class="text-[10px] text-gray-300 mt-1 truncate" id="kpiNameDebug"></p>
+                    </div>
                     <div class="mt-4 flex items-center text-sm text-green-600 font-bold"><i class="fas fa-chart-line mr-1"></i> <span id="cardTotalLabel">Periodo Actual</span></div>
                 </div>
                 <div class="card-daytona p-6 flex flex-col justify-between">
@@ -176,20 +180,19 @@
 <script>
 // --- CONFIGURACIÓN SEMINUEVOS ---
 const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck"; 
-const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ"; // ID de SEMINUEVOS
+const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ"; 
 
-// Ajusta esto si el KPI principal tiene otro nombre exacto (ej. 'Ventas Unidades')
-const KPI_TARGET = 'Ventas Totales'; 
+// LISTA DE NOMBRES POSIBLES PARA EL KPI PRINCIPAL DE VENTAS
+// El código buscará el primero que coincida.
+const TARGET_KEYWORDS = ['Ventas Totales', 'Ventas', 'Unidades', 'Facturadas', 'Facturado', 'Facturacion', 'Ventas Seminuevos'];
+
 const MONTHS_ORDER = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-// --- KPIS INVERSOS SEMINUEVOS (Menos es Mejor) ---
+// --- KPIS INVERSOS SEMINUEVOS ---
 const INVERSE_KPIS = [
-    'Antigüedad Promedio',
-    'Antigûedad', 'Antiguedad', // Variantes por seguridad
-    'Autos con más de 60 días', // Coincidencia parcial
-    'Inventario Total Unidades',
-    'Valor Total del Inventario',
-    'Gasto Financiero', // Cubre "Gasto Financiero" y "Gasto Financiero Mensual"
+    'Antigüedad Promedio', 'Antigüedad', 'Antiguedad', 'Antigûedad',
+    'Autos con más de 60 días', 'Inventario Total Unidades',
+    'Valor Total del Inventario', 'Gasto Financiero'
 ];
 
 // --- ESTADO ---
@@ -197,10 +200,22 @@ let rawData = [];
 let activeAgencies = [];
 let activeMonths = [];
 let chartInstances = {};
+let foundTargetKPI = ''; // Aquí guardaremos el nombre real que encontramos
 
 // --- INICIO ---
 function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'}); }
 setInterval(updateClock, 60000); updateClock();
+
+// --- FUNCION CLAVE: Encontrar el KPI principal ---
+function findMainKPI(kpiList) {
+    // 1. Buscar coincidencia con palabras clave
+    for (let keyword of TARGET_KEYWORDS) {
+        const found = kpiList.find(k => k.name.toLowerCase().includes(keyword.toLowerCase()));
+        if (found) return found.name;
+    }
+    // 2. Si no encuentra nada, usar el primer KPI de la lista (Fallback)
+    return kpiList.length > 0 ? kpiList[0].name : '';
+}
 
 // --- CARGA DE DATOS ---
 async function connectToAPI() {
@@ -210,8 +225,8 @@ async function connectToAPI() {
     try {
         const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`);
         
-        if (metaRes.status === 429) throw new Error("ERROR 429: Demasiadas solicitudes. Esperando...");
-        if (metaRes.status === 403) throw new Error("ERROR 403: Permisos denegados. Revisa el archivo.");
+        if (metaRes.status === 429) throw new Error("ERROR 429: Espera un momento (Google saturado).");
+        if (metaRes.status === 403) throw new Error("ERROR 403: Permisos. Revisa 'Compartir' en Sheets.");
         if (!metaRes.ok) throw new Error(`Error de conexión (${metaRes.status}).`);
 
         const meta = await metaRes.json();
@@ -219,9 +234,7 @@ async function connectToAPI() {
 
         rawData = [];
         for (const name of sheetNames) {
-            // PAUSA ANTI-BLOQUEO
-            await new Promise(r => setTimeout(r, 250));
-            
+            await new Promise(r => setTimeout(r, 250)); // Pausa antibloqueo
             const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(name + '!A:Z')}?key=${API_KEY}`);
             const json = await res.json();
             if (json.values && json.values.length > 1) {
@@ -230,8 +243,16 @@ async function connectToAPI() {
             }
         }
         if(rawData.length === 0) throw new Error("Datos vacíos");
+        
+        // DETECTAR KPI PRINCIPAL AUTOMÁTICAMENTE
+        if (rawData.length > 0 && rawData[0].kpis.length > 0) {
+            foundTargetKPI = findMainKPI(rawData[0].kpis);
+            console.log("KPI Principal detectado:", foundTargetKPI);
+            document.getElementById('kpiNameDebug').innerText = `Mostrando: ${foundTargetKPI}`;
+        }
+
         initDashboard();
-        uiStatus('success', `Conectado: ${rawData.length} agencias de Seminuevos.`);
+        uiStatus('success', `Conectado: ${rawData.length} agencias.`);
     } catch (e) {
         console.error(e);
         uiStatus('error', 'ERROR: ' + e.message);
@@ -241,8 +262,9 @@ async function connectToAPI() {
 }
 
 function loadDemo() {
-    const agencies = ['Seminuevos Interlomas', 'Seminuevos Cuajimalpa', 'Seminuevos Iztapalapa'];
-    const kpis = [KPI_TARGET, 'Inventario Total Unidades', 'Gasto Financiero', 'Antigüedad Promedio'];
+    foundTargetKPI = 'Ventas Totales'; // Default en demo
+    const agencies = ['Seminuevos Demo 1', 'Seminuevos Demo 2'];
+    const kpis = [foundTargetKPI, 'Inventario Total Unidades', 'Gasto Financiero', 'Antigüedad Promedio'];
     rawData = agencies.map(name => ({
         agency: name,
         kpis: kpis.map(k => {
@@ -308,7 +330,8 @@ function calculateTopStats() {
     activeAgencies.forEach(ag => {
         agencyTotals[ag] = 0;
         const d = rawData.find(data => data.agency === ag);
-        const k = d?.kpis.find(kpi => kpi.name === KPI_TARGET);
+        // USAMOS EL KPI ENCONTRADO
+        const k = d?.kpis.find(kpi => kpi.name === foundTargetKPI);
         if (k) { activeMonths.forEach(m => { const val = k[m] || 0; totalSales += val; agencyTotals[ag] += val; monthTotals[m] = (monthTotals[m] || 0) + val; }); }
     });
     const topAgency = Object.keys(agencyTotals).length > 0 ? Object.keys(agencyTotals).reduce((a, b) => agencyTotals[a] > agencyTotals[b] ? a : b) : '-';
@@ -384,7 +407,7 @@ function updateAgencyHistory() {
         const isInverse = INVERSE_KPIS.some(inv => k.name.includes(inv));
         let tr = document.createElement('tr'); tr.innerHTML = `<td class="font-medium text-gray-900">${k.name}</td>`;
         let sum = 0; let start = k[activeMonths[0]] || 0; let end = k[activeMonths[activeMonths.length-1]] || 0; const rowValues = [];
-        activeMonths.forEach(m => { const val = k[m] || 0; sum += val; rowValues.push(val); if (k.name === KPI_TARGET) chartValues.push(val); });
+        activeMonths.forEach(m => { const val = k[m] || 0; sum += val; rowValues.push(val); if (k.name === foundTargetKPI) chartValues.push(val); });
         const bestVal = isInverse ? Math.min(...rowValues) : Math.max(...rowValues);
         activeMonths.forEach((m) => { const val = k[m] || 0; const highlight = (val === bestVal && (isInverse || bestVal > 0)) ? 'class="highest-highlight"' : ''; tr.innerHTML += `<td ${highlight}>${fmt(val)}</td>`; });
         const avg = sum / activeMonths.length; tr.innerHTML += `<td class="font-bold bg-gray-50">${fmt(avg)}</td>`; 
@@ -399,7 +422,7 @@ function updateAgencyHistory() {
 }
 
 function renderWaterfall() {
-    const chartData = activeMonths.map(m => { let sum = 0; activeAgencies.forEach(a => { const d = rawData.find(data => data.agency === a); const k = d?.kpis.find(kpi => kpi.name === KPI_TARGET); if(k) sum += (k[m] || 0); }); return sum; });
+    const chartData = activeMonths.map(m => { let sum = 0; activeAgencies.forEach(a => { const d = rawData.find(data => data.agency === a); const k = d?.kpis.find(kpi => kpi.name === foundTargetKPI); if(k) sum += (k[m] || 0); }); return sum; });
     const dom = document.getElementById('waterfallChart'); if (chartInstances.waterfall) chartInstances.waterfall.dispose(); chartInstances.waterfall = echarts.init(dom);
     const option = { color: ['#fd0019'], tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } }, grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true }, xAxis: { type: 'category', data: activeMonths, axisLine: { lineStyle: { color: '#9CA3AF' } }, axisLabel: { color: '#374151' } }, yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } } }, series: [{ name: 'Total Ventas', type: 'bar', data: chartData, barWidth: '60%', itemStyle: { borderRadius: [4, 4, 0, 0] } }] };
     chartInstances.waterfall.setOption(option); window.onresize = function() { chartInstances.waterfall.resize(); };
