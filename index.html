@@ -39,13 +39,11 @@
         .highest-highlight { background-color: #dcfce7 !important; color: #166534 !important; font-weight: 800 !important; border: 1px solid #86efac !important; }
         .loader { border-top-color: #fd0019; animation: spinner 1.5s linear infinite; }
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .input-daytona:focus { border-color: #fd0019; --tw-ring-color: #fd0019; }
         .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
         .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <!-- Encabezado -->
     <header class="bg-white border-b border-gray-200 px-4 py-4 md:px-8 shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
@@ -72,9 +70,7 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8 md:px-8">
         <div id="status" class="hidden"></div>
-
         <div id="dashboardContent" class="hidden animate-in fade-in duration-700">
-            <!-- KPIs Principales -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
@@ -118,22 +114,18 @@
                 </div>
             </div>
 
-            <!-- Filtros -->
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-10">
                 <div class="lg:col-span-1 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
                     <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-8 border-b border-gray-100 pb-4">CONFIGURACIÓN Y FILTROS</h3>
-                    
                     <div class="space-y-8">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Año de Datos</label>
-                            <select id="yearSelect" onchange="updateAllTables()" 
-                                    class="w-full bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-4 py-3 focus:ring-2 focus:ring-daytona-red outline-none">
-                                <option value="2025" selected>2025</option>
+                            <select id="yearSelect" onchange="updateAllTables()" class="w-full bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-daytona-red">
+                                <option value="2025">2025</option>
                                 <option value="2026">2026</option>
-                                <option value="all">Comparativo (Ambos años)</option>
+                                <option value="all" selected>Comparativo (Ambos años)</option>
                             </select>
                         </div>
-
                         <div>
                             <div class="flex justify-between items-center mb-4">
                                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Agencias Visibles</label>
@@ -144,7 +136,6 @@
                             </div>
                             <div id="agencyChecks" class="space-y-2 max-h-60 overflow-y-auto pr-2 scrollbar-thin"></div>
                         </div>
-
                         <div>
                             <div class="flex justify-between items-center mb-4">
                                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Meses</label>
@@ -155,18 +146,13 @@
                             </div>
                             <div id="monthChecks" class="grid grid-cols-2 gap-2"></div>
                         </div>
-
-                        <button onclick="updateAllTables()" class="w-full btn-primary py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transform active:scale-95 transition-all">
-                            Aplicar Cambios
-                        </button>
+                        <button onclick="updateAllTables()" class="w-full btn-primary py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg">Aplicar Cambios</button>
                     </div>
                 </div>
 
                 <div class="lg:col-span-3 space-y-8">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Resumen Global Seminuevos</h2>
-                        </div>
+                        <h2 class="text-base font-black text-gray-900 uppercase tracking-tight mb-6">Resumen Global Seminuevos</h2>
                         <div class="overflow-x-auto scrollbar-thin">
                             <table id="globalTable" class="text-sm">
                                 <thead id="globalThead"></thead>
@@ -174,32 +160,27 @@
                             </table>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-80">
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Variación Mensual (Grupo)</h4>
+                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Tendencia Global (Línea de Tiempo)</h4>
                             <div id="waterfallChart" class="w-full h-full"></div>
                         </div>
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                             <div class="flex items-center justify-between mb-4">
-                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Matriz de KPIs (Promedios Inteligentes)</h4>
-                                <button onclick="exportTable('globalTable', 'Seminuevos_Global')" class="text-xs text-green-600 font-bold hover:underline">Excel</button>
+                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Matriz de KPIs Inteligente</h4>
+                                <button onclick="exportTable('globalTable', 'Global')" class="text-xs text-green-600 font-bold hover:underline">Excel</button>
                             </div>
-                            <p class="text-xs text-gray-500 italic">Los promedios se calculan inteligentemente diferenciando entre ratios (%) y volúmenes.</p>
+                            <p class="text-xs text-gray-500 italic">Los promedios respetan la naturaleza del KPI (Ratio vs Volumen).</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tablas Secundarias -->
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10">
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Comparativo Mensual</h2>
-                        <div class="flex gap-4">
-                            <select id="compareMonthSelect" onchange="updateMonthlyComparison()" class="bg-gray-50 border-gray-200 text-xs font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
-                            <button onclick="exportTable('monthlyTable', 'Seminuevos_Mes')" class="text-gray-400 hover:text-daytona-red"><i class="fas fa-file-export"></i></button>
-                        </div>
+                        <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Comparativo por Mes</h2>
+                        <select id="compareMonthSelect" onchange="updateMonthlyComparison()" class="bg-gray-50 border-gray-200 text-xs font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                     </div>
                     <div class="overflow-x-auto max-h-[600px] scrollbar-thin">
                         <table id="monthlyTable">
@@ -208,17 +189,13 @@
                         </table>
                     </div>
                 </div>
-
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Histórico</h2>
-                        <div class="flex gap-4">
-                            <select id="historyAgencySelect" onchange="updateAgencyHistory()" class="bg-gray-50 border-gray-200 text-xs font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
-                            <button onclick="exportTable('historyTable', 'Seminuevos_Historico')" class="text-gray-400 hover:text-daytona-red"><i class="fas fa-file-export"></i></button>
-                        </div>
+                        <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Histórico Agencia</h2>
+                        <select id="historyAgencySelect" onchange="updateAgencyHistory()" class="bg-gray-50 border-gray-200 text-xs font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                     </div>
                     <div class="mb-8 h-60">
-                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Tendencia de Ventas</h4>
+                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Línea de Tiempo (2025 - 2026)</h4>
                         <canvas id="historyChart"></canvas>
                     </div>
                     <div class="overflow-x-auto max-h-[400px] scrollbar-thin">
@@ -232,365 +209,197 @@
         </div>
     </main>
 
-    <footer class="max-w-7xl mx-auto px-4 py-8 text-center">
-        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">© 2026 Grupo Daytona | Business Intelligence</p>
+    <footer class="max-w-7xl mx-auto px-4 py-8 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+        © 2026 Grupo Daytona | Business Intelligence
     </footer>
 
     <script>
-        // --- CONFIGURACIÓN ---
         const API_KEY = "AIzaSyATBI8jMV1AtfsjhmwEwfOMYSdKmhMM5ck";
         const SPREADSHEET_ID = "1r3_CS8eu9MQz6Zwx0x95xwrHb-xSw1-R7m1aqsEAcQQ";
         const KPI_TARGET = 'Unidades Facturadas';
         const MONTHS_ORDER = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        
+        const INVERSE_KPIS = ['Antigüedad', 'Autos con más de 60', 'Gasto Financiero', 'Inventario Total'];
+        const AVERAGE_KPIS = ['%', 'Utilidad', 'Margen', 'ROI', 'Efectivdad', 'Cierre', 'Absorción', 'Comisión', 'Penetración'];
+        const GROUP_SUM_KPIS = ['Inventario Total', 'Gasto Financiero', 'Valor Total'];
 
-        // --- LÓGICA DE NEGOCIO ---
-        const INVERSE_KPIS = ['Antigüedad', 'Antiguedad', 'Antigûedad', 'Autos con más de 60', 'Inventario Total', 'Valor Total del Inventario', 'Gasto Financiero'];
-        const AVERAGE_KPIS = ['Utilidad por auto', 'Margen', 'ROI', 'Antigüedad', 'Antiguedad', 'Autos con más de 60', 'Acondicionamiento', 'Inventario', 'Valor Total', 'Efectivdad', 'Cierre', 'Gasto', 'Absorción', 'Asesores', 'Comisión', 'Penetración', 'Aprobación', 'Monto promedio', 'Ingresos Totales F&I', '%', '$'];
-        const GROUP_SUM_KPIS = ['Inventario Total', 'Autos con más de 60', 'Gasto Financiero', 'Ingresos Totales F&I', 'Valor Total', 'Asesores'];
+        let rawData2025 = [], rawData2026 = [], rawData = [];
+        let activeAgencies = [], activeMonths = [], chartInstances = {};
 
-        // --- ESTADO ---
-        let rawData2025 = [];
-        let rawData2026 = [];
-        let rawData = [];
-        let activeAgencies = [];
-        let activeMonths = [];
-        let chartInstances = {};
-
-        // --- INICIO ---
-        function updateClock() {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
-        }
-        setInterval(updateClock, 60000);
-        updateClock();
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'}); }
+        setInterval(updateClock, 60000); updateClock();
 
         async function connectToAPI() {
             uiStatus('loading', 'Conectando con Seminuevos...');
             try {
-                const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`);
-                if (!metaRes.ok) throw new Error(`Error de conexión (${metaRes.status}).`);
-                const meta = await metaRes.json();
+                const meta = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`)).json();
                 const sheetNames = meta.sheets.map(s => s.properties.title).filter(t => !['Resumen', 'Dashboard', 'Config', 'Data'].includes(t));
-
-                rawData2025 = [];
-                rawData2026 = [];
-
+                rawData2025 = []; rawData2026 = [];
                 for (const name of sheetNames) {
-                    await new Promise(r => setTimeout(r, 200));
-                    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(name + '!A:Z')}?key=${API_KEY}`);
-                    const json = await res.json();
-                    
+                    await new Promise(r => setTimeout(r, 150));
+                    const json = await (await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(name + '!A:Z')}?key=${API_KEY}`)).json();
                     if (json.values && json.values.length > 1) {
-                        const processed = parseSheet(json.values, name);
-                        if (processed) {
-                            if (processed.kpis2025.length > 0) rawData2025.push({ agency: name, year: '2025', kpis: processed.kpis2025 });
-                            if (processed.kpis2026.length > 0) rawData2026.push({ agency: name, year: '2026', kpis: processed.kpis2026 });
+                        const proc = parseSheet(json.values, name);
+                        if (proc) {
+                            rawData2025.push({ agency: name, year: '2025', kpis: proc.kpis2025 });
+                            rawData2026.push({ agency: name, year: '2026', kpis: proc.kpis2026 });
                         }
                     }
                 }
-
-                rawData = rawData2025;
                 initDashboard();
-                uiStatus('success', `Conectado: ${rawData2025.length} agencias (2025) + ${rawData2026.length} agencias (2026).`);
-            } catch (e) {
-                console.error(e);
-                uiStatus('error', 'ERROR: ' + e.message);
-            }
+                uiStatus('success', `Datos listos: ${rawData2025.length} agencias.`);
+            } catch (e) { uiStatus('error', 'Error: ' + e.message); }
         }
 
-        function parseSheet(values, agencyName) {
-            try {
-                const headers = values[0].map(h => (h || '').toString().trim());
-                let kpiIdx = headers.findIndex(h => h.toLowerCase().match(/kpi|concepto|indicador/));
-                if (kpiIdx === -1) kpiIdx = 0;
-
-                const map2025 = {};
-                const map2026 = {};
-
-                headers.forEach((h, i) => {
-                    const match = MONTHS_ORDER.find(m => h.toLowerCase().startsWith(m.toLowerCase().substr(0,3)));
-                    if (match) {
-                        if (i >= 1 && i <= 12) map2025[match] = i;
-                        if (i >= 13 && i <= 24) map2026[match] = i;
-                    }
-                });
-
-                const kpis2025 = [];
-                const kpis2026 = [];
-
-                values.slice(1).forEach(row => {
-                    const name = row[kpiIdx];
-                    if (!name) return;
-
-                    const obj25 = { name: name.trim() };
-                    const obj26 = { name: name.trim() };
-
-                    Object.keys(map2025).forEach(m => {
-                        let val = row[map2025[m]];
-                        if (typeof val === 'string') val = parseFloat(val.replace(/[^0-9.-]+/g,""));
-                        obj25[m] = isNaN(val) ? 0 : val;
-                    });
-                    Object.keys(map2026).forEach(m => {
-                        let val = row[map2026[m]];
-                        if (typeof val === 'string') val = parseFloat(val.replace(/[^0-9.-]+/g,""));
-                        obj26[m] = isNaN(val) ? 0 : val;
-                    });
-
-                    kpis2025.push(obj25);
-                    kpis2026.push(obj26);
-                });
-
-                return { agency: agencyName, kpis2025, kpis2026 };
-            } catch (e) { return null; }
+        function parseSheet(values, name) {
+            const headers = values[0].map(h => (h || '').trim());
+            const kpiIdx = headers.findIndex(h => h.toLowerCase().match(/kpi|concepto/)) || 0;
+            const map2025 = {}, map2026 = {};
+            headers.forEach((h, i) => {
+                const m = MONTHS_ORDER.find(mo => h.toLowerCase().startsWith(mo.toLowerCase().substr(0,3)));
+                if (m) { if (i >= 1 && i <= 12) map2025[m] = i; if (i >= 13 && i <= 24) map2026[m] = i; }
+            });
+            const kpis2025 = [], kpis2026 = [];
+            values.slice(1).forEach(row => {
+                if (!row[kpiIdx]) return;
+                const o25 = { name: row[kpiIdx].trim() }, o26 = { name: row[kpiIdx].trim() };
+                Object.keys(map2025).forEach(m => { let v = row[map2025[m]]; if(typeof v==='string') v=parseFloat(v.replace(/[^0-9.-]+/g,"")); o25[m] = isNaN(v)?0:v; });
+                Object.keys(map2026).forEach(m => { let v = row[map2026[m]]; if(typeof v==='string') v=parseFloat(v.replace(/[^0-9.-]+/g,"")); o26[m] = isNaN(v)?0:v; });
+                kpis2025.push(o25); kpis2026.push(o26);
+            });
+            return { kpis2025, kpis2026 };
         }
 
         function initDashboard() {
             document.getElementById('dashboardContent').classList.remove('hidden');
-            activeAgencies = [...new Set([...rawData2025, ...rawData2026].map(d => d.agency))].sort();
+            activeAgencies = rawData2025.map(d => d.agency).sort();
             activeMonths = [...MONTHS_ORDER];
-            
             renderChecks('agencyChecks', activeAgencies, 'agency');
             renderChecks('monthChecks', MONTHS_ORDER, 'month');
-
-            const monthSel = document.getElementById('compareMonthSelect');
-            monthSel.innerHTML = MONTHS_ORDER.map(m => `<option value="${m}">${m}</option>`).join('');
-            monthSel.value = MONTHS_ORDER[new Date().getMonth()] || 'Enero';
-
-            const agencySel = document.getElementById('historyAgencySelect');
-            agencySel.innerHTML = activeAgencies.map(a => `<option value="${a}">${a}</option>`).join('');
-            
+            document.getElementById('compareMonthSelect').innerHTML = MONTHS_ORDER.map(m => `<option value="${m}">${m}</option>`).join('');
+            document.getElementById('historyAgencySelect').innerHTML = activeAgencies.map(a => `<option value="${a}">${a}</option>`).join('');
             updateAllTables();
         }
 
         function updateAllTables() {
-            const year = document.getElementById('yearSelect').value;
-            if (year === '2025') rawData = rawData2025;
-            else if (year === '2026') rawData = rawData2026;
-            else rawData = [...rawData2025, ...rawData2026];
-
+            const y = document.getElementById('yearSelect').value;
+            rawData = (y === '2025') ? rawData2025 : (y === '2026') ? rawData2026 : [...rawData2025, ...rawData2026];
             activeAgencies = getCheckedValues('agency');
             activeMonths = getCheckedValues('month').sort((a,b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
-
-            if (activeAgencies.length === 0 || activeMonths.length === 0) return;
-
-            calculateTopStats();
-            renderTable1_Global();
-            updateMonthlyComparison();
-            updateAgencyHistory();
+            if (!activeAgencies.length || !activeMonths.length) return;
+            calculateTopStats(); renderTable1_Global(); updateMonthlyComparison(); updateAgencyHistory();
         }
 
         function calculateTopStats() {
-            let totalSales = 0;
-            let agencyTotals = {};
-            let monthTotals = {};
-
+            let total = 0, agTotals = {}, moTotals = {};
             activeAgencies.forEach(ag => {
-                agencyTotals[ag] = 0;
-                const datasets = rawData.filter(d => d.agency === ag);
-                datasets.forEach(d => {
-                    const k = d.kpis.find(kpi => kpi.name === KPI_TARGET);
-                    if (k) {
-                        activeMonths.forEach(m => {
-                            const val = k[m] || 0;
-                            totalSales += val;
-                            agencyTotals[ag] += val;
-                            monthTotals[m] = (monthTotals[m] || 0) + val;
-                        });
-                    }
+                agTotals[ag] = 0;
+                rawData.filter(d => d.agency === ag).forEach(d => {
+                    const k = d.kpis.find(ki => ki.name === KPI_TARGET);
+                    if (k) activeMonths.forEach(m => { const v = k[m]||0; total += v; agTotals[ag] += v; moTotals[m] = (moTotals[m]||0)+v; });
                 });
             });
-
-            const topAgency = Object.keys(agencyTotals).length > 0 ? Object.keys(agencyTotals).reduce((a, b) => agencyTotals[a] > agencyTotals[b] ? a : b) : '-';
-            const bestMonth = Object.keys(monthTotals).length > 0 ? Object.keys(monthTotals).reduce((a, b) => monthTotals[a] > monthTotals[b] ? a : b) : '-';
-            
-            document.getElementById('cardTotalSales').innerText = fmt(totalSales);
-            document.getElementById('cardTopAgency').innerText = topAgency;
-            document.getElementById('cardTopAgencyVal').innerText = fmt(agencyTotals[topAgency] || 0) + ' Unidades';
-            document.getElementById('cardBestMonth').innerText = bestMonth;
-            document.getElementById('cardAvg').innerText = fmt(totalSales / (activeMonths.length || 1));
+            const topA = Object.keys(agTotals).reduce((a,b) => agTotals[a]>agTotals[b]?a:b, '-');
+            const bestM = Object.keys(moTotals).reduce((a,b) => moTotals[a]>moTotals[b]?a:b, '-');
+            document.getElementById('cardTotalSales').innerText = fmt(total);
+            document.getElementById('cardTopAgency').innerText = topA;
+            document.getElementById('cardTopAgencyVal').innerText = fmt(agTotals[topA]||0) + ' Unidades';
+            document.getElementById('cardBestMonth').innerText = bestM;
+            document.getElementById('cardAvg').innerText = fmt(total / activeMonths.length);
         }
 
         function renderTable1_Global() {
-            const thead = document.getElementById('globalThead');
-            const tbody = document.getElementById('globalTbody');
-            thead.innerHTML = ''; tbody.innerHTML = '';
-
-            let htmlHead = `<tr><th>KPI</th>`;
-            activeAgencies.forEach(a => htmlHead += `<th>${a}</th>`);
-            htmlHead += `<th style="background-color:#1f2937;">Total</th><th style="background-color:#1f2937;">Prom.</th><th>Tend.</th></tr>`;
-            thead.innerHTML = htmlHead;
-
-            const allKpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))];
-
-            allKpiNames.forEach(kpiName => {
-                const isInverse = INVERSE_KPIS.some(inv => kpiName.includes(inv));
-                const isAverageKPI = AVERAGE_KPIS.some(avg => kpiName.includes(avg));
-                const isGroupSum = GROUP_SUM_KPIS.some(gs => kpiName.includes(gs));
-
-                let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="font-medium text-gray-900">${kpiName}</td>`;
-                
-                let rowTotal = 0;
-                let validAgencies = 0;
-                let startVal = 0, endVal = 0;
-                let valsForHighlight = [];
-
-                activeAgencies.forEach(ag => {
-                    const datasets = rawData.filter(d => d.agency === ag);
+            const head = document.getElementById('globalThead'), body = document.getElementById('globalTbody');
+            head.innerHTML = `<tr><th>KPI</th>${activeAgencies.map(a => `<th>${a}</th>`).join('')}<th>Total</th><th>Prom.</th></tr>`;
+            const kpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))];
+            body.innerHTML = kpiNames.map(name => {
+                let rowSum = 0, validAg = 0, vals = [];
+                const isAvg = AVERAGE_KPIS.some(a => name.includes(a)), isGS = GROUP_SUM_KPIS.some(g => name.includes(g));
+                const cells = activeAgencies.map(ag => {
                     let sum = 0, count = 0;
-
-                    datasets.forEach(d => {
-                        const k = d.kpis.find(kpi => kpi.name === kpiName);
-                        if (k) {
-                            activeMonths.forEach(m => {
-                                const v = k[m] || 0;
-                                sum += v; if(v !== 0) count++;
-                            });
-                            startVal += (k[activeMonths[0]] || 0);
-                            endVal += (k[activeMonths[activeMonths.length-1]] || 0);
-                        }
+                    rawData.filter(d => d.agency === ag).forEach(d => {
+                        const k = d.kpis.find(kp => kp.name === name);
+                        if (k) activeMonths.forEach(m => { const v = k[m]||0; sum += v; if(v!==0) count++; });
                     });
-
-                    let cellValue = (isAverageKPI && count > 0) ? sum / count : sum;
-                    rowTotal += cellValue;
-                    if(cellValue !== 0) validAgencies++;
-                    valsForHighlight.push(cellValue);
-                    tr.innerHTML += `<td>${fmt(cellValue)}</td>`;
-                });
-
-                let groupValue = (isAverageKPI && !isGroupSum && validAgencies > 0) ? rowTotal / validAgencies : rowTotal;
-                const bestVal = isInverse ? Math.min(...valsForHighlight) : Math.max(...valsForHighlight);
-
-                Array.from(tr.children).slice(1).forEach((td, i) => {
-                    const val = parseFloat(td.innerText.replace(/,/g,''));
-                    if (val === bestVal && (isInverse || bestVal > 0)) td.classList.add('highest-highlight');
-                });
-
-                tr.innerHTML += `<td class="font-bold bg-gray-100 text-gray-900">${fmt(groupValue)}</td>`;
-                tr.innerHTML += `<td class="font-bold bg-gray-100">${fmt(validAgencies > 0 ? rowTotal / validAgencies : 0)}</td>`;
-
-                const trend = startVal > 0 ? ((endVal - startVal) / startVal) * 100 : 0;
-                const trendClass = ((isInverse ? trend < 0 : trend > 0)) ? 'text-green-600' : (trend === 0 ? 'text-gray-400' : 'text-daytona-red');
-                tr.innerHTML += `<td class="${trendClass} font-bold text-xs">${trend > 0 ? '↑' : '↓'} ${Math.abs(trend).toFixed(1)}%</td>`;
-                tbody.appendChild(tr);
-            });
+                    const cellVal = (isAvg && count > 0) ? sum/count : sum;
+                    rowSum += cellVal; if (cellVal!==0) validAg++; vals.push(cellVal);
+                    return `<td>${fmt(cellVal)}</td>`;
+                }).join('');
+                const groupVal = (isAvg && !isGS && validAg > 0) ? rowSum/validAg : rowSum;
+                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(groupVal)}</td><td class="font-bold">${fmt(validAg?rowSum/validAg:0)}</td></tr>`;
+            }).join('');
             renderWaterfall();
         }
 
         function updateMonthlyComparison() {
-            const selectedMonth = document.getElementById('compareMonthSelect').value;
-            const thead = document.getElementById('monthlyThead');
-            const tbody = document.getElementById('monthlyTbody');
-            thead.innerHTML = ''; tbody.innerHTML = '';
-
-            let htmlHead = `<tr><th>KPI (${selectedMonth})</th>`;
-            activeAgencies.forEach(a => htmlHead += `<th>${a}</th>`);
-            htmlHead += `<th class="bg-gray-100">Promedio</th><th style="background-color:#1f2937;">Ganador</th></tr>`;
-            thead.innerHTML = htmlHead;
-
-            const allKpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))];
-            allKpiNames.forEach(kpiName => {
-                const isInverse = INVERSE_KPIS.some(inv => kpiName.includes(inv));
-                let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="font-medium text-gray-900">${kpiName}</td>`;
-                let rowSum = 0, bestVal = isInverse ? Infinity : -Infinity, winner = '-';
-                
-                activeAgencies.forEach(ag => {
-                    const datasets = rawData.filter(d => d.agency === ag);
-                    let val = 0;
-                    datasets.forEach(d => {
-                        const k = d.kpis.find(kp => kp.name === kpiName);
-                        if (k) val += (k[selectedMonth] || 0);
-                    });
-                    rowSum += val;
-                    if (isInverse ? val < bestVal : val > bestVal) { bestVal = val; winner = ag; }
-                    tr.innerHTML += `<td>${fmt(val)}</td>`;
-                });
-
-                tr.innerHTML += `<td class="font-bold bg-gray-50">${fmt(rowSum / (activeAgencies.length || 1))}</td>`;
-                tr.innerHTML += `<td class="text-daytona-red font-bold text-[10px] uppercase">${winner}</td>`;
-                tbody.appendChild(tr);
-            });
+            const m = document.getElementById('compareMonthSelect').value, head = document.getElementById('monthlyThead'), body = document.getElementById('monthlyTbody');
+            head.innerHTML = `<tr><th>KPI (${m})</th>${activeAgencies.map(a => `<th>${a}</th>`).join('')}<th>Prom.</th></tr>`;
+            const kpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))];
+            body.innerHTML = kpiNames.map(name => {
+                let sum = 0;
+                const cells = activeAgencies.map(ag => {
+                    let val = 0; rawData.filter(d => d.agency === ag).forEach(d => { const k = d.kpis.find(kp => kp.name===name); val += k?k[m]:0; });
+                    sum += val; return `<td>${fmt(val)}</td>`;
+                }).join('');
+                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(sum/activeAgencies.length)}</td></tr>`;
+            }).join('');
         }
 
         function updateAgencyHistory() {
-            const ag = document.getElementById('historyAgencySelect').value;
-            const thead = document.getElementById('historyThead');
-            const tbody = document.getElementById('historyTbody');
-            thead.innerHTML = ''; tbody.innerHTML = '';
+            const ag = document.getElementById('historyAgencySelect').value, yMode = document.getElementById('yearSelect').value;
+            let timeline = [], labels = [];
+            if (yMode === 'all') {
+                MONTHS_ORDER.forEach(m => { timeline.push({m, y:'2025'}); labels.push(`${m} 25`); });
+                MONTHS_ORDER.forEach(m => { timeline.push({m, y:'2026'}); labels.push(`${m} 26`); });
+            } else {
+                activeMonths.forEach(m => { timeline.push({m, y:yMode}); labels.push(m); });
+            }
 
-            let htmlHead = `<tr><th>KPI</th>`;
-            activeMonths.forEach(m => htmlHead += `<th>${m}</th>`);
-            htmlHead += `<th class="bg-gray-100">Prom.</th></tr>`;
-            thead.innerHTML = htmlHead;
-
-            const datasets = rawData.filter(d => d.agency === ag);
-            const kpiMap = {};
-            datasets.forEach(d => {
-                d.kpis.forEach(k => {
-                    if (!kpiMap[k.name]) kpiMap[k.name] = {};
-                    activeMonths.forEach(m => kpiMap[k.name][m] = (kpiMap[k.name][m] || 0) + (k[m] || 0));
-                });
-            });
-
-            const chartValues = [];
-            Object.keys(kpiMap).forEach(name => {
-                let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="font-medium text-gray-900">${name}</td>`;
-                let sum = 0;
-                activeMonths.forEach(m => {
-                    const v = kpiMap[name][m] || 0;
-                    sum += v;
-                    tr.innerHTML += `<td>${fmt(v)}</td>`;
-                    if (name === KPI_TARGET) chartValues.push(v);
-                });
-                tr.innerHTML += `<td class="font-bold bg-gray-50">${fmt(sum / activeMonths.length)}</td>`;
-                tbody.appendChild(tr);
-            });
+            const kpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))], chartV = [];
+            const head = document.getElementById('historyThead'), body = document.getElementById('historyTbody');
+            head.innerHTML = `<tr><th>KPI</th>${labels.map(l => `<th>${l}</th>`).join('')}</tr>`;
+            
+            body.innerHTML = kpiNames.map(name => {
+                const rowCells = timeline.map(t => {
+                    let val = 0;
+                    const ds = (t.y === '2025' ? rawData2025 : rawData2026).find(d => d.agency === ag);
+                    const k = ds?.kpis.find(kp => kp.name === name);
+                    val = k ? k[t.m] : 0;
+                    if (name === KPI_TARGET) chartV.push(val);
+                    return `<td>${fmt(val)}</td>`;
+                }).join('');
+                return `<tr><td class="font-medium">${name}</td>${rowCells}</tr>`;
+            }).join('');
 
             const ctx = document.getElementById('historyChart').getContext('2d');
             if (chartInstances.history) chartInstances.history.destroy();
-            chartInstances.history = new Chart(ctx, {
-                type: 'line',
-                data: { labels: activeMonths, datasets: [{ label: 'Ventas', data: chartValues, borderColor: '#fd0019', tension: 0.3, fill: true, backgroundColor: 'rgba(253, 0, 25, 0.1)' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            chartInstances.history = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Ventas', data: chartV, borderColor: '#fd0019', tension: 0.3, fill: true, backgroundColor: 'rgba(253, 0, 25, 0.05)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         }
 
         function renderWaterfall() {
-            const dom = document.getElementById('waterfallChart');
+            const yMode = document.getElementById('yearSelect').value, labels = [], data = [];
+            if (yMode === 'all') {
+                MONTHS_ORDER.forEach(m => { labels.push(`${m} 25`); let s=0; rawData2025.forEach(d => { const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; }); data.push(s); });
+                MONTHS_ORDER.forEach(m => { labels.push(`${m} 26`); let s=0; rawData2026.forEach(d => { const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; }); data.push(s); });
+            } else {
+                activeMonths.forEach(m => { labels.push(m); let s=0; rawData.forEach(d => { const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; }); data.push(s); });
+            }
             if (chartInstances.waterfall) chartInstances.waterfall.dispose();
-            chartInstances.waterfall = echarts.init(dom);
-            const chartData = activeMonths.map(m => {
-                let sum = 0;
-                activeAgencies.forEach(a => {
-                    rawData.filter(d => d.agency === a).forEach(d => {
-                        const k = d.kpis.find(kp => kp.name === KPI_TARGET);
-                        if (k) sum += (k[m] || 0);
-                    });
-                });
-                return sum;
-            });
-            chartInstances.waterfall.setOption({
-                color: ['#fd0019'], tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: activeMonths }, yAxis: { type: 'value' },
-                series: [{ type: 'bar', data: chartData, barWidth: '60%', itemStyle: { borderRadius: [4, 4, 0, 0] } }]
-            });
+            chartInstances.waterfall = echarts.init(document.getElementById('waterfallChart'));
+            chartInstances.waterfall.setOption({ color: ['#fd0019'], tooltip: { trigger: 'axis' }, xAxis: { type: 'category', data: labels, axisLabel: { interval: 0, rotate: 45, fontSize: 9 } }, yAxis: { type: 'value' }, series: [{ type: 'bar', data }] });
         }
 
         function forceReload() { window.location.reload(); }
         function fmt(n) { return n.toLocaleString('en-US', {maximumFractionDigits: 1}); }
         function uiStatus(type, msg) {
-            const el = document.getElementById('status');
-            el.classList.remove('hidden');
-            el.className = `mb-6 p-4 rounded-lg text-sm font-bold flex items-center justify-between ${type === 'loading' ? 'bg-blue-50 text-blue-700' : type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`;
-            el.innerHTML = `<div class="flex items-center"><i class="fas ${type==='loading'?'fa-spinner fa-spin':type==='error'?'fa-exclamation-circle':'fa-check-circle'} mr-2"></i> ${msg}</div>`;
+            const el = document.getElementById('status'); el.classList.remove('hidden');
+            el.className = `mb-6 p-4 rounded-lg text-sm font-bold flex items-center ${type === 'loading' ? 'bg-blue-50 text-blue-700' : type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`;
+            el.innerHTML = `<i class="fas ${type==='loading'?'fa-spinner fa-spin':type==='error'?'fa-exclamation-circle':'fa-check-circle'} mr-2"></i> ${msg}`;
         }
-        function renderChecks(id, items, type) {
-            document.getElementById(id).innerHTML = items.map(i => `<label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-1.5 rounded"><input type="checkbox" value="${i}" checked data-type="${type}" class="rounded border-gray-300 text-daytona-red focus:ring-daytona-red"><span class="text-gray-700 font-medium">${i}</span></label>`).join('');
-        }
+        function renderChecks(id, items, type) { document.getElementById(id).innerHTML = items.map(i => `<label class="flex items-center space-x-2 cursor-pointer p-1.5 rounded hover:bg-gray-100"><input type="checkbox" value="${i}" checked data-type="${type}" class="rounded text-daytona-red focus:ring-daytona-red"><span class="text-gray-700 font-medium">${i}</span></label>`).join(''); }
         function getCheckedValues(type) { return Array.from(document.querySelectorAll(`input[data-type="${type}"]:checked`)).map(cb => cb.value); }
         function toggleAll(type, state) { document.querySelectorAll(`input[data-type="${type}"]`).forEach(cb => cb.checked = state); updateAllTables(); }
-        function exportTable(tableId, filename) { XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById(tableId)), `${filename}_${new Date().toLocaleDateString()}.xlsx`); }
+        function exportTable(tableId, filename) { XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById(tableId)), `${filename}.xlsx`); }
 
         document.addEventListener('DOMContentLoaded', connectToAPI);
     </script>
