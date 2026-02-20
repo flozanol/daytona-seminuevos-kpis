@@ -71,7 +71,6 @@
     <main class="max-w-7xl mx-auto px-4 py-8 md:px-8">
         <div id="status" class="hidden"></div>
         <div id="dashboardContent" class="hidden animate-in fade-in duration-700">
-            <!-- KPIs Principales -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
@@ -83,7 +82,6 @@
                         <i class="fas fa-tags fa-2x"></i>
                     </div>
                 </div>
-                <!-- ... otros KPIs ... -->
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Agencia Líder</p>
@@ -178,9 +176,11 @@
                 </div>
             </div>
 
-            <!-- COMPARATIVO AÑO VS AÑO (NUEVA SECCIÓN) -->
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-10">
-                <h2 class="text-base font-black text-gray-900 uppercase tracking-tight mb-6">Comparativo Interanual (Mismo Mes)</h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-base font-black text-gray-900 uppercase tracking-tight">Comparativo Interanual (Mismo Mes)</h2>
+                    <button onclick="exportTable('yearCompareTable', 'Comparativo_Interanual')" class="text-gray-400 hover:text-daytona-red"><i class="fas fa-file-export"></i></button>
+                </div>
                 <div class="overflow-x-auto scrollbar-thin">
                     <table id="yearCompareTable">
                         <thead id="yearCompareThead"></thead>
@@ -208,7 +208,7 @@
                         <select id="historyAgencySelect" onchange="updateAgencyHistory()" class="bg-gray-50 border-gray-200 text-xs font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                     </div>
                     <div class="mb-8 h-60">
-                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Línea de Tiempo (Hasta Mes Actual)</h4>
+                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Línea de Tiempo (Hasta Mes Anterior)</h4>
                         <canvas id="historyChart"></canvas>
                     </div>
                     <div class="overflow-x-auto max-h-[400px] scrollbar-thin">
@@ -300,11 +300,7 @@
             activeAgencies = getCheckedValues('agency');
             activeMonths = getCheckedValues('month').sort((a,b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
             if (!activeAgencies.length || !activeMonths.length) return;
-            calculateTopStats(); 
-            renderTable1_Global(); 
-            updateMonthlyComparison(); 
-            updateAgencyHistory();
-            renderYearComparison();
+            calculateTopStats(); renderTable1_Global(); updateMonthlyComparison(); updateAgencyHistory(); renderYearComparison();
         }
 
         function calculateTopStats() {
@@ -363,21 +359,15 @@
         }
 
         function updateAgencyHistory() {
-            const ag = document.getElementById('historyAgencySelect').value, yMode = document.getElementById('yearSelect').value;
+            const ag = document.getElementById('historyAgencySelect').value;
             const currentM = new Date().getMonth();
             let timeline = [], labels = [];
-            
-            // 2025 Siempre completo
             MONTHS_ORDER.forEach(m => { timeline.push({m, y:'2025'}); labels.push(`${m} 25`); });
-            // 2026 Solo hasta el mes actual
-            MONTHS_ORDER.forEach((m, idx) => {
-                if (idx <= currentM) { timeline.push({m, y:'2026'}); labels.push(`${m} 26`); }
-            });
+            MONTHS_ORDER.forEach((m, idx) => { if (idx < currentM) { timeline.push({m, y:'2026'}); labels.push(`${m} 26`); } });
 
             const kpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))], chartV = [];
             const head = document.getElementById('historyThead'), body = document.getElementById('historyTbody');
             head.innerHTML = `<tr><th>KPI</th>${labels.map(l => `<th>${l}</th>`).join('')}</tr>`;
-            
             body.innerHTML = kpiNames.map(name => {
                 const rowCells = timeline.map(t => {
                     let val = 0;
@@ -389,7 +379,6 @@
                 }).join('');
                 return `<tr><td class="font-medium">${name}</td>${rowCells}</tr>`;
             }).join('');
-
             const ctx = document.getElementById('historyChart').getContext('2d');
             if (chartInstances.history) chartInstances.history.destroy();
             chartInstances.history = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Ventas', data: chartV, borderColor: '#fd0019', tension: 0.3, fill: true, backgroundColor: 'rgba(253, 0, 25, 0.05)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
@@ -398,47 +387,24 @@
         function renderWaterfall() {
             const currentM = new Date().getMonth(), labels = [], data = [];
             MONTHS_ORDER.forEach(m => { labels.push(`${m} 25`); let s=0; rawData2025.forEach(d => { if(activeAgencies.includes(d.agency)){ const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; } }); data.push(s); });
-            MONTHS_ORDER.forEach((m, idx) => {
-                if (idx <= currentM) { labels.push(`${m} 26`); let s=0; rawData2026.forEach(d => { if(activeAgencies.includes(d.agency)){ const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; } }); data.push(s); }
-            });
+            MONTHS_ORDER.forEach((m, idx) => { if (idx < currentM) { labels.push(`${m} 26`); let s=0; rawData2026.forEach(d => { if(activeAgencies.includes(d.agency)){ const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; } }); data.push(s); } });
             if (chartInstances.waterfall) chartInstances.waterfall.dispose();
             chartInstances.waterfall = echarts.init(document.getElementById('waterfallChart'));
             chartInstances.waterfall.setOption({ color: ['#fd0019'], tooltip: { trigger: 'axis' }, xAxis: { type: 'category', data: labels, axisLabel: { interval: 0, rotate: 45, fontSize: 8 } }, yAxis: { type: 'value' }, series: [{ type: 'bar', data }] });
         }
 
-        function renderYearComparison() {
-            const m = document.getElementById('compareMonthSelect').value;
+        function renderYearComparison() {feat: limit timeline to previous month and enhance interannual table with agency name and export
+            const m = document.getElementById('compareMonthSelect').value, ag = document.getElementById('historyAgencySelect').value;
             const head = document.getElementById('yearCompareThead'), body = document.getElementById('yearCompareTbody');
-            head.innerHTML = `<tr><th>KPI (${m})</th><th>Total 2025</th><th>Total 2026</th><th>Var. Abs.</th><th>Var. %</th></tr>`;
-            
+            head.innerHTML = `<tr><th>KPI (${m}) - ${ag}</th><th>Total 2025</th><th>Total 2026</th><th>Var. Abs.</th><th>Var. %</th></tr>`;
             const kpiNames = [...new Set(rawData2025.flatMap(d => d.kpis.map(k => k.name)))];
             body.innerHTML = kpiNames.map(name => {
-                let v25 = 0, v26 = 0, count25 = 0, count26 = 0;
-                const isAvg = AVERAGE_KPIS.some(a => name.includes(a)), isGS = GROUP_SUM_KPIS.some(g => name.includes(g));
-
-                activeAgencies.forEach(ag => {
-                    const d25 = rawData2025.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
-                    const d26 = rawData2026.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
-                    if (d25) { v25 += (d25[m]||0); if((d25[m]||0)!==0) count25++; }
-                    if (d26) { v26 += (d26[m]||0); if((d26[m]||0)!==0) count26++; }
-                });
-
-                if (isAvg && !isGS) { 
-                    if(count25>0) v25 /= count25; 
-                    if(count26>0) v26 /= count26; 
-                }
-
-                const diff = v26 - v25;
-                const pct = v25 !== 0 ? (diff / v25) * 100 : 0;
+                const d25 = rawData2025.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
+                const d26 = rawData2026.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
+                const v25 = d25 ? (d25[m]||0) : 0, v26 = d26 ? (d26[m]||0) : 0;
+                const diff = v26 - v25, pct = v25 !== 0 ? (diff / v25) * 100 : 0;
                 const color = diff > 0 ? 'text-green-600' : 'text-daytona-red';
-
-                return `<tr>
-                    <td class="font-medium">${name}</td>
-                    <td>${fmt(v25)}</td>
-                    <td>${fmt(v26)}</td>
-                    <td class="font-bold ${color}">${diff > 0 ? '+' : ''}${fmt(diff)}</td>
-                    <td class="font-black ${color}">${diff > 0 ? '+' : ''}${pct.toFixed(1)}%</td>
-                </tr>`;
+                return `<tr><td class="font-medium">${name}</td><td>${fmt(v25)}</td><td>${fmt(v26)}</td><td class="font-bold ${color}">${diff > 0 ? '+' : ''}${fmt(diff)}</td><td class="font-black ${color}">${diff > 0 ? '+' : ''}${pct.toFixed(1)}%</td></tr>`;
             }).join('');
         }
 
@@ -453,7 +419,6 @@
         function getCheckedValues(type) { return Array.from(document.querySelectorAll(`input[data-type="${type}"]:checked`)).map(cb => cb.value); }
         function toggleAll(type, state) { document.querySelectorAll(`input[data-type="${type}"]`).forEach(cb => cb.checked = state); updateAllTables(); }
         function exportTable(tableId, filename) { XLSX.writeFile(XLSX.utils.table_to_book(document.getElementById(tableId)), `${filename}.xlsx`); }
-
         document.addEventListener('DOMContentLoaded', connectToAPI);
     </script>
 </body>
