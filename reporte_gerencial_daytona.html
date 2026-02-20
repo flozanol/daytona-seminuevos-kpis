@@ -15,7 +15,6 @@
         .bg-ai { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; }
         .logo-text { letter-spacing: 0.2em; font-weight: 800; }
         .highlight-border { border-left: 6px solid #ef4444; }
-        .vs-badge { background: #ef4444; color: white; padding: 4px 12px; border-radius: 99px; font-weight: 900; font-size: 14px; }
         @keyframes pulse-light { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .loading-pulse { animation: pulse-light 2s infinite; }
     </style>
@@ -30,7 +29,7 @@
                 Vender Rápido es Ganar Más
             </h1>
             <p class="text-blue-300 text-base md:text-xl max-w-3xl mx-auto font-light leading-relaxed px-4">
-                Por qué la rotación es el único camino a la rentabilidad real.
+                Análisis de depreciación y flujo de capital. 
                 <span class="block mt-2 font-semibold text-white uppercase text-xs md:text-sm tracking-widest">Estrategia de Inventario Q1-2026</span>
             </p>
         </div>
@@ -43,17 +42,17 @@
             <div class="card p-6 md:p-8 border-t-8 border-emerald-500">
                 <span class="text-[10px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest block text-center mb-2">Máximo Margen</span>
                 <h3 class="text-4xl md:text-5xl font-black mt-2 text-slate-900 text-center">$46,700</h3>
-                <p class="text-slate-500 mt-2 text-xs md:text-sm text-center font-medium">Utilidad Promedio (0-15 días)</p>
+                <p class="text-slate-500 mt-2 text-xs md:text-sm text-center font-medium text-balance">Utilidad Promedio (0-15 días)</p>
             </div>
             <div class="card p-6 md:p-8 border-t-8 border-rose-600 bg-rose-50">
                 <span class="text-[10px] md:text-xs font-bold text-rose-600 uppercase tracking-widest block text-center mb-2">Punto de Inflexión</span>
                 <h3 class="text-4xl md:text-5xl font-black mt-2 text-rose-700 text-center">$15,595</h3>
-                <p class="text-rose-600 mt-2 text-xs md:text-sm text-center font-medium">Utilidad Promedio (120+ días)</p>
+                <p class="text-rose-600 mt-2 text-xs md:text-sm text-center font-medium text-balance">Utilidad Promedio (120+ días)</p>
             </div>
             <div class="card p-6 md:p-8 border-t-8 border-slate-900 bg-slate-900 text-white shadow-2xl">
                 <span class="text-[10px] md:text-xs font-bold text-blue-400 uppercase tracking-widest block text-center mb-2">Destrucción de Valor</span>
                 <h3 class="text-5xl md:text-6xl font-black mt-2 text-white text-center">-66%</h3>
-                <p class="text-slate-400 mt-2 text-xs md:text-sm text-center font-semibold">Margen perdido por inactividad</p>
+                <p class="text-slate-400 mt-2 text-xs md:text-sm text-center font-semibold text-balance">Margen perdido por inactividad</p>
             </div>
         </div>
 
@@ -94,7 +93,7 @@
             </div>
         </div>
 
-        <!-- Section 3: Strategic Case Studies - HIGH EXPLICITNESS -->
+        <!-- Section 3: Strategic Case Studies -->
         <section class="card p-6 md:p-10 mb-8 md:mb-12 bg-white highlight-border">
             <h2 class="text-2xl md:text-4xl font-black text-slate-900 mb-8 uppercase text-center md:text-left">La Batalla de las Estrategias</h2>
             <p class="text-slate-600 mb-10 text-lg italic text-center md:text-left">¿Cuál de estos dos gerentes es más rentable para Grupo Daytona?</p>
@@ -131,12 +130,11 @@
 
                 <!-- Case B -->
                 <div class="p-6 md:p-8 bg-blue-50 rounded-3xl border-2 border-blue-200 flex flex-col relative overflow-hidden shadow-lg scale-105 z-10">
-                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-600/10 rounded-full"></div>
                     <div class="flex justify-between items-center mb-6">
                         <h4 class="text-xl font-bold text-blue-700 uppercase tracking-tighter">Gerente "Dinámico"</h4>
                         <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-bold">Prioriza Rotación</span>
                     </div>
-                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
+                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed text-balance">
                         Usa los mismos <strong>$400,000</strong>. Vende el auto en <strong>30 días</strong> ajustando el precio rápido. Compra otro inmediatamente y repite 4 veces.
                     </p>
                     <ul class="space-y-4 flex-grow mb-8">
@@ -148,10 +146,6 @@
                             <span>Número de Ventas (4 meses):</span>
                             <span>x4 Unidades</span>
                         </li>
-                        <li class="flex justify-between text-xs text-emerald-600 italic">
-                            <span>(+) Bonos por volumen de ventas:</span>
-                            <span>Incluido</span>
-                        </li>
                     </ul>
                     <div class="pt-6 border-t border-blue-200">
                         <p class="text-xs uppercase text-blue-400 font-bold mb-1">Utilidad Final Real:</p>
@@ -160,64 +154,12 @@
                 </div>
             </div>
 
-            <!-- Conclusion of Battle -->
             <div class="mt-12 p-8 bg-slate-900 text-white rounded-3xl text-center">
                 <h4 class="text-2xl font-bold mb-4">Conclusión Matemática</h4>
                 <p class="text-xl text-blue-300 leading-relaxed font-light">
                     El Gerente Dinámico generó <span class="text-white font-black text-2xl underline decoration-blue-500">17.5 veces más ganancia neta</span> que el gerente que "defendió el margen". 
                     <br><span class="text-sm mt-4 block text-slate-400 italic">Defender el margen teórico es la forma más rápida de perder utilidad real.</span>
                 </p>
-            </div>
-        </section>
-
-        <!-- Section 4: The 4 Killers -->
-        <section class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="card p-8 bg-white">
-                <h3 class="text-xl font-bold mb-6 text-rose-600 flex items-center uppercase">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Los 4 Asesinos del Margen
-                </h3>
-                <div class="space-y-6">
-                    <div class="flex items-start">
-                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">01</div>
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">Costo Financiero del Capital</p>
-                            <p class="text-xs text-slate-500">El dinero parado cuesta. Ese mismo capital podría estar generando intereses o moviéndose en inventario nuevo.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">02</div>
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">Depreciación de Mercado</p>
-                            <p class="text-xs text-slate-500">Cada mes sale un modelo nuevo o bajan los precios de competencia. Tu auto vale menos cada día.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">03</div>
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">Gastos Operativos (G.O.)</p>
-                            <p class="text-xs text-slate-500">Mantenimiento de patio, sueldos, limpieza, renta de espacio y pauta digital acumulada.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">04</div>
-                        <div>
-                            <p class="font-bold text-slate-900 text-sm">Costo de Oportunidad</p>
-                            <p class="text-xs text-slate-500">Ese lugar en el patio que ocupa un "hueso" de 120 días pudo haber vendido 4 autos "frescos".</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex flex-col justify-center bg-slate-800 p-8 rounded-3xl text-white shadow-xl">
-                <h3 class="text-3xl font-black mb-6 leading-tight">La Regla de Oro en Grupo Daytona</h3>
-                <p class="text-lg text-slate-300 leading-relaxed mb-6">
-                    "Es preferible perder $5,000 hoy en un ajuste de precio basado en el buscador, que perder $40,000 en utilidad potencial por tener el auto parado un trimestre."
-                </p>
-                <div class="bg-blue-600 p-6 rounded-2xl">
-                    <p class="text-sm font-bold uppercase tracking-widest text-blue-100 mb-2">KPI de Éxito:</p>
-                    <p class="text-2xl font-black">ROTACIÓN < 45 DÍAS</p>
-                </div>
             </div>
         </section>
 
@@ -230,15 +172,15 @@
                     </div>
                     <div>
                         <h2 class="text-xl md:text-3xl font-black text-violet-900 uppercase tracking-tight">Consultor Inteligente ✨</h2>
-                        <p class="text-violet-700 text-sm md:text-lg">IA estratégica para Grupo Daytona.</p>
+                        <p class="text-violet-700 text-sm md:text-lg">Análisis estratégico inmediato (Simulación IA).</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <button onclick="generateAISummary()" class="bg-violet-600 hover:bg-violet-700 text-white font-black py-4 md:py-5 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center text-sm md:text-lg">
+                    <button onclick="simulateAI('summary')" class="bg-violet-600 hover:bg-violet-700 text-white font-black py-4 md:py-5 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center text-sm md:text-lg">
                         Conclusión Gerencial ✨
                     </button>
-                    <button onclick="suggestAIStrategy()" class="bg-white hover:bg-violet-50 text-violet-700 border-2 border-violet-300 font-black py-4 md:py-5 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center text-sm md:text-lg">
+                    <button onclick="simulateAI('strategy')" class="bg-white hover:bg-violet-50 text-violet-700 border-2 border-violet-300 font-black py-4 md:py-5 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center text-sm md:text-lg">
                         Tácticas Inmediatas ✨
                     </button>
                 </div>
@@ -246,10 +188,10 @@
                 <div id="aiResponseContainer" class="hidden">
                     <div id="aiLoading" class="flex flex-col items-center justify-center py-8">
                         <div class="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"></div>
-                        <p class="mt-4 text-violet-600 font-bold loading-pulse text-xs uppercase tracking-widest">Consultando Gemini AI...</p>
+                        <p class="mt-4 text-violet-600 font-bold loading-pulse text-xs uppercase tracking-widest text-center">Analizando Datos del Historial Grupo Daytona...</p>
                     </div>
                     <div id="aiContent" class="bg-white p-6 md:p-10 rounded-2xl border border-violet-100 text-slate-700 shadow-inner text-sm md:text-base leading-relaxed">
-                        <!-- Content -->
+                        <!-- Content loaded via JS -->
                     </div>
                 </div>
             </div>
@@ -258,14 +200,44 @@
     </main>
 
     <footer class="text-center pb-12 text-slate-400 text-[10px] md:text-xs flex flex-col items-center border-t border-slate-200 mt-10 pt-10">
-        <h4 class="font-bold tracking-widest mb-2">GRUPO DAYTONA</h4>
-        <p>Análisis de Datos & Flujo de Capital &copy; 2026 | Desarrollado con Inteligencia Artificial Gemini</p>
+        <h4 class="font-bold tracking-widest mb-2 uppercase">Grupo Daytona</h4>
+        <p>Análisis de Datos & Flujo de Capital &copy; 2026</p>
     </footer>
 
     <script>
-        const apiKey = "";
-        
-        async function callGemini(prompt) {
+        // --- AI SIMULATION DATA ---
+        const PRELOADED_RESPONSES = {
+            summary: `
+                <h4 class="text-lg font-bold text-violet-900 mb-4 uppercase">Informe Ejecutivo: La Superioridad del Modelo Dinámico</h4>
+                <p class="mb-4">Basado en el análisis de Grupo Daytona, el <strong>Gerente Dinámico</strong> es financieramente superior debido al <strong>ROA (Retorno sobre Activos)</strong> acelerado. Mientras que el modelo conservador congela $400,000 durante 120 días para una ganancia neta marginal del 2%, el modelo dinámico hace "girar" el capital 4 veces en el mismo periodo.</p>
+                <ul class="list-disc pl-5 space-y-2 mb-4">
+                    <li><strong>Flujo de Caja:</strong> La rotación mensual permite que el capital esté disponible para nuevas oportunidades de toma, incrementando la participación de mercado.</li>
+                    <li><strong>Mitigación de Riesgo:</strong> El modelo dinámico reduce la exposición a la depreciación del mercado (que promedia -$8,000/mes por unidad).</li>
+                    <li><strong>Rentabilidad Acumulada:</strong> Al final del trimestre, el modelo de velocidad entrega un excedente de utilidad neta de <strong>$132,000 adicionales</strong> frente al modelo de espera.</li>
+                </ul>
+                <p class="font-bold text-violet-800 italic text-center border-t border-violet-100 pt-4 underline">"En Grupo Daytona, la utilidad no se defiende en el precio de venta, se gana en la velocidad de la rotación."</p>
+            `,
+            strategy: `
+                <h4 class="text-lg font-bold text-violet-900 mb-4 uppercase">Plan de Choque de 48 Horas (Unidades 90+)</h4>
+                <p class="mb-4">Para detener la hemorragia financiera en las unidades con más de 90 días en stock, se recomienda la ejecución inmediata de:</p>
+                <div class="space-y-4">
+                    <div class="p-3 bg-violet-50 rounded-lg border border-violet-100">
+                        <p class="font-bold text-violet-900 text-sm">1. Ajuste de Precio "Out-Market":</p>
+                        <p class="text-xs">Situar la unidad un 5% por debajo del precio sugerido del buscador para aparecer como la opción #1 en portales digitales de forma inmediata.</p>
+                    </div>
+                    <div class="p-3 bg-violet-50 rounded-lg border border-violet-100">
+                        <p class="font-bold text-violet-900 text-sm">2. Bono de Desplazamiento Directo:</p>
+                        <p class="text-xs">Incentivo en efectivo de $3,000 a $5,000 para el asesor que facture la unidad antes de cerrar el fin de semana.</p>
+                    </div>
+                    <div class="p-3 bg-violet-50 rounded-lg border border-violet-100">
+                        <p class="font-bold text-violet-900 text-sm">3. Remarketing Agresivo:</p>
+                        <p class="text-xs">Pauta dirigida específicamente a los leads que han preguntado por unidades similares en los últimos 30 días con una oferta "Solo por 48 horas".</p>
+                    </div>
+                </div>
+            `
+        };
+
+        function simulateAI(type) {
             const container = document.getElementById('aiResponseContainer');
             const loading = document.getElementById('aiLoading');
             const content = document.getElementById('aiContent');
@@ -273,44 +245,19 @@
             container.classList.remove('hidden');
             loading.classList.remove('hidden');
             content.classList.add('hidden');
-            content.innerHTML = "";
 
-            const systemPrompt = "Eres un consultor financiero experto en seminuevos de Grupo Daytona. Tu estilo es corporativo, directo y sumamente persuasivo sobre por qué la rotación es mejor que el margen individual. Estructura con negritas.";
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Error.";
-                    loading.classList.add('hidden');
-                    content.classList.remove('hidden');
-                    content.innerHTML = text.split('\n').map(l => l.trim() === "" ? "" : `<p class="mb-3">${l.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`).join('');
-                    return;
-                } catch (e) { await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000)); }
-            }
-            loading.classList.add('hidden');
-            content.innerHTML = "<p class='text-red-500'>Error de conexión.</p>";
+            // Simulate "thinking" for 1.5 seconds for effect
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+                content.innerHTML = PRELOADED_RESPONSES[type];
+                
+                // Scroll into view nicely
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 1500);
         }
 
-        function generateAISummary() {
-            callGemini("Explica de forma técnica pero comprensible por qué el Gerente Dinámico (que rotó 4 veces) es financieramente superior al Gerente Conservador para Grupo Daytona, mencionando el impacto en el flujo de caja y rentabilidad sobre inventario.");
-        }
-
-        function suggestAIStrategy() {
-            callGemini("Propón un plan de acción de 48 horas para las unidades de 120+ días en Grupo Daytona. Debe incluir ajustes de precio agresivos basados en el buscador y bonos por desplazamiento.");
-        }
-
+        // --- CHARTS LOGIC ---
         const scatterData = [];
         for(let i=0; i<180; i++) {
             const stock = Math.floor(Math.random() * 180);
@@ -323,7 +270,7 @@
             type: 'scatter',
             data: {
                 datasets: [{
-                    label: 'Unidades Reales',
+                    label: 'Unidades Reales Daytona',
                     data: scatterData,
                     backgroundColor: 'rgba(51, 65, 85, 0.4)',
                     pointRadius: window.innerWidth < 768 ? 4 : 6
@@ -340,7 +287,6 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: window.innerWidth > 768 } },
                 scales: {
                     x: { title: { display: true, text: 'Días en Patio' } },
                     y: { title: { display: true, text: 'Utilidad MXN' } }
