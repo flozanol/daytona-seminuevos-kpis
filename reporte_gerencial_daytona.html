@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Rotación Crítica - Grupo Daytona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .gradient-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .card { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
+        .bg-ai { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; }
+        .logo-text { letter-spacing: 0.2em; font-weight: 800; }
+        .highlight-border { border-left: 6px solid #ef4444; }
+        .vs-badge { background: #ef4444; color: white; padding: 4px 12px; border-radius: 99px; font-weight: 900; font-size: 14px; }
+        @keyframes pulse-light { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .loading-pulse { animation: pulse-light 2s infinite; }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+
+    <!-- Header Section -->
+    <header class="gradient-header text-white pt-10 pb-20 md:pt-12 md:pb-24 px-4 md:px-6 text-center">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl md:text-3xl logo-text mb-4 text-white uppercase tracking-[0.3em] md:tracking-[0.5em]">GRUPO DAYTONA</h2>
+            <h1 class="text-3xl md:text-6xl font-black tracking-tight mb-4 px-2">
+                Vender Rápido es Ganar Más
+            </h1>
+            <p class="text-blue-300 text-base md:text-xl max-w-3xl mx-auto font-light leading-relaxed px-4">
+                Por qué la rotación es el único camino a la rentabilidad real.
+                <span class="block mt-2 font-semibold text-white uppercase text-xs md:text-sm tracking-widest">Estrategia de Inventario Q1-2026</span>
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 md:px-8 -mt-12 md:-mt-16">
+        
+        <!-- Key Metrics Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+            <div class="card p-6 md:p-8 border-t-8 border-emerald-500">
+                <span class="text-[10px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest block text-center mb-2">Máximo Margen</span>
+                <h3 class="text-4xl md:text-5xl font-black mt-2 text-slate-900 text-center">$46,700</h3>
+                <p class="text-slate-500 mt-2 text-xs md:text-sm text-center font-medium">Utilidad Promedio (0-15 días)</p>
+            </div>
+            <div class="card p-6 md:p-8 border-t-8 border-rose-600 bg-rose-50">
+                <span class="text-[10px] md:text-xs font-bold text-rose-600 uppercase tracking-widest block text-center mb-2">Punto de Inflexión</span>
+                <h3 class="text-4xl md:text-5xl font-black mt-2 text-rose-700 text-center">$15,595</h3>
+                <p class="text-rose-600 mt-2 text-xs md:text-sm text-center font-medium">Utilidad Promedio (120+ días)</p>
+            </div>
+            <div class="card p-6 md:p-8 border-t-8 border-slate-900 bg-slate-900 text-white shadow-2xl">
+                <span class="text-[10px] md:text-xs font-bold text-blue-400 uppercase tracking-widest block text-center mb-2">Destrucción de Valor</span>
+                <h3 class="text-5xl md:text-6xl font-black mt-2 text-white text-center">-66%</h3>
+                <p class="text-slate-400 mt-2 text-xs md:text-sm text-center font-semibold">Margen perdido por inactividad</p>
+            </div>
+        </div>
+
+        <!-- Section 1: The Spiral of Death (Scatter Plot) -->
+        <section class="mb-8 md:mb-12">
+            <div class="card p-4 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">La "Espiral de Pérdida"</h2>
+                        <p class="text-slate-500 mt-1 text-sm md:text-base">Evidencia visual: Cada día en patio evapora el margen.</p>
+                    </div>
+                </div>
+                <div class="h-[350px] md:h-[450px]">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+                <div class="mt-6 p-4 md:p-6 bg-amber-50 rounded-xl border-l-4 md:border-l-8 border-amber-400">
+                    <h4 class="font-bold text-amber-900 uppercase text-[10px] md:text-xs tracking-widest mb-2">Lectura de Gráfica</h4>
+                    <p class="text-xs md:text-sm text-amber-900 leading-relaxed italic">
+                        "Observe cómo la densidad de puntos de alta utilidad desaparece después de los <strong>60 días</strong>. El tiempo no mejora el precio; solo aumenta el descuento necesario para vender."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Bar & Line Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
+            <div class="card p-6 md:p-8">
+                <h3 class="text-xl md:text-2xl font-bold mb-6 text-slate-900">Muerte del Margen por Edad</h3>
+                <div class="h-60 md:h-72">
+                    <canvas id="agingBarChart"></canvas>
+                </div>
+            </div>
+            <div class="card p-6 md:p-8">
+                <h3 class="text-xl md:text-2xl font-bold mb-6 text-slate-900">Erosión Inevitable de Mercado</h3>
+                <div class="h-60 md:h-72">
+                    <canvas id="marketErosionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Strategic Case Studies - HIGH EXPLICITNESS -->
+        <section class="card p-6 md:p-10 mb-8 md:mb-12 bg-white highlight-border">
+            <h2 class="text-2xl md:text-4xl font-black text-slate-900 mb-8 uppercase text-center md:text-left">La Batalla de las Estrategias</h2>
+            <p class="text-slate-600 mb-10 text-lg italic text-center md:text-left">¿Cuál de estos dos gerentes es más rentable para Grupo Daytona?</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <!-- Case A -->
+                <div class="p-6 md:p-8 bg-slate-50 rounded-3xl border-2 border-slate-200 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xl font-bold text-slate-500 uppercase tracking-tighter">Gerente "Conservador"</h4>
+                        <span class="text-xs bg-slate-200 text-slate-600 px-3 py-1 rounded-full font-bold">Defiende Margen</span>
+                    </div>
+                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
+                        Compra un auto de <strong>$400,000</strong>. No quiere "perderle" y espera <strong>4 meses</strong> hasta encontrar al cliente que pague el precio completo.
+                    </p>
+                    <ul class="space-y-4 flex-grow mb-8">
+                        <li class="flex justify-between text-sm">
+                            <span>Utilidad Bruta Única:</span>
+                            <span class="font-bold text-slate-800">+$50,000</span>
+                        </li>
+                        <li class="flex justify-between text-xs text-rose-500 italic">
+                            <span>(-) Costos de mantenimiento (4 meses):</span>
+                            <span>-$18,000</span>
+                        </li>
+                        <li class="flex justify-between text-xs text-rose-500 italic">
+                            <span>(-) Costo financiero del capital:</span>
+                            <span>-$24,000</span>
+                        </li>
+                    </ul>
+                    <div class="pt-6 border-t border-slate-200">
+                        <p class="text-xs uppercase text-slate-400 font-bold mb-1">Utilidad Final Real:</p>
+                        <p class="text-4xl font-black text-slate-800">$8,000 <span class="text-xs text-slate-400">MXN</span></p>
+                    </div>
+                </div>
+
+                <!-- Case B -->
+                <div class="p-6 md:p-8 bg-blue-50 rounded-3xl border-2 border-blue-200 flex flex-col relative overflow-hidden shadow-lg scale-105 z-10">
+                    <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-600/10 rounded-full"></div>
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xl font-bold text-blue-700 uppercase tracking-tighter">Gerente "Dinámico"</h4>
+                        <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-bold">Prioriza Rotación</span>
+                    </div>
+                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
+                        Usa los mismos <strong>$400,000</strong>. Vende el auto en <strong>30 días</strong> ajustando el precio rápido. Compra otro inmediatamente y repite 4 veces.
+                    </p>
+                    <ul class="space-y-4 flex-grow mb-8">
+                        <li class="flex justify-between text-sm">
+                            <span>Utilidad por Venta (Promedio):</span>
+                            <span class="font-bold text-blue-700">+$35,000</span>
+                        </li>
+                        <li class="flex justify-between text-sm font-bold border-b border-blue-100 pb-2">
+                            <span>Número de Ventas (4 meses):</span>
+                            <span>x4 Unidades</span>
+                        </li>
+                        <li class="flex justify-between text-xs text-emerald-600 italic">
+                            <span>(+) Bonos por volumen de ventas:</span>
+                            <span>Incluido</span>
+                        </li>
+                    </ul>
+                    <div class="pt-6 border-t border-blue-200">
+                        <p class="text-xs uppercase text-blue-400 font-bold mb-1">Utilidad Final Real:</p>
+                        <p class="text-4xl font-black text-blue-700">$140,000 <span class="text-xs text-blue-400">MXN</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conclusion of Battle -->
+            <div class="mt-12 p-8 bg-slate-900 text-white rounded-3xl text-center">
+                <h4 class="text-2xl font-bold mb-4">Conclusión Matemática</h4>
+                <p class="text-xl text-blue-300 leading-relaxed font-light">
+                    El Gerente Dinámico generó <span class="text-white font-black text-2xl underline decoration-blue-500">17.5 veces más ganancia neta</span> que el gerente que "defendió el margen". 
+                    <br><span class="text-sm mt-4 block text-slate-400 italic">Defender el margen teórico es la forma más rápida de perder utilidad real.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 4: The 4 Killers -->
+        <section class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="card p-8 bg-white">
+                <h3 class="text-xl font-bold mb-6 text-rose-600 flex items-center uppercase">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Los 4 Asesinos del Margen
+                </h3>
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">01</div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Costo Financiero del Capital</p>
+                            <p class="text-xs text-slate-500">El dinero parado cuesta. Ese mismo capital podría estar generando intereses o moviéndose en inventario nuevo.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">02</div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Depreciación de Mercado</p>
+                            <p class="text-xs text-slate-500">Cada mes sale un modelo nuevo o bajan los precios de competencia. Tu auto vale menos cada día.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">03</div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Gastos Operativos (G.O.)</p>
+                            <p class="text-xs text-slate-500">Mantenimiento de patio, sueldos, limpieza, renta de espacio y pauta digital acumulada.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-rose-100 p-2 rounded-lg mr-4 font-bold text-rose-600">04</div>
+                        <div>
+                            <p class="font-bold text-slate-900 text-sm">Costo de Oportunidad</p>
+                            <p class="text-xs text-slate-500">Ese lugar en el patio que ocupa un "hueso" de 120 días pudo haber vendido 4 autos "frescos".</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col justify-center bg-slate-800 p-8 rounded-3xl text-white shadow-xl">
+                <h3 class="text-3xl font-black mb-6 leading-tight">La Regla de Oro en Grupo Daytona</h3>
+                <p class="text-lg text-slate-300 leading-relaxed mb-6">
+                    "Es preferible perder $5,000 hoy en un ajuste de precio basado en el buscador, que perder $40,000 en utilidad potencial por tener el auto parado un trimestre."
+                </p>
+                <div class="bg-blue-600 p-6 rounded-2xl">
+                    <p class="text-sm font-bold uppercase tracking-widest text-blue-100 mb-2">KPI de Éxito:</p>
+                    <p class="text-2xl font-black">ROTACIÓN < 45 DÍAS</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI ASSISTANT SECTION ✨ -->
+        <section id="ai-section" class="mb-12 md:mb-20">
+            <div class="card bg-ai p-6 md:p-10 border-2 border-violet-200 shadow-2xl">
+                <div class="flex items-center mb-6 md:mb-8">
+                    <div class="bg-violet-600 p-2 md:p-3 rounded-xl mr-4 md:mr-5 shadow-lg">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl md:text-3xl font-black text-violet-900 uppercase tracking-tight">Consultor Inteligente ✨</h2>
+                        <p class="text-violet-700 text-sm md:text-lg">IA estratégica para Grupo Daytona.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <button onclick="generateAISummary()" class="bg-violet-600 hover:bg-violet-700 text-white font-black py-4 md:py-5 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center text-sm md:text-lg">
+                        Conclusión Gerencial ✨
+                    </button>
+                    <button onclick="suggestAIStrategy()" class="bg-white hover:bg-violet-50 text-violet-700 border-2 border-violet-300 font-black py-4 md:py-5 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center text-sm md:text-lg">
+                        Tácticas Inmediatas ✨
+                    </button>
+                </div>
+
+                <div id="aiResponseContainer" class="hidden">
+                    <div id="aiLoading" class="flex flex-col items-center justify-center py-8">
+                        <div class="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"></div>
+                        <p class="mt-4 text-violet-600 font-bold loading-pulse text-xs uppercase tracking-widest">Consultando Gemini AI...</p>
+                    </div>
+                    <div id="aiContent" class="bg-white p-6 md:p-10 rounded-2xl border border-violet-100 text-slate-700 shadow-inner text-sm md:text-base leading-relaxed">
+                        <!-- Content -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center pb-12 text-slate-400 text-[10px] md:text-xs flex flex-col items-center border-t border-slate-200 mt-10 pt-10">
+        <h4 class="font-bold tracking-widest mb-2">GRUPO DAYTONA</h4>
+        <p>Análisis de Datos & Flujo de Capital &copy; 2026 | Desarrollado con Inteligencia Artificial Gemini</p>
+    </footer>
+
+    <script>
+        const apiKey = "";
+        
+        async function callGemini(prompt) {
+            const container = document.getElementById('aiResponseContainer');
+            const loading = document.getElementById('aiLoading');
+            const content = document.getElementById('aiContent');
+            
+            container.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+            content.innerHTML = "";
+
+            const systemPrompt = "Eres un consultor financiero experto en seminuevos de Grupo Daytona. Tu estilo es corporativo, directo y sumamente persuasivo sobre por qué la rotación es mejor que el margen individual. Estructura con negritas.";
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Error.";
+                    loading.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    content.innerHTML = text.split('\n').map(l => l.trim() === "" ? "" : `<p class="mb-3">${l.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`).join('');
+                    return;
+                } catch (e) { await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000)); }
+            }
+            loading.classList.add('hidden');
+            content.innerHTML = "<p class='text-red-500'>Error de conexión.</p>";
+        }
+
+        function generateAISummary() {
+            callGemini("Explica de forma técnica pero comprensible por qué el Gerente Dinámico (que rotó 4 veces) es financieramente superior al Gerente Conservador para Grupo Daytona, mencionando el impacto en el flujo de caja y rentabilidad sobre inventario.");
+        }
+
+        function suggestAIStrategy() {
+            callGemini("Propón un plan de acción de 48 horas para las unidades de 120+ días en Grupo Daytona. Debe incluir ajustes de precio agresivos basados en el buscador y bonos por desplazamiento.");
+        }
+
+        const scatterData = [];
+        for(let i=0; i<180; i++) {
+            const stock = Math.floor(Math.random() * 180);
+            const baseUtil = 50000 - (stock * 250);
+            const noise = (Math.random() - 0.5) * 40000;
+            scatterData.push({x: stock, y: baseUtil + noise});
+        }
+
+        new Chart(document.getElementById('scatterChart').getContext('2d'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Unidades Reales',
+                    data: scatterData,
+                    backgroundColor: 'rgba(51, 65, 85, 0.4)',
+                    pointRadius: window.innerWidth < 768 ? 4 : 6
+                }, {
+                    label: 'Umbral de Rentabilidad',
+                    data: [{x: 0, y: 50000}, {x: 180, y: 0}],
+                    type: 'line',
+                    borderColor: '#ef4444',
+                    borderWidth: 4,
+                    fill: false,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: window.innerWidth > 768 } },
+                scales: {
+                    x: { title: { display: true, text: 'Días en Patio' } },
+                    y: { title: { display: true, text: 'Utilidad MXN' } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('agingBarChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['0-15', '16-30', '31-60', '61-90', '91-120', '120+'],
+                datasets: [{
+                    label: 'Utilidad',
+                    data: [46700, 39200, 31000, 24500, 19800, 15595],
+                    backgroundColor: ['#10b981', '#34d399', '#fbbf24', '#f59e0b', '#ef4444', '#b91c1c'],
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('marketErosionChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Arribo', '15d', '30d', '45d', '60d', '90d'],
+                datasets: [{
+                    label: 'Valor de Mercado %',
+                    data: [100, 98, 96, 93, 91, 87],
+                    borderColor: '#3b82f6',
+                    borderWidth: 4,
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+</body>
+</html>
