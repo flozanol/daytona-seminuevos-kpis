@@ -393,7 +393,7 @@
             chartInstances.waterfall.setOption({ color: ['#fd0019'], tooltip: { trigger: 'axis' }, xAxis: { type: 'category', data: labels, axisLabel: { interval: 0, rotate: 45, fontSize: 8 } }, yAxis: { type: 'value' }, series: [{ type: 'bar', data }] });
         }
 
-        function renderYearComparison() {feat: limit timeline to previous month and enhance interannual table with agency name and export
+                function renderYearComparison() {
             const m = document.getElementById('compareMonthSelect').value, ag = document.getElementById('historyAgencySelect').value;
             const head = document.getElementById('yearCompareThead'), body = document.getElementById('yearCompareTbody');
             head.innerHTML = `<tr><th>KPI (${m}) - ${ag}</th><th>Total 2025</th><th>Total 2026</th><th>Var. Abs.</th><th>Var. %</th></tr>`;
