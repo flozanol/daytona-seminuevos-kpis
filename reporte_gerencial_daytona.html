@@ -3,181 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análisis de Inventario Crítico - Grupo Daytona</title>
+    <title>Análisis de Rotación Crítica - Grupo Daytona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
         .gradient-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .card { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card { background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
         .bg-ai { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; }
         .logo-text { letter-spacing: 0.2em; font-weight: 800; }
-        .highlight-red { border-left: 6px solid #ef4444; }
+        .highlight-border { border-left: 6px solid #ef4444; }
+        @keyframes pulse-light { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .loading-pulse { animation: pulse-light 2s infinite; }
     </style>
 </head>
 <body class="antialiased text-slate-800">
 
-    <header class="gradient-header text-white pt-10 pb-20 px-4 text-center">
+    <header class="gradient-header text-white pt-10 pb-20 md:pt-12 md:pb-24 px-4 md:px-6 text-center">
         <div class="max-w-7xl mx-auto">
-            <h2 class="text-2xl logo-text mb-4 uppercase">GRUPO DAYTONA</h2>
-            <h1 class="text-3xl md:text-5xl font-black tracking-tight mb-4">
-                Análisis de Costo de Oportunidad
+            <h2 class="text-2xl md:text-3xl logo-text mb-4 text-white uppercase tracking-[0.3em] md:tracking-[0.5em]">GRUPO DAYTONA</h2>
+            <h1 class="text-3xl md:text-6xl font-black tracking-tight mb-4 px-2">
+                Vender Rápido es Ganar Más
             </h1>
-            <p class="text-blue-300 text-lg max-w-3xl mx-auto font-light">
-                El impacto financiero de los <span class="text-white font-bold underline">458 días</span> en inventario.
+            <p class="text-blue-300 text-base md:text-xl max-w-3xl mx-auto font-light leading-relaxed px-4">
+                Análisis de depreciación y flujo de capital. 
+                <span class="block mt-2 font-semibold text-white uppercase text-xs md:text-sm tracking-widest">Estrategia de Inventario 2026</span>
             </p>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 -mt-12">
+    <main class="max-w-7xl mx-auto px-4 md:px-8 -mt-12 md:-mt-16">
         
-        <section class="mb-12">
-            <div class="card p-6 md:p-10 border-2 border-red-500 shadow-2xl bg-white highlight-red">
-                <div class="flex items-center mb-8">
-                    <div class="bg-red-600 p-3 rounded-xl mr-5 shadow-lg">
-                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+            <div class="card p-6 md:p-8 border-t-8 border-emerald-500">
+                <span class="text-[10px] md:text-xs font-bold text-emerald-600 uppercase tracking-widest block text-center mb-2">Máximo Margen</span>
+                <h3 class="text-4xl md:text-5xl font-black mt-2 text-slate-900 text-center">$46,700</h3>
+                <p class="text-slate-500 mt-2 text-xs md:text-sm text-center font-medium text-balance">Utilidad Promedio (0-15 días)</p>
+            </div>
+            <div class="card p-6 md:p-8 border-t-8 border-rose-600 bg-rose-50">
+                <span class="text-[10px] md:text-xs font-bold text-rose-600 uppercase tracking-widest block text-center mb-2">Punto de Inflexión</span>
+                <h3 class="text-4xl md:text-5xl font-black mt-2 text-rose-700 text-center">$15,595</h3>
+                <p class="text-rose-600 mt-2 text-xs md:text-sm text-center font-medium text-balance">Utilidad Promedio (120+ días)</p>
+            </div>
+            <div class="card p-6 md:p-8 border-t-8 border-slate-900 bg-slate-900 text-white shadow-2xl">
+                <span class="text-[10px] md:text-xs font-bold text-blue-400 uppercase tracking-widest block text-center mb-2">Destrucción de Valor</span>
+                <h3 class="text-5xl md:text-6xl font-black mt-2 text-white text-center">-66%</h3>
+                <p class="text-slate-400 mt-2 text-xs md:text-sm text-center font-semibold text-balance">Margen perdido por inactividad</p>
+            </div>
+        </div>
+
+        <section class="mb-8 md:mb-12">
+            <div class="card p-4 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">La "Espiral de Pérdida"</h2>
+                        <p class="text-slate-500 mt-1 text-sm md:text-base">Evidencia visual: Cada día en patio evapora el margen.</p>
+                    </div>
+                </div>
+                <div class="h-[350px] md:h-[450px]">
+                    <canvas id="scatterChart"></canvas>
+                </div>
+                <div class="mt-6 p-4 md:p-6 bg-amber-50 rounded-xl border-l-4 md:border-l-8 border-amber-400">
+                    <h4 class="font-bold text-amber-900 uppercase text-[10px] md:text-xs tracking-widest mb-2">Lectura de Gráfica</h4>
+                    <p class="text-xs md:text-sm text-amber-900 leading-relaxed italic">
+                        "Observe cómo la densidad de puntos de alta utilidad desaparece después de los <strong>60 días</strong>. El tiempo no mejora el precio; solo aumenta el descuento necesario para vender."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
+            <div class="card p-6 md:p-8">
+                <h3 class="text-xl md:text-2xl font-bold mb-6 text-slate-900">Muerte del Margen por Edad</h3>
+                <div class="h-60 md:h-72">
+                    <canvas id="agingBarChart"></canvas>
+                </div>
+            </div>
+            <div class="card p-6 md:p-8">
+                <h3 class="text-xl md:text-2xl font-bold mb-6 text-slate-900">Erosión Inevitable de Mercado</h3>
+                <div class="h-60 md:h-72">
+                    <canvas id="marketErosionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <section class="card p-6 md:p-10 mb-8 md:mb-12 bg-white highlight-border">
+            <h2 class="text-2xl md:text-4xl font-black text-slate-900 mb-8 uppercase text-center md:text-left">La Batalla de las Estrategias</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                <div class="p-6 md:p-8 bg-slate-50 rounded-3xl border-2 border-slate-200 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xl font-bold text-slate-500 uppercase tracking-tighter">Gerente "Conservador"</h4>
+                        <span class="text-xs bg-slate-200 text-slate-600 px-3 py-1 rounded-full font-bold">Defiende Margen</span>
+                    </div>
+                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed">
+                        Compra un auto de <strong>$400,000</strong>. No quiere "perderle" y espera <strong>4 meses</strong> hasta encontrar al cliente que pague el precio completo.
+                    </p>
+                    <ul class="space-y-4 flex-grow mb-8">
+                        <li class="flex justify-between text-sm"><span>Utilidad Bruta Única:</span><span class="font-bold text-slate-800">+$50,000</span></li>
+                        <li class="flex justify-between text-xs text-rose-500 italic"><span>(-) Costos mantenimiento (4 meses):</span><span>-$18,000</span></li>
+                        <li class="flex justify-between text-xs text-rose-500 italic"><span>(-) Costo financiero capital:</span><span>-$24,000</span></li>
+                    </ul>
+                    <div class="pt-6 border-t border-slate-200">
+                        <p class="text-xs uppercase text-slate-400 font-bold mb-1">Utilidad Final Real:</p>
+                        <p class="text-4xl font-black text-slate-800">$8,000 <span class="text-xs text-slate-400">MXN</span></p>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-8 bg-blue-50 rounded-3xl border-2 border-blue-200 flex flex-col relative overflow-hidden shadow-lg scale-105 z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-xl font-bold text-blue-700 uppercase tracking-tighter">Gerente "Dinámico"</h4>
+                        <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-bold">Prioriza Rotación</span>
+                    </div>
+                    <p class="text-slate-600 mb-6 text-sm md:text-base leading-relaxed text-balance">
+                        Usa los mismos <strong>$400,000</strong>. Vende el auto en <strong>30 días</strong> ajustando el precio rápido. Compra otro inmediatamente y repite 4 veces.
+                    </p>
+                    <ul class="space-y-4 flex-grow mb-8">
+                        <li class="flex justify-between text-sm"><span>Utilidad por Venta (Promedio):</span><span class="font-bold text-blue-700">+$35,000</span></li>
+                        <li class="flex justify-between text-sm font-bold border-b border-blue-100 pb-2"><span>Número de Ventas (4 meses):</span><span>x4 Unidades</span></li>
+                    </ul>
+                    <div class="pt-6 border-t border-blue-200">
+                        <p class="text-xs uppercase text-blue-400 font-bold mb-1">Utilidad Final Real:</p>
+                        <p class="text-4xl font-black text-blue-700">$140,000 <span class="text-xs text-blue-400">MXN</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12 md:mb-20">
+            <div class="card p-6 md:p-10 border-2 border-red-200 shadow-2xl bg-white">
+                <div class="flex items-center mb-6 md:mb-8">
+                    <div class="bg-red-600 p-2 md:p-3 rounded-xl mr-4 md:mr-5 shadow-lg">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-red-900 uppercase tracking-tight">CASO CRÍTICO: HONDA ODYSSEY</h2>
-                        <p class="text-red-600 font-medium">Análisis de destrucción de valor por inactividad.</p>
+                        <h2 class="text-xl md:text-3xl font-black text-red-900 uppercase tracking-tight">Caso Real Crítico: El Costo del Tiempo</h2>
+                        <p class="text-sm text-red-600 font-medium">Honda Odyssey — Análisis de 458 días en inventario</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 text-center">
-                        <p class="text-xs uppercase text-slate-500 font-bold mb-1">Costo Adquisición</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                        <p class="text-xs uppercase text-slate-500 font-bold mb-1">Costo Original</p>
                         <p class="text-2xl font-black text-slate-800">$520,000</p>
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
                         <p class="text-xs uppercase text-blue-600 font-bold mb-1">Costo Financiero (9.25%)</p>
                         <p class="text-2xl font-black text-blue-800">-$60,373</p>
-                        <p class="text-[10px] text-blue-500 italic">Interés por 458 días</p>
+                        <p class="text-[10px] text-blue-500">Acumulado 458 días</p>
                     </div>
-                    <div class="bg-orange-50 border border-orange-200 rounded-xl p-5 text-center">
-                        <p class="text-xs uppercase text-orange-600 font-bold mb-1">Precio Sugerido Hoy</p>
+                    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
+                        <p class="text-xs uppercase text-orange-600 font-bold mb-1">Valor Sugerido Actual</p>
                         <p class="text-2xl font-black text-orange-800">$430,766</p>
-                        <p class="text-[10px] text-orange-500">Última actualización: 16/02/26</p>
+                        <p class="text-[10px] text-orange-500">Última actualización feb-26</p>
                     </div>
-                    <div class="bg-red-900 border border-red-700 rounded-xl p-5 text-center shadow-xl">
-                        <p class="text-xs uppercase text-red-200 font-bold mb-1">Resultado Neto Real</p>
-                        <p class="text-3xl font-black text-white">-$149,607</p>
-                        <p class="text-[10px] text-red-300 italic">Pérdida Total Acumulada</p>
+                    <div class="bg-red-900 border border-red-700 rounded-xl p-4 text-center shadow-xl">
+                        <p class="text-xs uppercase text-red-200 font-bold mb-1">Pérdida Total Real</p>
+                        <p class="text-2xl font-black text-white">-$149,607</p>
+                        <p class="text-[10px] text-red-300">Margen Perdido + Financiero</p>
                     </div>
                 </div>
 
-                <div class="mb-10">
-                    <div class="flex justify-between items-end mb-4">
-                        <h3 class="text-lg font-bold text-slate-700 uppercase tracking-wide">Erosión del Precio (Ene - Feb 2026)</h3>
-                        <span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">-13.5% en 45 días</span>
-                    </div>
-                    <div class="relative" style="height: 350px;">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4 uppercase tracking-wide">Línea de Degradación de Precio (Ene-Feb 2026)</h3>
+                    <div class="relative" style="height: 300px;">
                         <canvas id="odysseyChart"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 text-white rounded-2xl p-6 text-center border-t-4 border-red-500">
-                    <h4 class="text-red-400 font-bold uppercase text-sm tracking-widest mb-2">Conclusión Gerencial</h4>
-                    <p class="text-xl font-light mb-4">
-                        En 458 días, este vehículo ha costado <span class="text-white font-bold">$326 pesos diarios</span> solo por existir en el patio.
-                    </p>
-                    <p class="text-slate-400 text-sm italic">
-                        La pérdida financiera equivale a regalar un auto compacto nuevo.
-                    </p>
+                <div class="bg-slate-900 text-white rounded-xl p-6 text-center">
+                    <p class="text-red-400 font-bold uppercase text-xs tracking-widest mb-2">Conclusión Financiera</p>
+                    <p class="text-lg md:text-xl font-black mb-2">Mantener este auto ha costado <span class="text-red-400">$326 pesos diarios</span>.</p>
+                    <p class="text-slate-300 text-sm">Cada mes que pasa sin venderse, se pierden aproximadamente <strong class="text-orange-300">$9,800 MXN</strong> solo en depreciación y costo financiero.</p>
                 </div>
             </div>
         </section>
 
-        <section class="mb-20">
-            <div class="card bg-ai p-8 md:p-10 border-2 border-violet-200">
-                <div class="flex items-center mb-6">
-                    <div class="bg-violet-600 p-2 rounded-lg mr-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <section id="ai-section" class="mb-12 md:mb-20">
+            <div class="card bg-ai p-6 md:p-10 border-2 border-violet-200 shadow-2xl">
+                <div class="flex items-center mb-6 md:mb-8">
+                    <div class="bg-violet-600 p-2 md:p-3 rounded-xl mr-4 md:mr-5 shadow-lg">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                    <h2 class="text-xl font-bold text-violet-900">¿Qué debemos hacer ahora?</h2>
+                    <div>
+                        <h2 class="text-xl md:text-3xl font-black text-violet-900 uppercase tracking-tight">Consultor Inteligente ✨</h2>
+                        <p class="text-violet-700 text-sm md:text-lg">Análisis estratégico inmediato (Simulación IA).</p>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onclick="showAnalysis('strategy')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg">Plan de Remate Inmediato ✨</button>
-                    <button onclick="showAnalysis('math')" class="bg-white hover:bg-violet-50 text-violet-700 border-2 border-violet-300 font-bold py-4 px-6 rounded-xl transition-all">Análisis de Reinversión ✨</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <button onclick="simulateAI('summary')" class="bg-violet-600 hover:bg-violet-700 text-white font-black py-4 md:py-5 px-6 rounded-2xl shadow-xl transition-all text-sm md:text-lg">Conclusión Gerencial ✨</button>
+                    <button onclick="simulateAI('strategy')" class="bg-white hover:bg-violet-50 text-violet-700 border-2 border-violet-300 font-black py-4 md:py-5 px-6 rounded-2xl shadow-md transition-all text-sm md:text-lg">Tácticas Inmediatas ✨</button>
                 </div>
-                <div id="aiResponse" class="mt-8 hidden bg-white p-6 rounded-xl border border-violet-100 text-slate-700 shadow-inner"></div>
+                <div id="aiResponseContainer" class="hidden">
+                    <div id="aiLoading" class="flex flex-col items-center justify-center py-8">
+                        <div class="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"></div>
+                        <p class="mt-4 text-violet-600 font-bold loading-pulse text-xs uppercase tracking-widest text-center">Analizando Datos del Historial Grupo Daytona...</p>
+                    </div>
+                    <div id="aiContent" class="bg-white p-6 md:p-10 rounded-2xl border border-violet-100 text-slate-700 shadow-inner text-sm md:text-base leading-relaxed"></div>
+                </div>
             </div>
         </section>
+
     </main>
 
-    <footer class="text-center pb-10 text-slate-400 text-xs">
-        <p>GRUPO DAYTONA - Inteligencia de Negocios 2026</p>
+    <footer class="text-center pb-12 text-slate-400 text-[10px] md:text-xs flex flex-col items-center border-t border-slate-200 mt-10 pt-10">
+        <h4 class="font-bold tracking-widest mb-2 uppercase">Grupo Daytona</h4>
+        <p>Análisis de Datos & Flujo de Capital &copy; 2026</p>
     </footer>
 
     <script>
-        // Datos de la gráfica extraídos de tu imagen
-        const ctx = document.getElementById('odysseyChart').getContext('2d');
-        new Chart(ctx, {
+        // --- CHARTS LOGIC ---
+        const scatterData = [];
+        for(let i=0; i<180; i++) {
+            const stock = Math.floor(Math.random() * 180);
+            const baseUtil = 50000 - (stock * 250);
+            const noise = (Math.random() - 0.5) * 40000;
+            scatterData.push({x: stock, y: baseUtil + noise});
+        }
+
+        new Chart(document.getElementById('scatterChart').getContext('2d'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Unidades Reales Daytona',
+                    data: scatterData,
+                    backgroundColor: 'rgba(51, 65, 85, 0.4)',
+                    pointRadius: 6
+                }, {
+                    label: 'Umbral de Rentabilidad',
+                    data: [{x: 0, y: 50000}, {x: 180, y: 0}],
+                    type: 'line',
+                    borderColor: '#ef4444',
+                    borderWidth: 4,
+                    fill: false,
+                    pointRadius: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        new Chart(document.getElementById('agingBarChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['0-15', '16-30', '31-60', '61-90', '91-120', '120+'],
+                datasets: [{
+                    label: 'Utilidad',
+                    data: [46700, 39200, 31000, 24500, 19800, 15595],
+                    backgroundColor: ['#10b981', '#34d399', '#fbbf24', '#f59e0b', '#ef4444', '#b91c1c'],
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('marketErosionChart').getContext('2d'), {
             type: 'line',
             data: {
-                labels: ['02/01', '05/01', '12/01', '19/01', '20/01', '27/01', '03/02', '09/02', '16/02'],
+                labels: ['Arribo', '15d', '30d', '45d', '60d', '90d'],
                 datasets: [{
-                    label: 'Precio Sugerido ($)',
-                    data: [498275, 503500, 459382, 450604, 450604, 443080, 443080, 447260, 430766],
+                    label: 'Valor de Mercado %',
+                    data: [100, 98, 96, 93, 91, 87],
+                    borderColor: '#3b82f6',
+                    borderWidth: 4,
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // --- ODYSSEY CHART ACTUALIZADA CON TUS DATOS ---
+        new Chart(document.getElementById('odysseyChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['02/Ene', '05/Ene', '12/Ene', '19/Ene', '27/Ene', '03/Feb', '09/Feb', '16/Feb'],
+                datasets: [{
+                    label: 'Precio Sugerido MXN',
+                    data: [498275, 503500, 459382, 450604, 443080, 443080, 447260, 430766],
                     borderColor: '#ef4444',
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 4,
                     fill: true,
                     tension: 0.2,
                     pointRadius: 6,
-                    pointHoverRadius: 10,
-                    pointBackgroundColor: '#ef4444',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2
+                    pointBackgroundColor: '#ef4444'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return ' Precio: $' + context.parsed.y.toLocaleString('es-MX');
-                            }
-                        }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     y: {
                         min: 420000,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + (value/1000).toFixed(0) + 'k';
-                            }
-                        },
-                        grid: { color: '#f1f5f9' }
-                    },
-                    x: { grid: { display: false } }
+                        ticks: { callback: (v) => '$' + v.toLocaleString() }
+                    }
                 }
             }
         });
 
-        function showAnalysis(type) {
-            const res = document.getElementById('aiResponse');
-            res.classList.remove('hidden');
-            if(type === 'strategy') {
-                res.innerHTML = `
-                    <h4 class="font-bold text-violet-900 mb-2 underline">ESTRATEGIA DE SALIDA DE EMERGENCIA</h4>
-                    <p class="text-sm">La unidad está en la "zona de muerte financiera". Se recomienda:</p>
-                    <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
-                        <li><strong>Liquidación a costo:</strong> Vender a los $430k de mercado inmediatamente.</li>
-                        <li><strong>Incentivo al Asesor:</strong> Bono especial de $5,000 por facturación esta semana.</li>
-                        <li><strong>Liberación de Capital:</strong> Recuperar los $430k para comprar 2 autos de $200k con rotación de 15 días.</li>
-                    </ul>
-                `;
-            } else {
-                res.innerHTML = `
-                    <h4 class="font-bold text-violet-900 mb-2 underline">EL COSTO DE LA ESPERA</h4>
-                    <p class="text-sm">Si hubiéramos vendido la Odyssey hace 1 año (aunque fuera con utilidad $0), y hubiéramos reinvertido esos $520,000 en autos con margen de $25,000 y rotación de 45 días, hoy tendríamos <strong>$200,000 adicionales</strong> en utilidad acumulada.</p>
-                `;
-            }
+        // --- AI LOGIC ---
+        function simulateAI(type) {
+            const container = document.getElementById('aiResponseContainer');
+            const loading = document.getElementById('aiLoading');
+            const content = document.getElementById('aiContent');
+            container.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+                content.innerHTML = type === 'summary' ? 
+                    `<h4 class="text-lg font-bold text-violet-900 mb-4 uppercase">Informe Ejecutivo</h4><p>El análisis del caso Odyssey demuestra que después de los 450 días, el activo ha perdido más del 25% de su valor recuperable. Urge liquidación para liberar capital.</p>` :
+                    `<h4 class="text-lg font-bold text-violet-900 mb-4 uppercase">Estrategia de Choque</h4><p>1. Ajustar precio a $425,000 (Líder de mercado). 2. Bono de $5k al asesor. 3. Remarketing digital agresivo de 48 horas.</p>`;
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 1500);
         }
     </script>
 </body>
