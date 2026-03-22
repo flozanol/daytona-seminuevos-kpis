@@ -134,7 +134,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wider">
                         <tr>
-                            <th class="p-3 font-black">Días</th>
+                            <th class="p-3 font-black text-center">Días</th>
                             <th class="p-3 font-black">Sucursal</th>
                             <th class="p-3 font-black">Vehículo (Año/Marca/Modelo)</th>
                             <th class="p-3 font-black">VIN</th>
@@ -159,9 +159,16 @@
     <script>
         let chartInstance = null;
 
-        // Formateadores
+        // Formateadores y Limpiadores
         const fmtMoney = (val) => '$' + Number(val).toLocaleString('es-MX', { maximumFractionDigits: 0 });
         const fmtNum = (val) => Number(val).toLocaleString('es-MX');
+
+        const limpiarNumero = (val) => {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            const num = Number(String(val).replace(/[^0-9.-]+/g, ""));
+            return isNaN(num) ? 0 : num;
+        };
 
         document.getElementById('csvFile').addEventListener('change', function (e) {
             const file = e.target.files[0];
@@ -169,7 +176,7 @@
 
             Papa.parse(file, {
                 header: true,
-                dynamicTyping: true,
+                dynamicTyping: false, // Forzamos texto para limpiarlo nosotros mismos
                 skipEmptyLines: true,
                 complete: function (results) {
                     procesarDatos(results.data);
@@ -178,8 +185,8 @@
         });
 
         function procesarDatos(rawData) {
-            // Filtrar basura (SIN CLASIFICAR, etc)
-            const data = rawData.filter(d => d.Sucursal && d['Id de Art.'] && !d.Marca?.includes('MARCA-NA'));
+            // Filtrar basura (SIN CLASIFICAR, etc) asegurando que Sucursal exista
+            const data = rawData.filter(d => d.Sucursal && String(d.Sucursal).trim() !== '' && !String(d.Marca || '').includes('MARCA-NA'));
 
             let totalUnidades = 0;
             let totalCosto = 0;
@@ -197,9 +204,10 @@
             const agencias = {};
 
             data.forEach(row => {
-                const costo = Number(row.Costo) || 0;
-                const dias = Number(row['Días en Inventario']) || 0;
-                const sucursal = row.Sucursal.trim();
+                // APLICANDO EL LIMPIADOR INMORTAL
+                const costo = limpiarNumero(row.Costo || row.costo || row.COSTO);
+                const dias = limpiarNumero(row['Días en Inventario'] || row['días en inventario'] || row['DIAS EN INVENTARIO']);
+                const sucursal = String(row.Sucursal).trim().toUpperCase();
 
                 totalUnidades++;
                 totalCosto += costo;
@@ -233,8 +241,8 @@
             document.getElementById('kpiUnidades').innerText = fmtNum(totalUnidades);
             document.getElementById('kpiCosto').innerText = fmtMoney(totalCosto);
             document.getElementById('kpiRiesgo').innerText = fmtMoney(buckets.hueso.cost);
-            document.getElementById('kpiRiesgoPct').innerText = `${((buckets.hueso.cost / totalCosto) * 100).toFixed(1)}% del capital congelado`;
-            document.getElementById('kpiDiasPromedio').innerText = Math.round(totalDias / totalUnidades) + ' Días';
+            document.getElementById('kpiRiesgoPct').innerText = `${((buckets.hueso.cost / (totalCosto || 1)) * 100).toFixed(1)}% del capital total`;
+            document.getElementById('kpiDiasPromedio').innerText = Math.round(totalDias / (totalUnidades || 1)) + ' Días';
 
             // 2. PINTAR DONA (CHART.JS)
             const ctx = document.getElementById('donutChart').getContext('2d');
@@ -265,11 +273,10 @@
             `).join('');
 
             // 3. PINTAR RADIOGRAFÍA POR AGENCIA
-            // Ordenar agencias por porcentaje de hueso (las más peligrosas primero)
-            const agenciasArr = Object.entries(agencias).map(([name, data]) => {
-                data.pctHueso = (data.hueso / data.total) * 100;
-                data.name = name;
-                return data;
+            const agenciasArr = Object.entries(agencias).map(([name, obj]) => {
+                obj.pctHueso = (obj.hueso / obj.total) * 100;
+                obj.name = name;
+                return obj;
             }).sort((a, b) => b.pctHueso - a.pctHueso);
 
             document.getElementById('agencyTbody').innerHTML = agenciasArr.map(ag => {
@@ -286,19 +293,19 @@
                 </tr>
             `}).join('');
 
-            // 4. PINTAR MURO DE LOS LAMENTOS (Top 15 Peores)
-            const peores = [...data].sort((a, b) => (Number(b['Días en Inventario']) || 0) - (Number(a['Días en Inventario']) || 0)).slice(0, 15);
+            // 4. PINTAR MURO DE LOS LAMENTOS
+            const peores = [...data].sort((a, b) => limpiarNumero(b['Días en Inventario']) - limpiarNumero(a['Días en Inventario'])).slice(0, 15);
 
             document.getElementById('worstTbody').innerHTML = peores.map(auto => `
                 <tr class="hover:bg-red-50 transition-colors group">
-                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${auto['Días en Inventario']}</td>
-                    <td class="p-3 font-bold text-gray-800 uppercase">${auto.Sucursal}</td>
+                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${limpiarNumero(auto['Días en Inventario'])}</td>
+                    <td class="p-3 font-bold text-gray-800 uppercase">${auto.Sucursal || 'N/A'}</td>
                     <td class="p-3">
-                        <p class="font-black text-gray-900">${auto.Modelo} ${auto.Marca} ${auto.SubMarca}</p>
-                        <p class="text-[9px] text-gray-400 mt-0.5">${auto.Versión}</p>
+                        <p class="font-black text-gray-900">${auto.Modelo || ''} ${auto.Marca || ''} ${auto.SubMarca || ''}</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">${auto.Versión || ''}</p>
                     </td>
                     <td class="p-3 font-mono text-gray-500 text-[10px]">${auto.VIN || 'N/A'}</td>
-                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(auto.Costo)}</td>
+                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(limpiarNumero(auto.Costo))}</td>
                 </tr>
             `).join('');
 
