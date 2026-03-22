@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica de Inventario - Seminuevos Daytona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .card-daytona {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #fd0019;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="pb-12">
+
+    <header class="bg-[#111827] text-white px-6 py-4 shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-[#fd0019] p-3 rounded-lg shadow-lg"><i class="fas fa-stethoscope fa-lg"></i></div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight uppercase">Clínica de Inventario</h1>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Auditoría de Riesgo y
+                        Capital Congelado</p>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 flex items-center gap-3">
+                <i class="fas fa-file-csv text-green-400 ml-2"></i>
+                <input type="file" id="csvFile" accept=".csv"
+                    class="text-xs text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#fd0019] file:text-white hover:file:bg-red-700 cursor-pointer">
+            </div>
+        </div>
+    </header>
+
+    <main id="dashboard" class="max-w-7xl mx-auto px-6 pt-8 hidden animate-in fade-in duration-700">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Unidades Totales</p>
+                <h3 id="kpiUnidades" class="text-3xl font-black text-gray-800">0</h3>
+                <i class="fas fa-car absolute -bottom-4 -right-4 text-6xl text-gray-100"></i>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Costo Total Invertido</p>
+                <h3 id="kpiCosto" class="text-3xl font-black text-[#003366]">0</h3>
+                <i class="fas fa-money-bill-wave absolute -bottom-4 -right-4 text-6xl text-blue-50"></i>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden">
+                <p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Capital en Riesgo (>90
+                    Días)</p>
+                <h3 id="kpiRiesgo" class="text-3xl font-black text-[#fd0019]">0</h3>
+                <p id="kpiRiesgoPct" class="text-xs font-bold text-red-500 mt-1">0% del capital total</p>
+                <i class="fas fa-fire absolute -bottom-4 -right-4 text-6xl text-red-50"></i>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Promedio Días Inv.</p>
+                <h3 id="kpiDiasPromedio" class="text-3xl font-black text-gray-800">0</h3>
+                <p class="text-xs font-bold text-gray-400 mt-1">Días de estancamiento global</p>
+                <i class="fas fa-calendar-alt absolute -bottom-4 -right-4 text-6xl text-gray-100"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="card-daytona p-6 lg:col-span-1">
+                <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2">Semáforo de
+                    Rotación</h2>
+                <div class="h-64 relative">
+                    <canvas id="donutChart"></canvas>
+                </div>
+                <div class="mt-4 space-y-2" id="donutLegend"></div>
+            </div>
+
+            <div class="card-daytona p-0 lg:col-span-2 overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest">Radiografía de Riesgo por
+                            Sucursal</h2>
+                        <p class="text-[10px] text-gray-500 uppercase mt-1 font-bold">Distribución del inventario tóxico
+                            (>90 días)</p>
+                    </div>
+                </div>
+                <div class="overflow-auto max-h-80 scrollbar-thin">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-[#111827] text-white text-[10px] uppercase tracking-wider sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3 font-black">Sucursal</th>
+                                <th class="p-3 font-black text-center">Unidades</th>
+                                <th class="p-3 font-black text-center text-green-400">Sano (0-60)</th>
+                                <th class="p-3 font-black text-center text-yellow-400">Alerta (61-90)</th>
+                                <th class="p-3 font-black text-center text-[#fd0019]">Hueso (>90)</th>
+                                <th class="p-3 font-black text-right">% Hueso</th>
+                                <th class="p-3 font-black text-right bg-red-900/50">Capital Congelado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agencyTbody" class="text-xs divide-y divide-gray-100 bg-white">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-daytona p-0 overflow-hidden border-t-4 border-black">
+            <div class="bg-black px-6 py-4 flex justify-between items-center">
+                <h2 class="text-sm font-black text-white uppercase tracking-widest"><i
+                        class="fas fa-skull-crossbones text-red-500 mr-2"></i> El Muro de los Lamentos (Top 15 Peores
+                    Casos)</h2>
+            </div>
+            <div class="overflow-auto scrollbar-thin">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="p-3 font-black">Días</th>
+                            <th class="p-3 font-black">Sucursal</th>
+                            <th class="p-3 font-black">Vehículo (Año/Marca/Modelo)</th>
+                            <th class="p-3 font-black">VIN</th>
+                            <th class="p-3 font-black text-right">Costo Atrapado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="worstTbody" class="text-xs divide-y divide-gray-100 bg-white">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="welcomeState" class="max-w-xl mx-auto mt-20 text-center">
+        <i class="fas fa-file-csv text-6xl text-gray-300 mb-4"></i>
+        <h2 class="text-2xl font-black text-gray-800">Carga tu Inventario</h2>
+        <p class="text-gray-500 mt-2 text-sm font-medium">Sube el archivo CSV exportado del sistema para generar la
+            auditoría de riesgo automáticamente.</p>
+    </div>
+
+    <script>
+        let chartInstance = null;
+
+        // Formateadores
+        const fmtMoney = (val) => '$' + Number(val).toLocaleString('es-MX', { maximumFractionDigits: 0 });
+        const fmtNum = (val) => Number(val).toLocaleString('es-MX');
+
+        document.getElementById('csvFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function (results) {
+                    procesarDatos(results.data);
+                }
+            });
+        });
+
+        function procesarDatos(rawData) {
+            // Filtrar basura (SIN CLASIFICAR, etc)
+            const data = rawData.filter(d => d.Sucursal && d['Id de Art.'] && !d.Marca?.includes('MARCA-NA'));
+
+            let totalUnidades = 0;
+            let totalCosto = 0;
+            let totalDias = 0;
+
+            // Buckets para la Dona
+            const buckets = {
+                sano: { label: 'Sano (0-30 días)', color: '#10b981', count: 0, cost: 0 },
+                precaucion: { label: 'Precaución (31-60)', color: '#f59e0b', count: 0, cost: 0 },
+                alerta: { label: 'Alerta (61-90)', color: '#f97316', count: 0, cost: 0 },
+                hueso: { label: 'Tóxico / Hueso (>90)', color: '#fd0019', count: 0, cost: 0 }
+            };
+
+            // Agrupación por Sucursal
+            const agencias = {};
+
+            data.forEach(row => {
+                const costo = Number(row.Costo) || 0;
+                const dias = Number(row['Días en Inventario']) || 0;
+                const sucursal = row.Sucursal.trim();
+
+                totalUnidades++;
+                totalCosto += costo;
+                totalDias += dias;
+
+                // Inicializar agencia
+                if (!agencias[sucursal]) {
+                    agencias[sucursal] = { total: 0, sano: 0, alerta: 0, hueso: 0, costoHueso: 0 };
+                }
+
+                agencias[sucursal].total++;
+
+                // Llenar Buckets y Agencias
+                if (dias <= 30) {
+                    buckets.sano.count++; buckets.sano.cost += costo;
+                    agencias[sucursal].sano++;
+                } else if (dias <= 60) {
+                    buckets.precaucion.count++; buckets.precaucion.cost += costo;
+                    agencias[sucursal].sano++; // Sano extendido para la tabla
+                } else if (dias <= 90) {
+                    buckets.alerta.count++; buckets.alerta.cost += costo;
+                    agencias[sucursal].alerta++;
+                } else {
+                    buckets.hueso.count++; buckets.hueso.cost += costo;
+                    agencias[sucursal].hueso++;
+                    agencias[sucursal].costoHueso += costo;
+                }
+            });
+
+            // 1. PINTAR KPIs
+            document.getElementById('kpiUnidades').innerText = fmtNum(totalUnidades);
+            document.getElementById('kpiCosto').innerText = fmtMoney(totalCosto);
+            document.getElementById('kpiRiesgo').innerText = fmtMoney(buckets.hueso.cost);
+            document.getElementById('kpiRiesgoPct').innerText = `${((buckets.hueso.cost / totalCosto) * 100).toFixed(1)}% del capital congelado`;
+            document.getElementById('kpiDiasPromedio').innerText = Math.round(totalDias / totalUnidades) + ' Días';
+
+            // 2. PINTAR DONA (CHART.JS)
+            const ctx = document.getElementById('donutChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.values(buckets).map(b => b.label),
+                    datasets: [{
+                        data: Object.values(buckets).map(b => b.count),
+                        backgroundColor: Object.values(buckets).map(b => b.color),
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Leyenda HTML de la dona
+            document.getElementById('donutLegend').innerHTML = Object.values(buckets).map(b => `
+                <div class="flex justify-between items-center text-xs font-bold">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background:${b.color}"></span>
+                        <span class="text-gray-600">${b.label}</span>
+                    </div>
+                    <span class="text-gray-900">${b.count} unids. <span class="text-gray-400 font-normal">(${fmtMoney(b.cost)})</span></span>
+                </div>
+            `).join('');
+
+            // 3. PINTAR RADIOGRAFÍA POR AGENCIA
+            // Ordenar agencias por porcentaje de hueso (las más peligrosas primero)
+            const agenciasArr = Object.entries(agencias).map(([name, data]) => {
+                data.pctHueso = (data.hueso / data.total) * 100;
+                data.name = name;
+                return data;
+            }).sort((a, b) => b.pctHueso - a.pctHueso);
+
+            document.getElementById('agencyTbody').innerHTML = agenciasArr.map(ag => {
+                const bgHueso = ag.pctHueso > 40 ? 'bg-red-50 text-red-700' : (ag.pctHueso > 20 ? 'text-red-600' : 'text-gray-600');
+                return `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="p-3 font-bold text-gray-800">${ag.name}</td>
+                    <td class="p-3 text-center font-bold text-gray-600">${ag.total}</td>
+                    <td class="p-3 text-center font-bold text-green-600">${ag.sano}</td>
+                    <td class="p-3 text-center font-bold text-yellow-500">${ag.alerta}</td>
+                    <td class="p-3 text-center font-black text-[#fd0019]">${ag.hueso}</td>
+                    <td class="p-3 text-right font-black ${bgHueso}">${ag.pctHueso.toFixed(1)}%</td>
+                    <td class="p-3 text-right font-black text-[#fd0019] bg-red-50/50">${fmtMoney(ag.costoHueso)}</td>
+                </tr>
+            `}).join('');
+
+            // 4. PINTAR MURO DE LOS LAMENTOS (Top 15 Peores)
+            const peores = [...data].sort((a, b) => (Number(b['Días en Inventario']) || 0) - (Number(a['Días en Inventario']) || 0)).slice(0, 15);
+
+            document.getElementById('worstTbody').innerHTML = peores.map(auto => `
+                <tr class="hover:bg-red-50 transition-colors group">
+                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${auto['Días en Inventario']}</td>
+                    <td class="p-3 font-bold text-gray-800 uppercase">${auto.Sucursal}</td>
+                    <td class="p-3">
+                        <p class="font-black text-gray-900">${auto.Modelo} ${auto.Marca} ${auto.SubMarca}</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">${auto.Versión}</p>
+                    </td>
+                    <td class="p-3 font-mono text-gray-500 text-[10px]">${auto.VIN || 'N/A'}</td>
+                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(auto.Costo)}</td>
+                </tr>
+            `).join('');
+
+            // Ocultar bienvenida y mostrar dashboard
+            document.getElementById('welcomeState').style.display = 'none';
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

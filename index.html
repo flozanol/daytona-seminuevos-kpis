@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,60 +27,148 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-        body { font-family: 'Roboto', sans-serif; background-color: #f3f4f6; color: #1f2937; }
-        .card-daytona { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-top: 4px solid #fd0019; transition: transform 0.2s ease; }
-        .card-daytona:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .btn-primary { background-color: #fd0019; color: white; transition: all 0.2s; }
-        .btn-primary:hover { background-color: #c40013; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th { background-color: #111827; color: white; font-weight: 600; padding: 12px; font-size: 0.75rem; position: sticky; top: 0; z-index: 20; }
-        td { border-bottom: 1px solid #e5e7eb; padding: 10px 12px; font-size: 0.85rem; color: #374151; text-align: center; }
-        td:first-child, th:first-child { position: sticky; left: 0; z-index: 25; text-align: left; font-weight: 700; background-color: #f9fafb; border-right: 2px solid #e5e7eb; }
-        th:first-child { background-color: #fd0019; color: white; }
-        .highest-highlight { background-color: #dcfce7 !important; color: #166534 !important; font-weight: 800 !important; border: 1px solid #86efac !important; }
-        .loader { border-top-color: #fd0019; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .card-daytona {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #fd0019;
+            transition: transform 0.2s ease;
+        }
+
+        .card-daytona:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #fd0019;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #c40013;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            background-color: #111827;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            font-size: 0.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            color: #374151;
+            text-align: center;
+        }
+
+        td:first-child,
+        th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 25;
+            text-align: left;
+            font-weight: 700;
+            background-color: #f9fafb;
+            border-right: 2px solid #e5e7eb;
+        }
+
+        th:first-child {
+            background-color: #fd0019;
+            color: white;
+        }
+
+        .highest-highlight {
+            background-color: #dcfce7 !important;
+            color: #166534 !important;
+            font-weight: 800 !important;
+            border: 1px solid #86efac !important;
+        }
+
+        .loader {
+            border-top-color: #fd0019;
+            animation: spinner 1.5s linear infinite;
+        }
+
+        @keyframes spinner {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
     </style>
 </head>
+
 <body>
     <header class="bg-white border-b border-gray-200 px-4 py-4 md:px-8 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex flex-row md:items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
                 <div class="bg-daytona-red text-white font-black p-2.5 rounded-xl shadow-lg">
                     <i class="fas fa-car-side fa-lg"></i>
                 </div>
                 <div>
-                    <h2 class="text-[10px] font-black text-daytona-red uppercase tracking-widest leading-none mb-1">Grupo Daytona</h2>
-                    <h1 class="text-xl md:text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">DASHBOARD GERENCIAL</h1>
+                    <h2 class="text-[10px] font-black text-daytona-red uppercase tracking-widest leading-none mb-1">
+                        Grupo Daytona</h2>
+                    <h1 class="text-xl md:text-2xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+                        DASHBOARD GERENCIAL</h1>
                     <p class="text-[11px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">Autos Seminuevos</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="text-right hidden sm:block">
-                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-tighter leading-none">Última actualización</p>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="text-right hidden sm:block mr-2">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-tighter leading-none">Última
+                        actualización</p>
                     <p id="clock" class="text-sm font-black text-gray-800 tracking-tighter mt-0.5">--:--</p>
                 </div>
-                <button onclick="forceReload()" class="btn-primary px-6 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest shadow-md flex items-center gap-2">
-                    <i class="fas fa-sync-alt"></i> Actualizar Datos
-                 <!-- Botón para el Reporte de Rotación -->
-        <div style="margin: 20px 0; text-align: center;">
-            <a href="reporte_gerencial_daytona.html" 
-               style="background-color: #ef4444; 
-                      color: white; 
-                      padding: 15px 30px; 
-                      text-decoration: none; 
-                      border-radius: 12px; 
-                      font-family: sans-serif; 
-                      font-weight: bold; 
-                      display: inline-block;
-                      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                      transition: transform 0.2s;">
-                📊 Ver Reporte de Rotación Crítica
-            </a>
-        </div>
-                                
+
+                <button onclick="forceReload()"
+                    class="btn-primary px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest shadow-md flex items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+
+                <a href="reporte_gerencial_daytona.html"
+                    class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest shadow-md flex items-center gap-2 transition-colors">
+                    <i class="fas fa-chart-pie"></i> Reporte Rotación
+                </a>
+
+                <a href="clinica_inventario.html"
+                    class="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white px-4 py-2.5 rounded-lg text-xs font-black uppercase tracking-widest shadow-md flex items-center gap-2 transition-all transform hover:scale-105">
+                    <i class="fas fa-stethoscope"></i> Clínica Inventario
+                </a>
             </div>
         </div>
     </header>
@@ -90,21 +179,26 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Unidades Facturadas</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Unidades
+                            Facturadas</p>
                         <h3 id="cardTotalSales" class="text-4xl font-black text-gray-900 tracking-tighter">0</h3>
                         <p class="text-[10px] font-bold text-daytona-red mt-1 uppercase">Periodo Actual</p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
+                    <div
+                        class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
                         <i class="fas fa-tags fa-2x"></i>
                     </div>
                 </div>
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Agencia Líder</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Agencia Líder
+                        </p>
                         <h3 id="cardTopAgency" class="text-2xl font-black text-gray-900 tracking-tighter">-</h3>
-                        <p id="cardTopAgencyVal" class="text-[10px] font-bold text-daytona-red mt-1 uppercase">0 Unidades</p>
+                        <p id="cardTopAgencyVal" class="text-[10px] font-bold text-daytona-red mt-1 uppercase">0
+                            Unidades</p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
+                    <div
+                        class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
                         <i class="fas fa-trophy fa-2x"></i>
                     </div>
                 </div>
@@ -114,17 +208,20 @@
                         <h3 id="cardBestMonth" class="text-2xl font-black text-gray-900 tracking-tighter">-</h3>
                         <p class="text-[10px] font-bold text-daytona-red mt-1 uppercase">Pico de facturación</p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
+                    <div
+                        class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
                         <i class="fas fa-calendar-check fa-2x"></i>
                     </div>
                 </div>
                 <div class="card-daytona p-6 flex items-center justify-between group">
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Promedio Mensual</p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Promedio Mensual
+                        </p>
                         <h3 id="cardAvg" class="text-2xl font-black text-gray-900 tracking-tighter">-</h3>
                         <p class="text-[10px] font-bold text-daytona-red mt-1 uppercase">Unidades x Mes</p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
+                    <div
+                        class="bg-gray-50 p-4 rounded-xl text-gray-400 group-hover:bg-daytona-red group-hover:text-white transition-all">
                         <i class="fas fa-chart-line fa-2x"></i>
                     </div>
                 </div>
@@ -132,11 +229,16 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-10">
                 <div class="lg:col-span-1 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-                    <h3 class="text-xs font-black text-gray-900 uppercase tracking-widest mb-8 border-b border-gray-100 pb-4">CONFIGURACIÓN Y FILTROS</h3>
+                    <h3
+                        class="text-xs font-black text-gray-900 uppercase tracking-widest mb-8 border-b border-gray-100 pb-4">
+                        CONFIGURACIÓN Y FILTROS</h3>
                     <div class="space-y-8">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Áño de Datos</label>
-                            <select id="yearSelect" onchange="updateAllTables()" class="w-full bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-daytona-red">
+                            <label
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-2">Áño
+                                de Datos</label>
+                            <select id="yearSelect" onchange="updateAllTables()"
+                                class="w-full bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-daytona-red">
                                 <option value="2025">2025</option>
                                 <option value="2026">2026</option>
                                 <option value="all" selected>Comparativo (Ambos años)</option>
@@ -144,41 +246,55 @@
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-4">
-                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Agencias Visibles</label>
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Agencias
+                                    Visibles</label>
                                 <div class="space-x-2">
-                                    <button onclick="toggleAll('agency', true)" class="text-[9px] font-bold text-daytona-red uppercase">Todas</button>
-                                    <button onclick="toggleAll('agency', false)" class="text-[9px] font-bold text-gray-400 uppercase">Ninguna</button>
+                                    <button onclick="toggleAll('agency', true)"
+                                        class="text-[9px] font-bold text-daytona-red uppercase">Todas</button>
+                                    <button onclick="toggleAll('agency', false)"
+                                        class="text-[9px] font-bold text-gray-400 uppercase">Ninguna</button>
                                 </div>
                             </div>
                             <div id="agencyChecks" class="space-y-1 max-h-48 overflow-y-auto scrollbar-thin"></div>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-4">
-                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Meses</label>
+                                <label
+                                    class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Meses</label>
                                 <div class="space-x-2">
-                                    <button onclick="toggleAll('month', true)" class="text-[9px] font-bold text-daytona-red uppercase">Todos</button>
-                                    <button onclick="toggleAll('month', false)" class="text-[9px] font-bold text-gray-400 uppercase">Ninguno</button>
+                                    <button onclick="toggleAll('month', true)"
+                                        class="text-[9px] font-bold text-daytona-red uppercase">Todos</button>
+                                    <button onclick="toggleAll('month', false)"
+                                        class="text-[9px] font-bold text-gray-400 uppercase">Ninguno</button>
                                 </div>
                             </div>
                             <div id="monthChecks" class="space-y-1 max-h-48 overflow-y-auto scrollbar-thin"></div>
                         </div>
-                        <button onclick="updateAllTables()" class="btn-primary w-full py-3 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg">Aplicar Cambios</button>
+                        <button onclick="updateAllTables()"
+                            class="btn-primary w-full py-3 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg">Aplicar
+                            Cambios</button>
                     </div>
                 </div>
 
                 <div class="lg:col-span-3">
                     <div class="card-daytona p-6 mb-6">
-                        <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase mb-6">Resumen Global Seminuevos</h2>
+                        <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase mb-6">Resumen Global
+                            Seminuevos</h2>
                         <div class="mb-6">
-                            <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tendencia Global (Línea de Tiempo)</h4>
+                            <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Tendencia Global
+                                (Línea de Tiempo)</h4>
                             <div id="waterfallChart" style="height:220px;"></div>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-3">
-                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Matriz de KPIs Inteligente</h4>
-                                <button onclick="exportTable('globalTable','KPIs_Global')" class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i class="fas fa-file-excel"></i> Excel</button>
+                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Matriz de KPIs
+                                    Inteligente</h4>
+                                <button onclick="exportTable('globalTable','KPIs_Global')"
+                                    class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i
+                                        class="fas fa-file-excel"></i> Excel</button>
                             </div>
-                            <p class="text-[10px] text-gray-400 mb-3">Los promedios respetan la naturaleza del KPI (Ratio vs Volumen).</p>
+                            <p class="text-[10px] text-gray-400 mb-3">Los promedios respetan la naturaleza del KPI
+                                (Ratio vs Volumen).</p>
                             <div class="overflow-auto max-h-96 scrollbar-thin rounded-lg">
                                 <table id="globalTable">
                                     <thead id="globalThead"></thead>
@@ -190,20 +306,26 @@
                 </div>
             </div>
 
-            <!-- COMPARATIVO INTERANUAL - pantalla completa con selector propio de agencia -->
             <div class="card-daytona p-6 mb-8">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase">Comparativo Interanual (Mismo Mes)</h2>
+                    <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase">Comparativo Interanual
+                        (Mismo Mes)</h2>
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Agencia:</label>
-                            <select id="yearCompareAgencySelect" onchange="renderYearComparison()" class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
+                            <label
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Agencia:</label>
+                            <select id="yearCompareAgencySelect" onchange="renderYearComparison()"
+                                class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                         </div>
                         <div class="flex items-center gap-2">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Mes:</label>
-                            <select id="compareMonthSelect" onchange="updateMonthlyComparison(); renderYearComparison()" class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
+                            <label
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Mes:</label>
+                            <select id="compareMonthSelect" onchange="updateMonthlyComparison(); renderYearComparison()"
+                                class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                         </div>
-                        <button onclick="exportTable('yearCompareTable','Comparativo_Interanual')" class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button onclick="exportTable('yearCompareTable','Comparativo_Interanual')"
+                            class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i
+                                class="fas fa-file-excel"></i> Excel</button>
                     </div>
                 </div>
                 <div class="overflow-auto max-h-[500px] scrollbar-thin rounded-lg">
@@ -214,12 +336,13 @@
                 </div>
             </div>
 
-            <!-- COMPARATIVO POR MES -->
             <div class="card-daytona p-6 mb-8">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase">Comparativo por Mes</h2>
                     <div class="flex items-center gap-3">
-                        <button onclick="exportTable('monthlyTable','Comparativo_Mes')" class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button onclick="exportTable('monthlyTable','Comparativo_Mes')"
+                            class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i
+                                class="fas fa-file-excel"></i> Excel</button>
                     </div>
                 </div>
                 <div class="overflow-auto max-h-[500px] scrollbar-thin rounded-lg">
@@ -230,20 +353,24 @@
                 </div>
             </div>
 
-            <!-- HISTÓRICO AGENCIA - pantalla completa -->
             <div class="card-daytona p-6 mb-8">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <h2 class="text-lg font-black text-gray-900 tracking-tighter uppercase">Histórico Agencia</h2>
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Agencia:</label>
-                            <select id="historyAgencySelect" onchange="updateAgencyHistory()" class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
+                            <label
+                                class="text-[10px] font-black text-gray-400 uppercase tracking-tighter whitespace-nowrap">Agencia:</label>
+                            <select id="historyAgencySelect" onchange="updateAgencyHistory()"
+                                class="bg-gray-50 border border-gray-200 text-gray-800 font-bold text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-daytona-red"></select>
                         </div>
-                        <button onclick="exportTable('historyTable','Historico_Agencia')" class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button onclick="exportTable('historyTable','Historico_Agencia')"
+                            class="text-[10px] font-bold text-daytona-red uppercase hover:underline flex items-center gap-1"><i
+                                class="fas fa-file-excel"></i> Excel</button>
                     </div>
                 </div>
                 <div class="mb-6">
-                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Línea de Tiempo (Hasta Mes Anterior)</h4>
+                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Línea de Tiempo (Hasta
+                        Mes Anterior)</h4>
                     <canvas id="historyChart" style="height:220px; max-height:220px;"></canvas>
                 </div>
                 <div class="overflow-auto max-h-[500px] scrollbar-thin rounded-lg">
@@ -274,7 +401,7 @@
         let activeAgencies = [], activeMonths = [], chartInstances = {};
 
         function updateClock() {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
         }
         setInterval(updateClock, 60000);
         updateClock();
@@ -309,7 +436,7 @@
             const kpiIdx = headers.findIndex(h => h.toLowerCase().match(/kpi|concepto/)) || 0;
             const map2025 = {}, map2026 = {};
             headers.forEach((h, i) => {
-                const m = MONTHS_ORDER.find(mo => h.toLowerCase().startsWith(mo.toLowerCase().substr(0,3)));
+                const m = MONTHS_ORDER.find(mo => h.toLowerCase().startsWith(mo.toLowerCase().substr(0, 3)));
                 if (m) {
                     if (i >= 1 && i <= 12) map2025[m] = i;
                     if (i >= 13 && i <= 24) map2026[m] = i;
@@ -321,13 +448,13 @@
                 const o25 = { name: row[kpiIdx].trim() }, o26 = { name: row[kpiIdx].trim() };
                 Object.keys(map2025).forEach(m => {
                     let v = row[map2025[m]];
-                    if(typeof v==='string') v=parseFloat(v.replace(/[^0-9.-]+/g,""));
-                    o25[m] = isNaN(v)?0:v;
+                    if (typeof v === 'string') v = parseFloat(v.replace(/[^0-9.-]+/g, ""));
+                    o25[m] = isNaN(v) ? 0 : v;
                 });
                 Object.keys(map2026).forEach(m => {
                     let v = row[map2026[m]];
-                    if(typeof v==='string') v=parseFloat(v.replace(/[^0-9.-]+/g,""));
-                    o26[m] = isNaN(v)?0:v;
+                    if (typeof v === 'string') v = parseFloat(v.replace(/[^0-9.-]+/g, ""));
+                    o26[m] = isNaN(v) ? 0 : v;
                 });
                 kpis2025.push(o25);
                 kpis2026.push(o26);
@@ -341,10 +468,10 @@
             activeMonths = [...MONTHS_ORDER];
             renderChecks('agencyChecks', activeAgencies, 'agency');
             renderChecks('monthChecks', MONTHS_ORDER, 'month');
-            
+
             const monthOpts = MONTHS_ORDER.map(m => `<option value="${m}">${m}</option>`).join('');
             document.getElementById('compareMonthSelect').innerHTML = monthOpts;
-            
+
             const agencyOpts = activeAgencies.map(a => `<option value="${a}">${a}</option>`).join('');
             document.getElementById('historyAgencySelect').innerHTML = agencyOpts;
             document.getElementById('yearCompareAgencySelect').innerHTML = agencyOpts;
@@ -356,7 +483,7 @@
             const y = document.getElementById('yearSelect').value;
             rawData = (y === '2025') ? rawData2025 : (y === '2026') ? rawData2026 : [...rawData2025, ...rawData2026];
             activeAgencies = getCheckedValues('agency');
-            activeMonths = getCheckedValues('month').sort((a,b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
+            activeMonths = getCheckedValues('month').sort((a, b) => MONTHS_ORDER.indexOf(a) - MONTHS_ORDER.indexOf(b));
             if (!activeAgencies.length || !activeMonths.length) return;
             calculateTopStats();
             renderTable1_Global();
@@ -372,18 +499,18 @@
                 rawData.filter(d => d.agency === ag).forEach(d => {
                     const k = d.kpis.find(ki => ki.name === KPI_TARGET);
                     if (k) activeMonths.forEach(m => {
-                        const v = k[m]||0;
+                        const v = k[m] || 0;
                         total += v;
                         agTotals[ag] += v;
-                        moTotals[m] = (moTotals[m]||0)+v;
+                        moTotals[m] = (moTotals[m] || 0) + v;
                     });
                 });
             });
-            const topA = Object.keys(agTotals).reduce((a,b) => agTotals[a]>agTotals[b]?a:b, '-');
-            const bestM = Object.keys(moTotals).reduce((a,b) => moTotals[a]>moTotals[b]?a:b, '-');
+            const topA = Object.keys(agTotals).reduce((a, b) => agTotals[a] > agTotals[b] ? a : b, '-');
+            const bestM = Object.keys(moTotals).reduce((a, b) => moTotals[a] > moTotals[b] ? a : b, '-');
             document.getElementById('cardTotalSales').innerText = fmt(total);
             document.getElementById('cardTopAgency').innerText = topA;
-            document.getElementById('cardTopAgencyVal').innerText = fmt(agTotals[topA]||0) + ' Unidades';
+            document.getElementById('cardTopAgencyVal').innerText = fmt(agTotals[topA] || 0) + ' Unidades';
             document.getElementById('cardBestMonth').innerText = bestM;
             document.getElementById('cardAvg').innerText = fmt(total / activeMonths.length);
         }
@@ -400,18 +527,18 @@
                     rawData.filter(d => d.agency === ag).forEach(d => {
                         const k = d.kpis.find(kp => kp.name === name);
                         if (k) activeMonths.forEach(m => {
-                            const v = k[m]||0;
+                            const v = k[m] || 0;
                             sum += v;
-                            if(v!==0) count++;
+                            if (v !== 0) count++;
                         });
                     });
-                    const cellVal = (isAvg && count > 0) ? sum/count : sum;
+                    const cellVal = (isAvg && count > 0) ? sum / count : sum;
                     rowSum += cellVal;
-                    if (cellVal!==0) validAg++;
+                    if (cellVal !== 0) validAg++;
                     return `<td>${fmt(cellVal)}</td>`;
                 }).join('');
-                const groupVal = (isAvg && !isGS && validAg > 0) ? rowSum/validAg : rowSum;
-                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(groupVal)}</td><td class="font-bold">${fmt(validAg?rowSum/validAg:0)}</td></tr>`;
+                const groupVal = (isAvg && !isGS && validAg > 0) ? rowSum / validAg : rowSum;
+                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(groupVal)}</td><td class="font-bold">${fmt(validAg ? rowSum / validAg : 0)}</td></tr>`;
             }).join('');
             renderWaterfall();
         }
@@ -425,13 +552,13 @@
                 const cells = activeAgencies.map(ag => {
                     let val = 0;
                     rawData.filter(d => d.agency === ag).forEach(d => {
-                        const k = d.kpis.find(kp => kp.name===name);
-                        val += k?k[m]:0;
+                        const k = d.kpis.find(kp => kp.name === name);
+                        val += k ? k[m] : 0;
                     });
                     sum += val;
                     return `<td>${fmt(val)}</td>`;
                 }).join('');
-                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(sum/activeAgencies.length)}</td></tr>`;
+                return `<tr><td class="font-medium">${name}</td>${cells}<td class="font-bold">${fmt(sum / activeAgencies.length)}</td></tr>`;
             }).join('');
         }
 
@@ -439,9 +566,9 @@
             const ag = document.getElementById('historyAgencySelect').value;
             const currentM = new Date().getMonth();
             let timeline = [], labels = [];
-            MONTHS_ORDER.forEach(m => { timeline.push({m, y:'2025'}); labels.push(`${m} 25`); });
-            MONTHS_ORDER.forEach((m, idx) => { if (idx <= currentM) { timeline.push({m, y:'2026'}); labels.push(`${m} 26`); } });
-            
+            MONTHS_ORDER.forEach(m => { timeline.push({ m, y: '2025' }); labels.push(`${m} 25`); });
+            MONTHS_ORDER.forEach((m, idx) => { if (idx <= currentM) { timeline.push({ m, y: '2026' }); labels.push(`${m} 26`); } });
+
             const kpiNames = [...new Set(rawData.flatMap(d => d.kpis.map(k => k.name)))], chartV = [];
             const head = document.getElementById('historyThead'), body = document.getElementById('historyTbody');
             head.innerHTML = `<tr><th>KPI</th>${labels.map(l => `<th>${l}</th>`).join('')}</tr>`;
@@ -456,7 +583,7 @@
                 }).join('');
                 return `<tr><td class="font-medium">${name}</td>${rowCells}</tr>`;
             }).join('');
-            
+
             const ctx = document.getElementById('historyChart').getContext('2d');
             if (chartInstances.history) chartInstances.history.destroy();
             chartInstances.history = new Chart(ctx, {
@@ -468,9 +595,9 @@
 
         function renderWaterfall() {
             const currentM = new Date().getMonth(), labels = [], data = [];
-            MONTHS_ORDER.forEach(m => { labels.push(`${m} 25`); let s=0; rawData2025.forEach(d => { if(activeAgencies.includes(d.agency)){ const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; } }); data.push(s); });
-            MONTHS_ORDER.forEach((m, idx) => { if (idx <= currentM) { labels.push(`${m} 26`); let s=0; rawData2026.forEach(d => { if(activeAgencies.includes(d.agency)){ const k=d.kpis.find(ki=>ki.name===KPI_TARGET); s+=k?k[m]:0; } }); data.push(s); } });
-            
+            MONTHS_ORDER.forEach(m => { labels.push(`${m} 25`); let s = 0; rawData2025.forEach(d => { if (activeAgencies.includes(d.agency)) { const k = d.kpis.find(ki => ki.name === KPI_TARGET); s += k ? k[m] : 0; } }); data.push(s); });
+            MONTHS_ORDER.forEach((m, idx) => { if (idx <= currentM) { labels.push(`${m} 26`); let s = 0; rawData2026.forEach(d => { if (activeAgencies.includes(d.agency)) { const k = d.kpis.find(ki => ki.name === KPI_TARGET); s += k ? k[m] : 0; } }); data.push(s); } });
+
             if (chartInstances.waterfall) chartInstances.waterfall.dispose();
             chartInstances.waterfall = echarts.init(document.getElementById('waterfallChart'));
             chartInstances.waterfall.setOption({ color: ['#fd0019'], tooltip: { trigger: 'axis' }, xAxis: { type: 'category', data: labels, axisLabel: { interval: 0, rotate: 45, fontSize: 8 } }, yAxis: { type: 'value' }, series: [{ type: 'bar', data }] });
@@ -484,7 +611,7 @@
             body.innerHTML = kpiNames.map(name => {
                 const d25 = rawData2025.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
                 const d26 = rawData2026.find(d => d.agency === ag)?.kpis.find(k => k.name === name);
-                const v25 = d25 ? (d25[m]||0) : 0, v26 = d26 ? (d26[m]||0) : 0;
+                const v25 = d25 ? (d25[m] || 0) : 0, v26 = d26 ? (d26[m] || 0) : 0;
                 const diff = v26 - v25, pct = v25 !== 0 ? (diff / v25) * 100 : 0;
                 const color = diff > 0 ? 'text-green-600' : 'text-daytona-red';
                 return `<tr><td class="font-medium">${name}</td><td>${fmt(v25)}</td><td>${fmt(v26)}</td><td class="font-bold ${color}">${diff > 0 ? '+' : ''}${fmt(diff)}</td><td class="font-black ${color}">${diff > 0 ? '+' : ''}${pct.toFixed(1)}%</td></tr>`;
@@ -492,11 +619,11 @@
         }
 
         function forceReload() { window.location.reload(); }
-        function fmt(n) { return n.toLocaleString('en-US', {maximumFractionDigits: 1}); }
+        function fmt(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
         function uiStatus(type, msg) {
             const el = document.getElementById('status'); el.classList.remove('hidden');
             el.className = `mb-6 p-4 rounded-lg text-sm font-bold flex items-center ${type === 'loading' ? 'bg-blue-50 text-blue-700' : type === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`;
-            el.innerHTML = `<i class="fas ${type==='loading'?'fa-spinner fa-spin':type==='error'?'fa-exclamation-circle':'fa-check-circle'} mr-2"></i> ${msg}`;
+            el.innerHTML = `<i class="fas ${type === 'loading' ? 'fa-spinner fa-spin' : type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i> ${msg}`;
         }
         function renderChecks(id, items, type) { document.getElementById(id).innerHTML = items.map(i => `<label class="flex items-center space-x-2 cursor-pointer p-1.5 rounded hover:bg-gray-100"><input type="checkbox" value="${i}" checked data-type="${type}" class="rounded text-daytona-red focus:ring-daytona-red"><span class="text-gray-700 font-medium">${i}</span></label>`).join(''); }
         function getCheckedValues(type) { return Array.from(document.querySelectorAll(`input[data-type="${type}"]:checked`)).map(cb => cb.value); }
@@ -505,4 +632,5 @@
         document.addEventListener('DOMContentLoaded', connectToAPI);
     </script>
 </body>
+
 </html>
