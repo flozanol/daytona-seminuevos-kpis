@@ -49,10 +49,17 @@
                         Capital Congelado</p>
                 </div>
             </div>
-            <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 flex items-center gap-3">
-                <i class="fas fa-file-csv text-green-400 ml-2"></i>
-                <input type="file" id="csvFile" accept=".csv"
-                    class="text-xs text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#fd0019] file:text-white hover:file:bg-red-700 cursor-pointer">
+            <div class="flex items-center gap-3">
+                <select id="agencyFilter"
+                    class="hidden bg-gray-800 border border-gray-600 text-white text-xs font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-[#fd0019]">
+                    <option value="ALL">Todas las Sucursales</option>
+                </select>
+
+                <div class="bg-gray-800 p-2 rounded-lg border border-gray-700 flex items-center gap-2">
+                    <i class="fas fa-file-csv text-green-400 ml-2"></i>
+                    <input type="file" id="csvFile" accept=".csv"
+                        class="text-xs text-gray-300 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#fd0019] file:text-white hover:file:bg-red-700 cursor-pointer">
+                </div>
             </div>
         </div>
     </header>
@@ -85,21 +92,31 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
             <div class="card-daytona p-6 lg:col-span-1">
-                <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2">Semáforo de
+                <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2">Semáforo
                     Rotación</h2>
-                <div class="h-64 relative">
+                <div class="h-48 relative">
                     <canvas id="donutChart"></canvas>
                 </div>
                 <div class="mt-4 space-y-2" id="donutLegend"></div>
             </div>
 
+            <div class="card-daytona p-6 lg:col-span-1 flex flex-col">
+                <h2
+                    class="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2 text-[#fd0019]">
+                    Top Marcas Tóxicas</h2>
+                <p class="text-[9px] text-gray-500 uppercase font-bold mb-3">Marcas con más dinero congelado (>90 días)
+                </p>
+                <div id="toxicBrandsList" class="flex-1 space-y-4 overflow-y-auto pr-2 scrollbar-thin">
+                </div>
+            </div>
+
             <div class="card-daytona p-0 lg:col-span-2 overflow-hidden flex flex-col">
                 <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <div>
-                        <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest">Radiografía de Riesgo por
-                            Sucursal</h2>
+                        <h2 class="text-sm font-black text-gray-900 uppercase tracking-widest">Radiografía por Sucursal
+                        </h2>
                         <p class="text-[10px] text-gray-500 uppercase mt-1 font-bold">Distribución del inventario tóxico
                             (>90 días)</p>
                     </div>
@@ -110,8 +127,7 @@
                             <tr>
                                 <th class="p-3 font-black">Sucursal</th>
                                 <th class="p-3 font-black text-center">Unidades</th>
-                                <th class="p-3 font-black text-center text-green-400">Sano (0-60)</th>
-                                <th class="p-3 font-black text-center text-yellow-400">Alerta (61-90)</th>
+                                <th class="p-3 font-black text-center text-green-400">Sano</th>
                                 <th class="p-3 font-black text-center text-[#fd0019]">Hueso (>90)</th>
                                 <th class="p-3 font-black text-right">% Hueso</th>
                                 <th class="p-3 font-black text-right bg-red-900/50">Capital Congelado</th>
@@ -124,15 +140,21 @@
             </div>
         </div>
 
-        <div class="card-daytona p-0 overflow-hidden border-t-4 border-black">
-            <div class="bg-black px-6 py-4 flex justify-between items-center">
+        <div class="card-daytona p-0 overflow-hidden border-t-4 border-black mb-10">
+            <div class="bg-black px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <h2 class="text-sm font-black text-white uppercase tracking-widest"><i
-                        class="fas fa-skull-crossbones text-red-500 mr-2"></i> El Muro de los Lamentos (Top 15 Peores
-                    Casos)</h2>
+                        class="fas fa-skull-crossbones text-red-500 mr-2"></i> Muro de los Lamentos (Riesgo Crítico)
+                </h2>
+
+                <button onclick="exportarHuesos()"
+                    class="bg-[#fd0019] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors">
+                    <i class="fas fa-file-excel"></i> Descargar Huesos
+                </button>
             </div>
-            <div class="overflow-auto scrollbar-thin">
+            <div class="overflow-auto scrollbar-thin max-h-[400px]">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wider">
+                    <thead
+                        class="bg-gray-100 text-gray-600 text-[10px] uppercase tracking-wider sticky top-0 z-10 shadow-sm">
                         <tr>
                             <th class="p-3 font-black text-center">Días</th>
                             <th class="p-3 font-black">Sucursal</th>
@@ -158,8 +180,10 @@
 
     <script>
         let chartInstance = null;
+        let globalData = []; // Guardamos los datos puros aquí
+        let colNames = {};   // Guardamos cómo se llaman las columnas
 
-        // Formateadores y Limpiadores Inmortales
+        // Formateadores y Limpiadores
         const fmtMoney = (val) => '$' + Number(val).toLocaleString('es-MX', { maximumFractionDigits: 0 });
         const fmtNum = (val) => Number(val).toLocaleString('es-MX');
 
@@ -179,58 +203,84 @@
                 dynamicTyping: false,
                 skipEmptyLines: true,
                 complete: function (results) {
-                    procesarDatos(results.data);
+                    prepararDatos(results.data);
                 }
             });
         });
 
-        function procesarDatos(rawData) {
+        function prepararDatos(rawData) {
             if (!rawData || rawData.length === 0) return;
 
-            // 🧠 EL RADAR INTELIGENTE DE COLUMNAS 🧠
-            // Lee los nombres exactos que traiga tu Excel, sin importar cómo vengan escritos
+            // Radar de Columnas
             const headers = Object.keys(rawData[0]);
             const findKey = (keywords) => headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw)));
 
-            const colCosto = findKey(['costo', 'inversión']) || 'Costo';
-            const colDias = findKey(['días', 'dias', 'antigüedad']) || 'Días en Inventario';
-            const colSucursal = findKey(['sucursal', 'agencia']) || 'Sucursal';
-            const colMarca = findKey(['marca']) || 'Marca';
-            const colModelo = findKey(['modelo', 'año']) || 'Modelo';
-            const colSubMarca = findKey(['submarca', 'sub marca', 'linea']) || 'SubMarca';
-            const colVersion = findKey(['versión', 'version']) || 'Versión';
-            const colVin = findKey(['vin', 'serie']) || 'VIN';
+            colNames = {
+                costo: findKey(['costo', 'inversión']) || 'Costo',
+                dias: findKey(['días', 'dias', 'antigüedad']) || 'Días en Inventario',
+                sucursal: findKey(['sucursal', 'agencia']) || 'Sucursal',
+                marca: findKey(['marca']) || 'Marca',
+                modelo: findKey(['modelo', 'año']) || 'Modelo',
+                subMarca: findKey(['submarca', 'sub marca', 'linea']) || 'SubMarca',
+                version: findKey(['versión', 'version']) || 'Versión',
+                vin: findKey(['vin', 'serie']) || 'VIN'
+            };
 
-            // Filtrar basura
-            const data = rawData.filter(d => d[colSucursal] && String(d[colSucursal]).trim() !== '' && !String(d[colMarca] || '').includes('MARCA-NA'));
+            // FILTRAR BASURA Y LA FILA "TOTAL" (BUG FIX)
+            globalData = rawData.filter(d => {
+                const suc = String(d[colNames.sucursal] || '').trim().toUpperCase();
+                // Ignorar si está vacío, o si dice "TOTAL", "SUBTOTAL"
+                if (!suc || suc === 'TOTAL' || suc === 'SUBTOTAL') return false;
+                if (String(d[colNames.marca] || '').includes('MARCA-NA')) return false;
+                return true;
+            });
 
-            let totalUnidades = 0;
-            let totalCosto = 0;
-            let totalDias = 0;
+            // Llenar el Dropdown de Sucursales
+            const sucursalesUnicas = [...new Set(globalData.map(d => String(d[colNames.sucursal]).trim().toUpperCase()))].sort();
+            const filterEl = document.getElementById('agencyFilter');
+            filterEl.innerHTML = '<option value="ALL">Todas las Sucursales</option>' +
+                sucursalesUnicas.map(s => `<option value="${s}">${s}</option>`).join('');
+            filterEl.classList.remove('hidden');
+
+            renderDashboard('ALL');
+
+            // Mostrar el dashboard
+            document.getElementById('welcomeState').style.display = 'none';
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        // Listener del Filtro
+        document.getElementById('agencyFilter').addEventListener('change', (e) => {
+            renderDashboard(e.target.value);
+        });
+
+        function renderDashboard(filtroSucursal) {
+            // Filtrar datos según el dropdown
+            const data = filtroSucursal === 'ALL'
+                ? globalData
+                : globalData.filter(d => String(d[colNames.sucursal]).trim().toUpperCase() === filtroSucursal);
+
+            let totalUnidades = 0; let totalCosto = 0; let totalDias = 0;
 
             const buckets = {
                 sano: { label: 'Sano (0-30 días)', color: '#10b981', count: 0, cost: 0 },
                 precaucion: { label: 'Precaución (31-60)', color: '#f59e0b', count: 0, cost: 0 },
                 alerta: { label: 'Alerta (61-90)', color: '#f97316', count: 0, cost: 0 },
-                hueso: { label: 'Tóxico / Hueso (>90)', color: '#fd0019', count: 0, cost: 0 }
+                hueso: { label: 'Tóxico (>90)', color: '#fd0019', count: 0, cost: 0 }
             };
 
             const agencias = {};
+            const marcasToxicas = {};
 
             data.forEach(row => {
-                // Usamos las columnas encontradas por el Radar
-                const costo = limpiarNumero(row[colCosto]);
-                const dias = limpiarNumero(row[colDias]);
-                const sucursal = String(row[colSucursal]).trim().toUpperCase();
+                const costo = limpiarNumero(row[colNames.costo]);
+                const dias = limpiarNumero(row[colNames.dias]);
+                const sucursal = String(row[colNames.sucursal]).trim().toUpperCase();
+                const marca = String(row[colNames.marca] || 'OTRA').trim().toUpperCase();
 
-                totalUnidades++;
-                totalCosto += costo;
-                totalDias += dias;
+                totalUnidades++; totalCosto += costo; totalDias += dias;
 
-                if (!agencias[sucursal]) {
-                    agencias[sucursal] = { total: 0, sano: 0, alerta: 0, hueso: 0, costoHueso: 0 };
-                }
-
+                if (!agencias[sucursal]) agencias[sucursal] = { total: 0, sano: 0, alerta: 0, hueso: 0, costoHueso: 0 };
                 agencias[sucursal].total++;
 
                 if (dias <= 30) {
@@ -246,6 +296,11 @@
                     buckets.hueso.count++; buckets.hueso.cost += costo;
                     agencias[sucursal].hueso++;
                     agencias[sucursal].costoHueso += costo;
+
+                    // Idea 2: Llenar Marcas Tóxicas
+                    if (!marcasToxicas[marca]) marcasToxicas[marca] = { count: 0, cost: 0 };
+                    marcasToxicas[marca].count++;
+                    marcasToxicas[marca].cost += costo;
                 }
             });
 
@@ -266,24 +321,43 @@
                     datasets: [{
                         data: Object.values(buckets).map(b => b.count),
                         backgroundColor: Object.values(buckets).map(b => b.color),
-                        borderWidth: 0,
-                        cutout: '75%'
+                        borderWidth: 0, cutout: '75%'
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
             document.getElementById('donutLegend').innerHTML = Object.values(buckets).map(b => `
-                <div class="flex justify-between items-center text-xs font-bold">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background:${b.color}"></span>
+                <div class="flex justify-between items-center text-[10px] font-bold">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background:${b.color}"></span>
                         <span class="text-gray-600">${b.label}</span>
                     </div>
-                    <span class="text-gray-900">${b.count} unids. <span class="text-gray-400 font-normal">(${fmtMoney(b.cost)})</span></span>
+                    <span class="text-gray-900">${b.count} ud. <span class="text-gray-400 font-normal">(${fmtMoney(b.cost)})</span></span>
                 </div>
             `).join('');
 
-            // 3. PINTAR RADIOGRAFÍA POR AGENCIA
+            // 3. PINTAR MARCAS TÓXICAS (NUEVO)
+            const marcasArr = Object.entries(marcasToxicas).map(([m, data]) => ({ name: m, ...data })).sort((a, b) => b.cost - a.cost).slice(0, 5);
+
+            if (marcasArr.length === 0) {
+                document.getElementById('toxicBrandsList').innerHTML = '<p class="text-xs text-green-600 font-bold"><i class="fas fa-check-circle"></i> No hay marcas en riesgo crítico.</p>';
+            } else {
+                const maxCost = marcasArr[0].cost;
+                document.getElementById('toxicBrandsList').innerHTML = marcasArr.map(m => `
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-gray-800">${m.name} <span class="text-gray-400 font-normal">(${m.count} ud)</span></span>
+                            <span class="text-[#fd0019]">${fmtMoney(m.cost)}</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5">
+                            <div class="bg-[#fd0019] h-1.5 rounded-full" style="width: ${(m.cost / maxCost) * 100}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 4. PINTAR RADIOGRAFÍA POR AGENCIA
             const agenciasArr = Object.entries(agencias).map(([name, obj]) => {
                 obj.pctHueso = (obj.hueso / obj.total) * 100;
                 obj.name = name;
@@ -297,32 +371,67 @@
                     <td class="p-3 font-bold text-gray-800">${ag.name}</td>
                     <td class="p-3 text-center font-bold text-gray-600">${ag.total}</td>
                     <td class="p-3 text-center font-bold text-green-600">${ag.sano}</td>
-                    <td class="p-3 text-center font-bold text-yellow-500">${ag.alerta}</td>
                     <td class="p-3 text-center font-black text-[#fd0019]">${ag.hueso}</td>
                     <td class="p-3 text-right font-black ${bgHueso}">${ag.pctHueso.toFixed(1)}%</td>
                     <td class="p-3 text-right font-black text-[#fd0019] bg-red-50/50">${fmtMoney(ag.costoHueso)}</td>
                 </tr>
             `}).join('');
 
-            // 4. PINTAR MURO DE LOS LAMENTOS
-            const peores = [...data].sort((a, b) => limpiarNumero(b[colDias]) - limpiarNumero(a[colDias])).slice(0, 15);
+            // 5. PINTAR MURO DE LOS LAMENTOS
+            // Filtramos solo los de >90 días y agarramos todos (o los peores 50)
+            const peores = data.filter(a => limpiarNumero(a[colNames.dias]) > 90)
+                .sort((a, b) => limpiarNumero(b[colNames.dias]) - limpiarNumero(a[colNames.dias]));
 
-            document.getElementById('worstTbody').innerHTML = peores.map(auto => `
-                <tr class="hover:bg-red-50 transition-colors group">
-                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${limpiarNumero(auto[colDias])}</td>
-                    <td class="p-3 font-bold text-gray-800 uppercase">${auto[colSucursal] || 'N/A'}</td>
-                    <td class="p-3">
-                        <p class="font-black text-gray-900">${auto[colModelo] || ''} ${auto[colMarca] || ''} ${auto[colSubMarca] || ''}</p>
-                        <p class="text-[9px] text-gray-400 mt-0.5">${auto[colVersion] || ''}</p>
-                    </td>
-                    <td class="p-3 font-mono text-gray-500 text-[10px]">${auto[colVin] || 'N/A'}</td>
-                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(limpiarNumero(auto[colCosto]))}</td>
-                </tr>
-            `).join('');
+            if (peores.length === 0) {
+                document.getElementById('worstTbody').innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500 font-bold">¡Inventario Limpio! No hay unidades mayores a 90 días.</td></tr>';
+            } else {
+                document.getElementById('worstTbody').innerHTML = peores.map(auto => `
+                    <tr class="hover:bg-red-50 transition-colors group">
+                        <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${limpiarNumero(auto[colNames.dias])}</td>
+                        <td class="p-3 font-bold text-gray-800 uppercase">${auto[colNames.sucursal] || 'N/A'}</td>
+                        <td class="p-3">
+                            <p class="font-black text-gray-900">${auto[colNames.modelo] || ''} ${auto[colNames.marca] || ''} ${auto[colNames.subMarca] || ''}</p>
+                            <p class="text-[9px] text-gray-400 mt-0.5">${auto[colNames.version] || ''}</p>
+                        </td>
+                        <td class="p-3 font-mono text-gray-500 text-[10px]">${auto[colNames.vin] || 'N/A'}</td>
+                        <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(limpiarNumero(auto[colNames.costo]))}</td>
+                    </tr>
+                `).join('');
+            }
+        }
 
-            // Mostrar el dashboard
-            document.getElementById('welcomeState').style.display = 'none';
-            document.getElementById('dashboard').classList.remove('hidden');
+        // IDEA 3: FUNCIÓN EXPORTAR EXCEL
+        function exportarHuesos() {
+            if (globalData.length === 0) return alert("Primero carga un archivo CSV.");
+
+            // Filtramos los > 90 días de TODA la base o de la sucursal seleccionada
+            const filtro = document.getElementById('agencyFilter').value;
+            let dataExportar = filtro === 'ALL' ? globalData : globalData.filter(d => String(d[colNames.sucursal]).trim().toUpperCase() === filtro);
+
+            const huesos = dataExportar.filter(row => limpiarNumero(row[colNames.dias]) > 90)
+                .sort((a, b) => limpiarNumero(b[colNames.dias]) - limpiarNumero(a[colNames.dias]));
+
+            if (huesos.length === 0) return alert("No hay inventario tóxico (>90 días) para exportar.");
+
+            // Mapear a un Excel limpio
+            const cleanData = huesos.map(h => ({
+                'Días Inventario': limpiarNumero(h[colNames.dias]),
+                'Sucursal': h[colNames.sucursal],
+                'Marca': h[colNames.marca],
+                'Modelo/Año': h[colNames.modelo],
+                'SubMarca': h[colNames.subMarca],
+                'VIN': h[colNames.vin],
+                'Costo ($)': limpiarNumero(h[colNames.costo])
+            }));
+
+            // Convertir a CSV (con acentos soportados por Excel)
+            const csv = Papa.unparse(cleanData);
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Inventario_Toxico_${filtro}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
         }
     </script>
 </body>
