@@ -159,7 +159,7 @@
     <script>
         let chartInstance = null;
 
-        // Formateadores y Limpiadores
+        // Formateadores y Limpiadores Inmortales
         const fmtMoney = (val) => '$' + Number(val).toLocaleString('es-MX', { maximumFractionDigits: 0 });
         const fmtNum = (val) => Number(val).toLocaleString('es-MX');
 
@@ -176,7 +176,7 @@
 
             Papa.parse(file, {
                 header: true,
-                dynamicTyping: false, // Forzamos texto para limpiarlo nosotros mismos
+                dynamicTyping: false,
                 skipEmptyLines: true,
                 complete: function (results) {
                     procesarDatos(results.data);
@@ -185,14 +185,29 @@
         });
 
         function procesarDatos(rawData) {
-            // Filtrar basura (SIN CLASIFICAR, etc) asegurando que Sucursal exista
-            const data = rawData.filter(d => d.Sucursal && String(d.Sucursal).trim() !== '' && !String(d.Marca || '').includes('MARCA-NA'));
+            if (!rawData || rawData.length === 0) return;
+
+            // 🧠 EL RADAR INTELIGENTE DE COLUMNAS 🧠
+            // Lee los nombres exactos que traiga tu Excel, sin importar cómo vengan escritos
+            const headers = Object.keys(rawData[0]);
+            const findKey = (keywords) => headers.find(h => keywords.some(kw => h.toLowerCase().includes(kw)));
+
+            const colCosto = findKey(['costo', 'inversión']) || 'Costo';
+            const colDias = findKey(['días', 'dias', 'antigüedad']) || 'Días en Inventario';
+            const colSucursal = findKey(['sucursal', 'agencia']) || 'Sucursal';
+            const colMarca = findKey(['marca']) || 'Marca';
+            const colModelo = findKey(['modelo', 'año']) || 'Modelo';
+            const colSubMarca = findKey(['submarca', 'sub marca', 'linea']) || 'SubMarca';
+            const colVersion = findKey(['versión', 'version']) || 'Versión';
+            const colVin = findKey(['vin', 'serie']) || 'VIN';
+
+            // Filtrar basura
+            const data = rawData.filter(d => d[colSucursal] && String(d[colSucursal]).trim() !== '' && !String(d[colMarca] || '').includes('MARCA-NA'));
 
             let totalUnidades = 0;
             let totalCosto = 0;
             let totalDias = 0;
 
-            // Buckets para la Dona
             const buckets = {
                 sano: { label: 'Sano (0-30 días)', color: '#10b981', count: 0, cost: 0 },
                 precaucion: { label: 'Precaución (31-60)', color: '#f59e0b', count: 0, cost: 0 },
@@ -200,33 +215,30 @@
                 hueso: { label: 'Tóxico / Hueso (>90)', color: '#fd0019', count: 0, cost: 0 }
             };
 
-            // Agrupación por Sucursal
             const agencias = {};
 
             data.forEach(row => {
-                // APLICANDO EL LIMPIADOR INMORTAL
-                const costo = limpiarNumero(row.Costo || row.costo || row.COSTO);
-                const dias = limpiarNumero(row['Días en Inventario'] || row['días en inventario'] || row['DIAS EN INVENTARIO']);
-                const sucursal = String(row.Sucursal).trim().toUpperCase();
+                // Usamos las columnas encontradas por el Radar
+                const costo = limpiarNumero(row[colCosto]);
+                const dias = limpiarNumero(row[colDias]);
+                const sucursal = String(row[colSucursal]).trim().toUpperCase();
 
                 totalUnidades++;
                 totalCosto += costo;
                 totalDias += dias;
 
-                // Inicializar agencia
                 if (!agencias[sucursal]) {
                     agencias[sucursal] = { total: 0, sano: 0, alerta: 0, hueso: 0, costoHueso: 0 };
                 }
 
                 agencias[sucursal].total++;
 
-                // Llenar Buckets y Agencias
                 if (dias <= 30) {
                     buckets.sano.count++; buckets.sano.cost += costo;
                     agencias[sucursal].sano++;
                 } else if (dias <= 60) {
                     buckets.precaucion.count++; buckets.precaucion.cost += costo;
-                    agencias[sucursal].sano++; // Sano extendido para la tabla
+                    agencias[sucursal].sano++;
                 } else if (dias <= 90) {
                     buckets.alerta.count++; buckets.alerta.cost += costo;
                     agencias[sucursal].alerta++;
@@ -244,7 +256,7 @@
             document.getElementById('kpiRiesgoPct').innerText = `${((buckets.hueso.cost / (totalCosto || 1)) * 100).toFixed(1)}% del capital total`;
             document.getElementById('kpiDiasPromedio').innerText = Math.round(totalDias / (totalUnidades || 1)) + ' Días';
 
-            // 2. PINTAR DONA (CHART.JS)
+            // 2. PINTAR DONA
             const ctx = document.getElementById('donutChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
@@ -261,7 +273,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // Leyenda HTML de la dona
             document.getElementById('donutLegend').innerHTML = Object.values(buckets).map(b => `
                 <div class="flex justify-between items-center text-xs font-bold">
                     <div class="flex items-center gap-2">
@@ -294,22 +305,22 @@
             `}).join('');
 
             // 4. PINTAR MURO DE LOS LAMENTOS
-            const peores = [...data].sort((a, b) => limpiarNumero(b['Días en Inventario']) - limpiarNumero(a['Días en Inventario'])).slice(0, 15);
+            const peores = [...data].sort((a, b) => limpiarNumero(b[colDias]) - limpiarNumero(a[colDias])).slice(0, 15);
 
             document.getElementById('worstTbody').innerHTML = peores.map(auto => `
                 <tr class="hover:bg-red-50 transition-colors group">
-                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${limpiarNumero(auto['Días en Inventario'])}</td>
-                    <td class="p-3 font-bold text-gray-800 uppercase">${auto.Sucursal || 'N/A'}</td>
+                    <td class="p-3 font-black text-white bg-[#fd0019] text-center rounded-l-lg">${limpiarNumero(auto[colDias])}</td>
+                    <td class="p-3 font-bold text-gray-800 uppercase">${auto[colSucursal] || 'N/A'}</td>
                     <td class="p-3">
-                        <p class="font-black text-gray-900">${auto.Modelo || ''} ${auto.Marca || ''} ${auto.SubMarca || ''}</p>
-                        <p class="text-[9px] text-gray-400 mt-0.5">${auto.Versión || ''}</p>
+                        <p class="font-black text-gray-900">${auto[colModelo] || ''} ${auto[colMarca] || ''} ${auto[colSubMarca] || ''}</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">${auto[colVersion] || ''}</p>
                     </td>
-                    <td class="p-3 font-mono text-gray-500 text-[10px]">${auto.VIN || 'N/A'}</td>
-                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(limpiarNumero(auto.Costo))}</td>
+                    <td class="p-3 font-mono text-gray-500 text-[10px]">${auto[colVin] || 'N/A'}</td>
+                    <td class="p-3 text-right font-black text-[#fd0019]">${fmtMoney(limpiarNumero(auto[colCosto]))}</td>
                 </tr>
             `).join('');
 
-            // Ocultar bienvenida y mostrar dashboard
+            // Mostrar el dashboard
             document.getElementById('welcomeState').style.display = 'none';
             document.getElementById('dashboard').classList.remove('hidden');
         }
